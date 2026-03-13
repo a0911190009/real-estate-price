@@ -2,10 +2,13 @@
 """
 房仲工具 — 實價登錄調查（real-estate-price）
 查詢內政部實價登錄、附近成交價，與物件庫整合。
-目前為最小架構，後續可加入：批次匯入 CSV、依地址查詢、與物件庫連動。
+資料儲存在 GCS：price/price_data_v.json（臺東縣）
 """
 
 import os
+import json
+import time
+import threading
 from flask import Flask, request, session, redirect, jsonify, send_from_directory
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
@@ -31,9 +34,51 @@ app.config["SESSION_COOKIE_SECURE"] = _is_production
 
 PORTAL_URL = (os.environ.get("PORTAL_URL") or "").strip()
 ADMIN_EMAILS = [e.strip() for e in (os.environ.get("ADMIN_EMAILS") or "").split(",") if e.strip()]
+GCS_BUCKET = (os.environ.get("GCS_BUCKET") or "").strip()
+PRICE_DATA_GCS_KEY = "price/price_data_v.json"   # GCS 上的路徑
+LOCAL_DATA_PATH = os.path.join(os.path.dirname(__file__), "price_data_v.json")
 
 TOKEN_SERIALIZER = URLSafeTimedSerializer(app.secret_key)
 TOKEN_MAX_AGE = 300
+
+# ── 資料快取（從 GCS 或本地讀取，每小時重新整理）────────────────────
+_data_cache = []
+_data_cache_ts = 0.0
+_data_lock = threading.Lock()
+
+
+def _load_price_data():
+    """從 GCS 或本地讀取實價登錄資料，附帶快取（1小時）。"""
+    global _data_cache, _data_cache_ts
+
+    with _data_lock:
+        # 快取有效直接回傳
+        if _data_cache and (time.time() - _data_cache_ts) < 3600:
+            return _data_cache
+
+        data = []
+
+        if GCS_BUCKET:
+            # Cloud Run 環境：從 GCS 讀取
+            try:
+                from google.cloud import storage
+                client = storage.Client()
+                bucket = client.bucket(GCS_BUCKET)
+                blob = bucket.blob(PRICE_DATA_GCS_KEY)
+                content = blob.download_as_text(encoding='utf-8')
+                data = json.loads(content)
+            except Exception as e:
+                import logging
+                logging.error(f'GCS 讀取失敗：{e}')
+        else:
+            # 本機開發：從本地 JSON 讀取
+            if os.path.isfile(LOCAL_DATA_PATH):
+                with open(LOCAL_DATA_PATH, encoding='utf-8') as f:
+                    data = json.load(f)
+
+        _data_cache = data
+        _data_cache_ts = time.time()
+        return data
 
 
 def _is_admin(email):
@@ -100,163 +145,125 @@ def index():
     return redirect(PORTAL_URL or "/")
 
 
-# ── 假資料：台東地區近期成交紀錄 ──────────────────────────────────────
-_FAKE_DATA = [
-    {
-        "id": "1",
-        "address": "台東縣台東市中華路一段 120 號",
-        "district": "台東市",
-        "type": "住宅大樓",
-        "total_price": 580,        # 萬元
-        "unit_price": 14.2,        # 萬/坪
-        "building_ping": 40.8,     # 坪
-        "floor": "5/12",
-        "age": 12,
-        "date": "2025-11",
-        "lat": 22.7583,
-        "lng": 121.1444,
-    },
-    {
-        "id": "2",
-        "address": "台東縣台東市更生路 88 號",
-        "district": "台東市",
-        "type": "公寓",
-        "total_price": 320,
-        "unit_price": 10.5,
-        "building_ping": 30.5,
-        "floor": "3/5",
-        "age": 28,
-        "date": "2025-10",
-        "lat": 22.7521,
-        "lng": 121.1502,
-    },
-    {
-        "id": "3",
-        "address": "台東縣台東市四維路 210 號",
-        "district": "台東市",
-        "type": "透天厝",
-        "total_price": 950,
-        "unit_price": 16.8,
-        "building_ping": 56.5,
-        "floor": "1/3",
-        "age": 20,
-        "date": "2025-12",
-        "lat": 22.7650,
-        "lng": 121.1380,
-    },
-    {
-        "id": "4",
-        "address": "台東縣台東市正氣路 45 號",
-        "district": "台東市",
-        "type": "住宅大樓",
-        "total_price": 460,
-        "unit_price": 13.1,
-        "building_ping": 35.1,
-        "floor": "8/14",
-        "age": 8,
-        "date": "2025-09",
-        "lat": 22.7555,
-        "lng": 121.1460,
-    },
-    {
-        "id": "5",
-        "address": "台東縣卑南鄉知本路三段 300 號",
-        "district": "卑南鄉",
-        "type": "透天厝",
-        "total_price": 780,
-        "unit_price": 12.3,
-        "building_ping": 63.4,
-        "floor": "1/3",
-        "age": 15,
-        "date": "2025-11",
-        "lat": 22.7012,
-        "lng": 121.0845,
-    },
-    {
-        "id": "6",
-        "address": "台東縣台東市鐵花路 60 號",
-        "district": "台東市",
-        "type": "店面",
-        "total_price": 1200,
-        "unit_price": 30.2,
-        "building_ping": 39.7,
-        "floor": "1/6",
-        "age": 35,
-        "date": "2026-01",
-        "lat": 22.7600,
-        "lng": 121.1430,
-    },
-    {
-        "id": "7",
-        "address": "台東縣台東市長沙街 15 號",
-        "district": "台東市",
-        "type": "公寓",
-        "total_price": 290,
-        "unit_price": 9.8,
-        "building_ping": 29.6,
-        "floor": "2/4",
-        "age": 40,
-        "date": "2025-08",
-        "lat": 22.7540,
-        "lng": 121.1490,
-    },
-    {
-        "id": "8",
-        "address": "台東縣台東市大同路 180 號",
-        "district": "台東市",
-        "type": "住宅大樓",
-        "total_price": 620,
-        "unit_price": 15.5,
-        "building_ping": 40.0,
-        "floor": "10/16",
-        "age": 5,
-        "date": "2026-02",
-        "lat": 22.7570,
-        "lng": 121.1415,
-    },
-]
-
-
 @app.route("/api/search", methods=["POST"])
 def api_search():
     """
-    查詢附近成交紀錄。
-    目前回傳假資料，之後換成真實資料庫查詢。
-    輸入：{ "query": "地址或區域", "lat": 22.75, "lng": 121.14, "radius_m": 2000 }
+    查詢實價登錄成交紀錄。
+    輸入：{
+      "query": "地址或區域關鍵字",
+      "district": "鄉鎮市區（可選）",
+      "transaction_type": "交易標的類型（可選）",
+      "min_price": 數字（萬，可選）,
+      "max_price": 數字（萬，可選）,
+      "min_ping": 數字（坪，可選）,
+      "max_ping": 數字（坪，可選）,
+      "sort": "date_desc|date_asc|price_desc|price_asc|unit_desc|unit_asc",
+      "limit": 數字（預設 100）
+    }
     """
     email, err = _require_user()
     if err:
         return jsonify(err[0]), err[1]
 
-    data = request.get_json() or {}
-    query = (data.get("query") or "").strip()
-    radius_m = int(data.get("radius_m") or 2000)
+    body = request.get_json() or {}
+    query = (body.get("query") or "").strip()
+    district = (body.get("district") or "").strip()
+    transaction_type = (body.get("transaction_type") or "").strip()
+    min_price = body.get("min_price")   # 萬元
+    max_price = body.get("max_price")
+    min_ping = body.get("min_ping")     # 坪
+    max_ping = body.get("max_ping")
+    sort_by = (body.get("sort") or "date_desc").strip()
+    limit = min(int(body.get("limit") or 100), 500)
 
-    # 目前直接回傳全部假資料，之後可依 query/lat/lng 過濾
-    results = _FAKE_DATA
+    # 讀取資料
+    all_data = _load_price_data()
 
-    # 計算統計摘要
+    # ── 篩選 ──────────────────────────────────────────────────────────
+    results = []
+    for r in all_data:
+        # 關鍵字（地址 / 地段）
+        if query:
+            addr = r.get("address", "")
+            if query not in addr:
+                continue
+
+        # 鄉鎮市區
+        if district and r.get("district") != district:
+            continue
+
+        # 交易標的類型
+        if transaction_type and transaction_type not in r.get("transaction_type", ""):
+            continue
+
+        # 總價範圍（萬）
+        total = r.get("total_price", 0)
+        if min_price is not None and total < float(min_price):
+            continue
+        if max_price is not None and total > float(max_price):
+            continue
+
+        # 建物面積範圍（坪）
+        ping = r.get("building_ping", 0)
+        if min_ping is not None and ping < float(min_ping):
+            continue
+        if max_ping is not None and ping > float(max_ping):
+            continue
+
+        results.append(r)
+
+    # ── 排序 ──────────────────────────────────────────────────────────
+    sort_map = {
+        "date_desc":  lambda x: x.get("date", ""),
+        "date_asc":   lambda x: x.get("date", ""),
+        "price_desc": lambda x: x.get("total_price", 0),
+        "price_asc":  lambda x: x.get("total_price", 0),
+        "unit_desc":  lambda x: x.get("unit_price", 0),
+        "unit_asc":   lambda x: x.get("unit_price", 0),
+    }
+    reverse_map = {
+        "date_desc": True, "date_asc": False,
+        "price_desc": True, "price_asc": False,
+        "unit_desc": True, "unit_asc": False,
+    }
+    key_fn = sort_map.get(sort_by, sort_map["date_desc"])
+    reverse = reverse_map.get(sort_by, True)
+    results.sort(key=key_fn, reverse=reverse)
+
+    # 限制筆數
+    total_count = len(results)
+    results = results[:limit]
+
+    # ── 統計摘要 ──────────────────────────────────────────────────────
     if results:
+        # 只計算有建物面積的（排除純土地）
+        with_unit = [r for r in results if r.get("unit_price", 0) > 0]
         prices = [r["total_price"] for r in results]
-        unit_prices = [r["unit_price"] for r in results]
         summary = {
-            "count": len(results),
+            "count": total_count,
+            "shown": len(results),
             "avg_total": round(sum(prices) / len(prices), 1),
             "max_total": max(prices),
             "min_total": min(prices),
-            "avg_unit": round(sum(unit_prices) / len(unit_prices), 1),
-            "max_unit": max(unit_prices),
-            "min_unit": min(unit_prices),
+            "avg_unit": round(sum(r["unit_price"] for r in with_unit) / len(with_unit), 1) if with_unit else 0,
+            "max_unit": max((r["unit_price"] for r in with_unit), default=0),
+            "min_unit": min((r["unit_price"] for r in with_unit if r["unit_price"] > 0), default=0),
         }
     else:
-        summary = {"count": 0}
+        summary = {"count": 0, "shown": 0}
+
+    # ── 可用的篩選選項（供前端下拉選單） ─────────────────────────────
+    all_districts = sorted(set(r.get("district", "") for r in all_data if r.get("district")))
+    all_types = sorted(set(r.get("transaction_type", "") for r in all_data if r.get("transaction_type")))
 
     return jsonify({
         "results": results,
         "summary": summary,
-        "query": query,
-        "radius_m": radius_m,
-        "is_mock": True,   # 標記這是假資料，前端可顯示提示
+        "filter_options": {
+            "districts": all_districts,
+            "transaction_types": all_types,
+        },
+        "is_mock": False,
     })
 
 
