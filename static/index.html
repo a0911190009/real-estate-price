@@ -4,43 +4,628 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>實價登錄調查</title>
+
+  <!-- Leaflet 地圖 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #0f172a; --surface: #1e293b; --border: #334155;
-      --text: #e2e8f0; --text-muted: #94a3b8; --primary: #3b82f6;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #263347;
+      --border: #334155;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
     }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg); color: var(--text);
-      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
-    .card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-      padding: 2rem; max-width: 420px; text-align: center;
+
+    /* ── 頂部工具列 ── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 100;
     }
-    .card h1 { font-size: 1.25rem; margin-bottom: 0.5rem; }
-    .card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
-    .card a {
-      display: inline-block; padding: 0.5rem 1rem; background: var(--primary); color: #fff;
-      text-decoration: none; border-radius: 8px; font-size: 0.9rem;
+    .topbar-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .card a:hover { opacity: 0.9; }
+    .topbar-logo span { color: var(--text-muted); font-size: 0.75rem; font-weight: 400; }
+
+    /* 搜尋框 */
+    .search-wrap {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      max-width: 560px;
+    }
+    .search-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .search-input::placeholder { color: var(--text-muted); }
+
+    /* 半徑選單 */
+    .radius-select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
+
+    /* 返回入口按鈕 */
+    .btn-portal {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-portal:hover { color: var(--text); border-color: var(--text-muted); }
+
+    /* ── 主內容區（左右分割） ── */
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── 左側面板 ── */
+    .panel {
+      width: 420px;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* 統計摘要區 */
+    .summary-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      flex-shrink: 0;
+    }
+    .summary-bar.hidden { display: none; }
+    .summary-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mock-badge {
+      background: #78350f;
+      color: #fde68a;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .stat-item {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* 結果清單 */
+    .results-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .results-list::-webkit-scrollbar { width: 4px; }
+    .results-list::-webkit-scrollbar-track { background: transparent; }
+    .results-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* 空白佔位 */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--text-muted);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .empty-state .icon { font-size: 3rem; opacity: 0.4; }
+    .empty-state p { font-size: 0.9rem; line-height: 1.6; }
+
+    /* 成交卡片 */
+    .record-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .record-card:hover { border-color: var(--primary); background: var(--surface2); }
+    .record-card.active { border-color: var(--primary); background: var(--surface2); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    .card-addr {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      flex: 1;
+      margin-right: 8px;
+    }
+    .card-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--danger);
+      white-space: nowrap;
+    }
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .tag {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--surface2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .tag.type { color: #93c5fd; border-color: #1d4ed8; background: #1e3a5f; }
+    .tag.date { color: #86efac; border-color: #166534; background: #14401f; }
+    .card-unit {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .card-unit strong { color: var(--warning); }
+
+    /* Loading */
+    .loading-spinner {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── 右側地圖 ── */
+    #map {
+      flex: 1;
+      z-index: 1;
+    }
+
+    /* Leaflet popup 客製化 */
+    .leaflet-popup-content-wrapper {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+    }
+    .leaflet-popup-tip { background: var(--surface) !important; }
+    .popup-inner { padding: 2px; min-width: 180px; }
+    .popup-addr { font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+    .popup-price { font-size: 1.1rem; font-weight: 700; color: var(--danger); }
+    .popup-unit { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .popup-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+    /* 自訂地圖標記 */
+    .price-marker {
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 12px;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      border: 1.5px solid rgba(255,255,255,0.3);
+    }
+    .price-marker.active {
+      background: var(--primary);
+      transform: scale(1.15);
+    }
+
+    /* 響應式：小螢幕 */
+    @media (max-width: 700px) {
+      .panel { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); }
+      .main { flex-direction: column; }
+      #map { min-height: 260px; }
+      .search-wrap { max-width: unset; }
+      .radius-select { display: none; }
+      .topbar-logo span { display: none; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>📊 實價登錄調查系統</h1>
-    <p>查詢內政部實價登錄、附近成交價，與物件庫整合。此工具正在開發中，敬請期待。</p>
-    <a href="#" id="btn-portal">返回入口</a>
+
+<!-- ── 頂部工具列 ── -->
+<header class="topbar">
+  <div class="topbar-logo">
+    📊 實價登錄
+    <span>附近成交查詢</span>
   </div>
-  <script>
-    (function() {
-      fetch('/api/config').then(function(r) { return r.json(); }).then(function(cfg) {
-        var url = (cfg.portal_url || '').replace(/\/$/, '');
-        if (url) document.getElementById('btn-portal').href = url;
-      }).catch(function() {});
-    })();
-  </script>
+
+  <div class="search-wrap">
+    <input id="search-input" class="search-input" type="text"
+      placeholder="輸入地址或區域，如：台東市中華路"
+      autocomplete="off">
+    <select id="radius-select" class="radius-select" title="搜尋半徑">
+      <option value="500">500m</option>
+      <option value="1000">1km</option>
+      <option value="2000" selected>2km</option>
+      <option value="5000">5km</option>
+    </select>
+    <button class="btn btn-primary" onclick="doSearch()">查詢</button>
+  </div>
+
+  <a id="btn-portal" href="/" class="btn-portal">🏠 入口</a>
+</header>
+
+<!-- ── 主內容 ── -->
+<div class="main">
+
+  <!-- 左側面板 -->
+  <div class="panel">
+
+    <!-- 統計摘要 -->
+    <div id="summary-bar" class="summary-bar hidden">
+      <div class="summary-title">
+        <span id="summary-count">共 0 筆</span>
+        <span id="mock-badge" class="mock-badge hidden">⚠ 示範資料</span>
+      </div>
+      <div class="summary-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="stat-avg-unit">—</div>
+          <div class="stat-label">平均單價（萬/坪）</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-max-total">—</div>
+          <div class="stat-label">最高總價（萬）</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-min-total">—</div>
+          <div class="stat-label">最低總價（萬）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 載入中 -->
+    <div id="loading" class="loading-spinner">
+      <div class="spinner"></div>
+      <span>查詢中…</span>
+    </div>
+
+    <!-- 空白佔位 -->
+    <div id="empty-state" class="empty-state">
+      <div class="icon">🏡</div>
+      <p>輸入地址或區域<br>查詢附近實價登錄成交紀錄</p>
+    </div>
+
+    <!-- 成交清單 -->
+    <div id="results-list" class="results-list" style="display:none;"></div>
+
+  </div>
+
+  <!-- 右側地圖 -->
+  <div id="map"></div>
+
+</div>
+
+<script>
+// ── 全域狀態 ──────────────────────────────────────────────────────────
+var _portalUrl = '/';
+var _map = null;
+var _markers = {};        // id -> Leaflet marker
+var _activeId = null;     // 目前選中的成交紀錄 id
+var _results = [];        // 目前查詢結果
+
+// ── 初始化 ────────────────────────────────────────────────────────────
+(function init() {
+  // 取得 Portal URL
+  fetch('/api/config').then(function(r) { return r.json(); }).then(function(cfg) {
+    _portalUrl = (cfg.portal_url || '').replace(/\/?$/, '') || '/';
+    document.getElementById('btn-portal').href = _portalUrl;
+  }).catch(function() {});
+
+  // 驗證登入
+  fetch('/api/me').then(function(r) {
+    if (r.status === 401) {
+      window.location.href = _portalUrl;
+    }
+    return r.json();
+  }).catch(function() {});
+
+  // 初始化地圖（預設台東市中心）
+  _map = L.map('map', { zoomControl: true }).setView([22.7583, 121.1444], 14);
+
+  // OSM 底圖
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19,
+  }).addTo(_map);
+
+  // Enter 鍵觸發搜尋
+  document.getElementById('search-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doSearch();
+  });
+})();
+
+// ── 執行搜尋 ──────────────────────────────────────────────────────────
+function doSearch() {
+  var query = document.getElementById('search-input').value.trim();
+  var radius = parseInt(document.getElementById('radius-select').value) || 2000;
+
+  // 顯示 loading
+  setLoadingState(true);
+
+  fetch('/api/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: query, radius_m: radius }),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    setLoadingState(false);
+    if (data.error) {
+      alert('查詢失敗：' + data.error);
+      return;
+    }
+    renderResults(data);
+  })
+  .catch(function(err) {
+    setLoadingState(false);
+    alert('連線錯誤，請稍後再試。');
+    console.error(err);
+  });
+}
+
+// ── 渲染結果 ──────────────────────────────────────────────────────────
+function renderResults(data) {
+  _results = data.results || [];
+  var summary = data.summary || {};
+  var isMock = data.is_mock;
+
+  // 更新統計摘要
+  var summaryBar = document.getElementById('summary-bar');
+  if (_results.length > 0) {
+    summaryBar.classList.remove('hidden');
+    document.getElementById('summary-count').textContent = '共 ' + _results.length + ' 筆成交紀錄';
+    document.getElementById('stat-avg-unit').textContent = summary.avg_unit || '—';
+    document.getElementById('stat-max-total').textContent = summary.max_total || '—';
+    document.getElementById('stat-min-total').textContent = summary.min_total || '—';
+    var mockBadge = document.getElementById('mock-badge');
+    if (isMock) mockBadge.classList.remove('hidden');
+    else mockBadge.classList.add('hidden');
+  } else {
+    summaryBar.classList.add('hidden');
+  }
+
+  // 清除舊標記
+  Object.values(_markers).forEach(function(m) { _map.removeLayer(m); });
+  _markers = {};
+  _activeId = null;
+
+  // 渲染清單
+  var list = document.getElementById('results-list');
+  var empty = document.getElementById('empty-state');
+
+  if (_results.length === 0) {
+    list.style.display = 'none';
+    empty.style.display = 'flex';
+    empty.innerHTML = '<div class="icon">🔍</div><p>沒有找到符合條件的成交紀錄</p>';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display = 'flex';
+
+  var html = '';
+  _results.forEach(function(r) {
+    html += '<div class="record-card" id="card-' + r.id + '" onclick="selectRecord(\'' + r.id + '\')">' +
+      '<div class="card-header">' +
+        '<div class="card-addr">' + escHtml(r.address) + '</div>' +
+        '<div class="card-price">' + r.total_price + ' 萬</div>' +
+      '</div>' +
+      '<div class="card-meta">' +
+        '<span class="tag type">' + escHtml(r.type) + '</span>' +
+        '<span class="tag">' + r.building_ping + ' 坪</span>' +
+        '<span class="tag">' + r.floor + ' 樓</span>' +
+        '<span class="tag">屋齡 ' + r.age + ' 年</span>' +
+        '<span class="tag date">' + r.date + '</span>' +
+      '</div>' +
+      '<div class="card-unit">單價 <strong>' + r.unit_price + ' 萬/坪</strong></div>' +
+    '</div>';
+  });
+  list.innerHTML = html;
+
+  // 在地圖上加標記
+  var bounds = [];
+  _results.forEach(function(r) {
+    if (!r.lat || !r.lng) return;
+    var icon = L.divIcon({
+      className: '',
+      html: '<div class="price-marker">' + r.total_price + '萬</div>',
+      iconAnchor: [30, 12],
+    });
+    var marker = L.marker([r.lat, r.lng], { icon: icon }).addTo(_map);
+    marker.bindPopup(buildPopup(r), { maxWidth: 240 });
+    marker.on('click', function() { selectRecord(r.id); });
+    _markers[r.id] = marker;
+    bounds.push([r.lat, r.lng]);
+  });
+
+  // 自動縮放到所有標記
+  if (bounds.length > 0) {
+    _map.fitBounds(bounds, { padding: [40, 40] });
+  }
+}
+
+// ── 選取成交紀錄（地圖 ↔ 清單同步） ────────────────────────────────
+function selectRecord(id) {
+  // 清除上一個選中
+  if (_activeId) {
+    var prevCard = document.getElementById('card-' + _activeId);
+    if (prevCard) prevCard.classList.remove('active');
+    var prevMarker = _markers[_activeId];
+    if (prevMarker) {
+      var el = prevMarker.getElement();
+      if (el) el.querySelector('.price-marker').classList.remove('active');
+    }
+  }
+
+  _activeId = id;
+
+  // 高亮卡片
+  var card = document.getElementById('card-' + id);
+  if (card) {
+    card.classList.add('active');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // 高亮標記 + 開啟 popup
+  var marker = _markers[id];
+  if (marker) {
+    var el = marker.getElement();
+    if (el) el.querySelector('.price-marker').classList.add('active');
+    marker.openPopup();
+    _map.panTo(marker.getLatLng(), { animate: true });
+  }
+}
+
+// ── 建立 popup HTML ──────────────────────────────────────────────────
+function buildPopup(r) {
+  return '<div class="popup-inner">' +
+    '<div class="popup-addr">' + escHtml(r.address) + '</div>' +
+    '<div class="popup-price">' + r.total_price + ' 萬元</div>' +
+    '<div class="popup-unit">單價 ' + r.unit_price + ' 萬/坪 ｜ ' + r.building_ping + ' 坪</div>' +
+    '<div class="popup-meta">' +
+      '<span class="tag type">' + escHtml(r.type) + '</span>' +
+      '<span class="tag">' + r.floor + ' 樓</span>' +
+      '<span class="tag date">' + r.date + '</span>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── UI 狀態切換 ──────────────────────────────────────────────────────
+function setLoadingState(on) {
+  document.getElementById('loading').style.display = on ? 'flex' : 'none';
+  document.getElementById('results-list').style.display = on ? 'none' : '';
+  document.getElementById('empty-state').style.display = on ? 'none' : '';
+  document.getElementById('summary-bar').classList.add('hidden');
+  if (on) document.getElementById('results-list').style.display = 'none';
+}
+
+// ── 工具函式 ─────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+</script>
 </body>
 </html>
