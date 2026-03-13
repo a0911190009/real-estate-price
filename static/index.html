@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>實價登錄調查</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f172a; --surface: #1e293b; --border: #334155;
+      --text: #e2e8f0; --text-muted: #94a3b8; --primary: #3b82f6;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 2rem; max-width: 420px; text-align: center;
+    }
+    .card h1 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .card a {
+      display: inline-block; padding: 0.5rem 1rem; background: var(--primary); color: #fff;
+      text-decoration: none; border-radius: 8px; font-size: 0.9rem;
+    }
+    .card a:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📊 實價登錄調查系統</h1>
+    <p>查詢內政部實價登錄、附近成交價，與物件庫整合。此工具正在開發中，敬請期待。</p>
+    <a href="#" id="btn-portal">返回入口</a>
+  </div>
+  <script>
+    (function() {
+      fetch('/api/config').then(function(r) { return r.json(); }).then(function(cfg) {
+        var url = (cfg.portal_url || '').replace(/\/$/, '');
+        if (url) document.getElementById('btn-portal').href = url;
+      }).catch(function() {});
+    })();
+  </script>
+</body>
+</html>

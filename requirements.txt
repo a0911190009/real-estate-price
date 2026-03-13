@@ -1,0 +1,4 @@
+flask>=2.3
+itsdangerous>=2.1
+python-dotenv>=1.0
+gunicorn>=21.0
