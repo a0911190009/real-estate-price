@@ -512,16 +512,21 @@ var _results = [];        // 目前查詢結果
 
 // ── 初始化 ────────────────────────────────────────────────────────────
 (function init() {
-  // 取得 Portal URL
+  // 先取得 Portal URL，再驗證登入（避免 race condition）
+  // 若 /api/config 尚未回來就跳轉，_portalUrl 還是 '/' 會造成無限循環
   fetch('/api/config').then(function(r) { return r.json(); }).then(function(cfg) {
     _portalUrl = (cfg.portal_url || '').replace(/\/?$/, '') || '/';
     document.getElementById('btn-portal').href = _portalUrl;
-  }).catch(function() {});
 
-  // 驗證登入
-  fetch('/api/me').then(function(r) {
+    // config 回來後才確認登入狀態
+    return fetch('/api/me');
+  }).then(function(r) {
+    if (!r) return;
     if (r.status === 401) {
-      window.location.href = _portalUrl;
+      // 優先用後端回傳的 redirect 欄位，雙重保險
+      return r.json().then(function(body) {
+        window.location.href = (body && body.redirect) ? body.redirect : _portalUrl;
+      });
     }
     return r.json();
   }).catch(function() {});

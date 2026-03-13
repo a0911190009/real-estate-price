@@ -4,3 +4,6 @@ __pycache__
 *.pyc
 *.pyo
 .DS_Store
+# 實價登錄資料檔（2MB+，存在 GCS，不進 git / Docker）
+price_data_v.json
+price_data_tw.json
