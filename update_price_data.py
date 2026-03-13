@@ -29,6 +29,12 @@ import hashlib
 import datetime
 import zipfile
 import tempfile
+import warnings
+
+# 抑制 google-auth 等套件的 Python 3.9 過期警告，讓終端輸出簡潔
+warnings.filterwarnings('ignore', category=FutureWarning, module='google.auth')
+warnings.filterwarnings('ignore', category=FutureWarning, module='google.oauth2')
+warnings.filterwarnings('ignore', category=FutureWarning, module='google.api_core')
 
 # ── 嘗試載入 .env ─────────────────────────────────────────────────────
 try:
@@ -304,15 +310,18 @@ def parse_source(batch, source_path, is_zip):
         with tempfile.TemporaryDirectory() as tmpdir:
             with zipfile.ZipFile(source_path, 'r') as zf:
                 zf.extractall(tmpdir)
-            # 找臺東買賣主檔
+            # 找臺東買賣主檔（內政部 ZIP 可能是 V_lvr_land_A.csv 大寫）
+            want_name = f'{TARGET_COUNTY}_lvr_land_a.csv'
             csv_path = None
             for root, dirs, files in os.walk(tmpdir):
                 for fname in files:
-                    if fname == f'{TARGET_COUNTY}_lvr_land_a.csv':
+                    if fname.lower() == want_name.lower():
                         csv_path = os.path.join(root, fname)
                         break
+                if csv_path:
+                    break
             if not csv_path:
-                print(f'  ⚠ ZIP 內找不到 {TARGET_COUNTY}_lvr_land_a.csv：{source_path}')
+                print(f'  ⚠ ZIP 內找不到 {want_name}：{source_path}')
                 return []
             return parse_csv_file(csv_path, batch)
     else:

@@ -328,14 +328,56 @@
       transform: scale(1.15);
     }
 
+    /* 進階篩選區 */
+    .filter-bar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 12px;
+      flex-shrink: 0;
+    }
+    .filter-toggle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .filter-toggle:hover { color: var(--primary); }
+    .filter-toggle .arrow { transition: transform 0.2s; }
+    .filter-bar.collapsed .filter-toggle .arrow { transform: rotate(-90deg); }
+    .filter-bar.collapsed .filter-fields { display: none; }
+    .filter-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+      font-size: 0.8rem;
+    }
+    .filter-fields label { color: var(--text-muted); display: block; margin-bottom: 2px; }
+    .filter-fields select, .filter-fields input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 8px;
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+    .filter-fields input[type="number"] { min-width: 0; }
+    .filter-actions { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-actions .btn { padding: 6px 12px; font-size: 0.8rem; }
+    .filter-row-full { grid-column: 1 / -1; }
+
     /* 響應式：小螢幕 */
     @media (max-width: 700px) {
       .panel { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); }
       .main { flex-direction: column; }
       #map { min-height: 260px; }
       .search-wrap { max-width: unset; }
-      .radius-select { display: none; }
       .topbar-logo span { display: none; }
+      .filter-fields { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -350,14 +392,8 @@
 
   <div class="search-wrap">
     <input id="search-input" class="search-input" type="text"
-      placeholder="輸入地址或區域，如：台東市中華路"
+      placeholder="輸入地址或地段關鍵字，如：中華路、豐成段"
       autocomplete="off">
-    <select id="radius-select" class="radius-select" title="搜尋半徑">
-      <option value="500">500m</option>
-      <option value="1000">1km</option>
-      <option value="2000" selected>2km</option>
-      <option value="5000">5km</option>
-    </select>
     <button class="btn btn-primary" onclick="doSearch()">查詢</button>
   </div>
 
@@ -369,6 +405,58 @@
 
   <!-- 左側面板 -->
   <div class="panel">
+
+    <!-- 進階篩選（預設收合） -->
+    <div id="filter-bar" class="filter-bar collapsed">
+      <div class="filter-toggle" onclick="toggleFilter()">
+        <span class="arrow">▼</span> 進階篩選（鄉鎮、類型、總價、坪數、排序）
+      </div>
+      <div class="filter-fields">
+        <div>
+          <label>鄉鎮市區</label>
+          <select id="filter-district">
+            <option value="">全部</option>
+          </select>
+        </div>
+        <div>
+          <label>交易類型</label>
+          <select id="filter-type">
+            <option value="">全部</option>
+          </select>
+        </div>
+        <div>
+          <label>總價最低（萬元）</label>
+          <input id="filter-min-price" type="number" min="0" placeholder="不限制">
+        </div>
+        <div>
+          <label>總價最高（萬元）</label>
+          <input id="filter-max-price" type="number" min="0" placeholder="不限制">
+        </div>
+        <div>
+          <label>坪數最低</label>
+          <input id="filter-min-ping" type="number" min="0" step="0.1" placeholder="不限制">
+        </div>
+        <div>
+          <label>坪數最高</label>
+          <input id="filter-max-ping" type="number" min="0" step="0.1" placeholder="不限制">
+        </div>
+        <div>
+          <label>排序</label>
+          <select id="filter-sort">
+            <option value="date_desc">交易日期 新→舊</option>
+            <option value="date_asc">交易日期 舊→新</option>
+            <option value="price_desc">總價 高→低</option>
+            <option value="price_asc">總價 低→高</option>
+            <option value="unit_desc">單價 高→低</option>
+            <option value="unit_asc">單價 低→高</option>
+          </select>
+        </div>
+        <div class="filter-row-full filter-actions">
+          <button type="button" class="btn btn-primary" onclick="doSearch()">查詢</button>
+          <button type="button" class="btn btn-ghost" onclick="clearFilter()">清除篩選</button>
+        </div>
+      </div>
+    </div>
 
     <!-- 統計摘要 -->
     <div id="summary-bar" class="summary-bar hidden">
@@ -401,7 +489,7 @@
     <!-- 空白佔位 -->
     <div id="empty-state" class="empty-state">
       <div class="icon">🏡</div>
-      <p>輸入地址或區域<br>查詢附近實價登錄成交紀錄</p>
+      <p>臺東縣實價登錄（資料至 114 年）<br>輸入關鍵字或使用進階篩選後按「查詢」</p>
     </div>
 
     <!-- 成交清單 -->
@@ -451,20 +539,36 @@ var _results = [];        // 目前查詢結果
   document.getElementById('search-input').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') doSearch();
   });
+
+  // 進入頁面時自動查詢一筆，載入臺東資料與篩選選項
+  doSearch();
 })();
 
 // ── 執行搜尋 ──────────────────────────────────────────────────────────
 function doSearch() {
   var query = document.getElementById('search-input').value.trim();
-  var radius = parseInt(document.getElementById('radius-select').value) || 2000;
+  var district = (document.getElementById('filter-district') && document.getElementById('filter-district').value) || '';
+  var transactionType = (document.getElementById('filter-type') && document.getElementById('filter-type').value) || '';
+  var minPrice = document.getElementById('filter-min-price') ? document.getElementById('filter-min-price').value.trim() : '';
+  var maxPrice = document.getElementById('filter-max-price') ? document.getElementById('filter-max-price').value.trim() : '';
+  var minPing = document.getElementById('filter-min-ping') ? document.getElementById('filter-min-ping').value.trim() : '';
+  var maxPing = document.getElementById('filter-max-ping') ? document.getElementById('filter-max-ping').value.trim() : '';
+  var sort = document.getElementById('filter-sort') ? document.getElementById('filter-sort').value : 'date_desc';
 
-  // 顯示 loading
+  var body = { query: query, sort: sort, limit: 200 };
+  if (district) body.district = district;
+  if (transactionType) body.transaction_type = transactionType;
+  if (minPrice !== '') body.min_price = parseFloat(minPrice);
+  if (maxPrice !== '') body.max_price = parseFloat(maxPrice);
+  if (minPing !== '') body.min_ping = parseFloat(minPing);
+  if (maxPing !== '') body.max_ping = parseFloat(maxPing);
+
   setLoadingState(true);
 
   fetch('/api/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query: query, radius_m: radius }),
+    body: JSON.stringify(body),
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
@@ -473,6 +577,7 @@ function doSearch() {
       alert('查詢失敗：' + data.error);
       return;
     }
+    fillFilterOptions(data.filter_options);
     renderResults(data);
   })
   .catch(function(err) {
@@ -480,6 +585,47 @@ function doSearch() {
     alert('連線錯誤，請稍後再試。');
     console.error(err);
   });
+}
+
+// 填寫鄉鎮 / 交易類型下拉選單（僅在選項尚未填過時）
+function fillFilterOptions(opts) {
+  if (!opts) return;
+  var districtEl = document.getElementById('filter-district');
+  var typeEl = document.getElementById('filter-type');
+  if (districtEl && opts.districts && opts.districts.length > 0 && districtEl.options.length <= 1) {
+    opts.districts.forEach(function(d) {
+      var o = document.createElement('option');
+      o.value = d;
+      o.textContent = d;
+      districtEl.appendChild(o);
+    });
+  }
+  if (typeEl && opts.transaction_types && opts.transaction_types.length > 0 && typeEl.options.length <= 1) {
+    opts.transaction_types.forEach(function(t) {
+      var o = document.createElement('option');
+      o.value = t;
+      o.textContent = t;
+      typeEl.appendChild(o);
+    });
+  }
+}
+
+function toggleFilter() {
+  document.getElementById('filter-bar').classList.toggle('collapsed');
+}
+
+function clearFilter() {
+  document.getElementById('search-input').value = '';
+  var districtEl = document.getElementById('filter-district');
+  var typeEl = document.getElementById('filter-type');
+  if (districtEl) districtEl.value = '';
+  if (typeEl) typeEl.value = '';
+  document.getElementById('filter-min-price').value = '';
+  document.getElementById('filter-max-price').value = '';
+  document.getElementById('filter-min-ping').value = '';
+  document.getElementById('filter-max-ping').value = '';
+  document.getElementById('filter-sort').value = 'date_desc';
+  doSearch();
 }
 
 // ── 渲染結果 ──────────────────────────────────────────────────────────
@@ -492,7 +638,9 @@ function renderResults(data) {
   var summaryBar = document.getElementById('summary-bar');
   if (_results.length > 0) {
     summaryBar.classList.remove('hidden');
-    document.getElementById('summary-count').textContent = '共 ' + _results.length + ' 筆成交紀錄';
+    var total = summary.count != null ? summary.count : _results.length;
+    var shown = summary.shown != null ? summary.shown : _results.length;
+    document.getElementById('summary-count').textContent = total === shown ? ('共 ' + total + ' 筆') : ('共 ' + total + ' 筆（顯示 ' + shown + ' 筆）');
     document.getElementById('stat-avg-unit').textContent = summary.avg_unit || '—';
     document.getElementById('stat-max-total').textContent = summary.max_total || '—';
     document.getElementById('stat-min-total').textContent = summary.min_total || '—';
@@ -524,19 +672,22 @@ function renderResults(data) {
 
   var html = '';
   _results.forEach(function(r) {
+    var typeLabel = r.building_type || r.transaction_type || '—';
+    var floorLabel = (r.floor != null && r.total_floor != null && r.total_floor > 0) ? (r.floor + '/' + r.total_floor + ' 樓') : ((r.floor ? r.floor + ' 樓' : '') || '—');
+    var pingVal = (r.building_ping != null && r.building_ping > 0) ? (r.building_ping + ' 坪') : '—';
     html += '<div class="record-card" id="card-' + r.id + '" onclick="selectRecord(\'' + r.id + '\')">' +
       '<div class="card-header">' +
         '<div class="card-addr">' + escHtml(r.address) + '</div>' +
         '<div class="card-price">' + r.total_price + ' 萬</div>' +
       '</div>' +
       '<div class="card-meta">' +
-        '<span class="tag type">' + escHtml(r.type) + '</span>' +
-        '<span class="tag">' + r.building_ping + ' 坪</span>' +
-        '<span class="tag">' + r.floor + ' 樓</span>' +
-        '<span class="tag">屋齡 ' + r.age + ' 年</span>' +
-        '<span class="tag date">' + r.date + '</span>' +
+        '<span class="tag type">' + escHtml(typeLabel) + '</span>' +
+        '<span class="tag">' + pingVal + '</span>' +
+        '<span class="tag">' + floorLabel + '</span>' +
+        (r.age != null && r.age > 0 ? '<span class="tag">屋齡 ' + r.age + ' 年</span>' : '') +
+        '<span class="tag date">' + (r.date || '') + '</span>' +
       '</div>' +
-      '<div class="card-unit">單價 <strong>' + r.unit_price + ' 萬/坪</strong></div>' +
+      '<div class="card-unit">單價 <strong>' + (r.unit_price != null && r.unit_price > 0 ? r.unit_price + ' 萬/坪' : '—') + '</strong></div>' +
     '</div>';
   });
   list.innerHTML = html;
@@ -597,14 +748,16 @@ function selectRecord(id) {
 
 // ── 建立 popup HTML ──────────────────────────────────────────────────
 function buildPopup(r) {
+  var typeLabel = r.building_type || r.transaction_type || '—';
+  var unitStr = (r.unit_price != null && r.unit_price > 0) ? (r.unit_price + ' 萬/坪') : '—';
+  var pingStr = (r.building_ping != null && r.building_ping > 0) ? (r.building_ping + ' 坪') : '—';
   return '<div class="popup-inner">' +
     '<div class="popup-addr">' + escHtml(r.address) + '</div>' +
     '<div class="popup-price">' + r.total_price + ' 萬元</div>' +
-    '<div class="popup-unit">單價 ' + r.unit_price + ' 萬/坪 ｜ ' + r.building_ping + ' 坪</div>' +
+    '<div class="popup-unit">單價 ' + unitStr + ' ｜ ' + pingStr + '</div>' +
     '<div class="popup-meta">' +
-      '<span class="tag type">' + escHtml(r.type) + '</span>' +
-      '<span class="tag">' + r.floor + ' 樓</span>' +
-      '<span class="tag date">' + r.date + '</span>' +
+      '<span class="tag type">' + escHtml(typeLabel) + '</span>' +
+      '<span class="tag date">' + (r.date || '') + '</span>' +
     '</div>' +
   '</div>';
 }
