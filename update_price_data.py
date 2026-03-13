@@ -3,8 +3,10 @@
 實價登錄資料更新腳本
 =====================
 用法：
-  python3 update_price_data.py                  # 掃描預設目錄，合併臺東資料
-  python3 update_price_data.py ~/Downloads/新資料夾  # 指定新批次目錄
+  python3 update_price_data.py                        # 掃描預設目錄（ZIP 和資料夾都支援）
+  python3 update_price_data.py ~/Downloads/20260121.zip   # 指定單一 ZIP 檔
+  python3 update_price_data.py ~/Downloads/新批次資料夾    # 指定單一解壓資料夾
+  python3 update_price_data.py ~/Downloads/實價登錄        # 掃整個上層目錄（混合 ZIP+資料夾都可）
 
 功能：
   1. 掃描 ~/Downloads/實價登錄/ 下所有 *_opendata 資料夾
@@ -25,6 +27,8 @@ import glob
 import sys
 import hashlib
 import datetime
+import zipfile
+import tempfile
 
 # ── 嘗試載入 .env ─────────────────────────────────────────────────────
 try:
@@ -255,17 +259,74 @@ def gcs_backup(bucket_name, key):
 
 # ── 主程式 ────────────────────────────────────────────────────────────
 
-def main():
-    # 搜尋目錄（預設掃全部，或指定單一新批次資料夾）
-    base_dir = os.path.expanduser('~/Downloads/實價登錄')
-    if len(sys.argv) > 1:
-        # 指定資料夾（可以是單一批次）
-        target_dirs = [sys.argv[1]]
-    else:
-        target_dirs = sorted(glob.glob(os.path.join(base_dir, '*_opendata')))
+def find_sources(path):
+    """
+    輸入路徑可以是：
+      - 單一 ZIP 檔
+      - 單一解壓後的資料夾（*_opendata）
+      - 包含多個 ZIP 或資料夾的上層目錄
+    回傳：list of (batch_label, csv_path_or_zip_path, is_zip)
+    """
+    sources = []
 
-    if not target_dirs:
-        print(f'找不到資料夾，請確認路徑：{base_dir}')
+    if os.path.isfile(path) and path.endswith('.zip'):
+        # 單一 ZIP
+        batch = os.path.basename(path).replace('.zip', '').replace('_opendata', '')
+        sources.append((batch, path, True))
+    elif os.path.isdir(path) and path.endswith('_opendata'):
+        # 單一解壓資料夾
+        batch = os.path.basename(path.rstrip('/')).replace('_opendata', '')
+        csv_path = os.path.join(path, f'{TARGET_COUNTY}_lvr_land_a.csv')
+        if os.path.isfile(csv_path):
+            sources.append((batch, csv_path, False))
+    else:
+        # 上層目錄：掃 ZIP 和資料夾
+        for item in sorted(os.listdir(path)):
+            full = os.path.join(path, item)
+            if item.endswith('.zip'):
+                batch = item.replace('.zip', '').replace('_opendata', '')
+                sources.append((batch, full, True))
+            elif os.path.isdir(full) and item.endswith('_opendata'):
+                batch = item.replace('_opendata', '')
+                csv_path = os.path.join(full, f'{TARGET_COUNTY}_lvr_land_a.csv')
+                if os.path.isfile(csv_path):
+                    sources.append((batch, csv_path, False))
+
+    return sources
+
+
+def parse_source(batch, source_path, is_zip):
+    """
+    解析單一來源（ZIP 或 CSV 路徑）。
+    ZIP 會解壓到暫存目錄，解析完自動清理。
+    """
+    if is_zip:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with zipfile.ZipFile(source_path, 'r') as zf:
+                zf.extractall(tmpdir)
+            # 找臺東買賣主檔
+            csv_path = None
+            for root, dirs, files in os.walk(tmpdir):
+                for fname in files:
+                    if fname == f'{TARGET_COUNTY}_lvr_land_a.csv':
+                        csv_path = os.path.join(root, fname)
+                        break
+            if not csv_path:
+                print(f'  ⚠ ZIP 內找不到 {TARGET_COUNTY}_lvr_land_a.csv：{source_path}')
+                return []
+            return parse_csv_file(csv_path, batch)
+    else:
+        return parse_csv_file(source_path, batch)
+
+
+def main():
+    # 搜尋目錄或指定路徑（ZIP / 資料夾 / 上層目錄皆可）
+    base_dir = os.path.expanduser('~/Downloads/實價登錄')
+    search_path = sys.argv[1] if len(sys.argv) > 1 else base_dir
+
+    sources = find_sources(search_path)
+    if not sources:
+        print(f'找不到任何 ZIP 或 *_opendata 資料夾：{search_path}')
         sys.exit(1)
 
     print('=' * 50)
@@ -273,21 +334,18 @@ def main():
     print('=' * 50)
 
     # ── Step 1：解析新批次 CSV ─────────────────────────────────────
-    print('\n【Step 1】解析 CSV 資料...')
+    print('\n【Step 1】解析資料...')
     new_records = []
     new_ids = set()
 
-    for folder in target_dirs:
-        batch = os.path.basename(folder.rstrip('/')).replace('_opendata', '')
-        csv_path = os.path.join(folder, f'{TARGET_COUNTY}_lvr_land_a.csv')
-        if not os.path.isfile(csv_path):
-            continue
-        records = parse_csv_file(csv_path, batch)
+    for batch, source_path, is_zip in sources:
+        src_type = 'ZIP' if is_zip else '資料夾'
+        records = parse_source(batch, source_path, is_zip)
         for r in records:
             if r['id'] not in new_ids:
                 new_ids.add(r['id'])
                 new_records.append(r)
-        print(f'  {batch}：{len(records)} 筆')
+        print(f'  {batch}（{src_type}）：{len(records)} 筆')
 
     print(f'  新批次合計：{len(new_records)} 筆')
 
