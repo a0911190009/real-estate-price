@@ -9,3 +9,6 @@ __pycache__
 # 實價登錄資料檔（2MB+，存在 GCS，不進 Docker image）
 price_data_v.json
 price_data_tw.json
+
+gunicorn.ctl
+*.sock
