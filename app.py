@@ -9,7 +9,7 @@ import os
 import json
 import time
 import threading
-from datetime import timedelta
+from datetime import timedelta, datetime
 from flask import Flask, request, session, redirect, jsonify, send_from_directory
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
@@ -48,6 +48,9 @@ ADMIN_EMAILS = [e.strip() for e in (os.environ.get("ADMIN_EMAILS") or "").split(
 GCS_BUCKET = (os.environ.get("GCS_BUCKET") or "").strip()
 PRICE_DATA_GCS_KEY = "price/price_data_v.json"   # GCS 上的路徑
 LOCAL_DATA_PATH = os.path.join(os.path.dirname(__file__), "price_data_v.json")
+
+_APP_DIR = os.path.dirname(os.path.abspath(__file__))
+GENERAL_FEEDBACK_FILE = os.path.join(_APP_DIR, "general_feedback.json")
 
 TOKEN_SERIALIZER = URLSafeTimedSerializer(app.secret_key)
 TOKEN_MAX_AGE = 300
@@ -94,6 +97,57 @@ def _load_price_data():
 
 def _is_admin(email):
     return email in ADMIN_EMAILS
+
+
+def _load_general_feedback():
+    """讀取通用反饋列表"""
+    if GCS_BUCKET:
+        try:
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(GCS_BUCKET)
+            blob = bucket.blob("general_feedback.json")
+            if blob.exists():
+                content = blob.download_as_text(encoding='utf-8')
+                return json.loads(content) if content else []
+        except:
+            pass
+    # Fallback 至本地
+    if os.path.exists(GENERAL_FEEDBACK_FILE):
+        try:
+            with open(GENERAL_FEEDBACK_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+
+def _atomic_write(fpath, data_str):
+    """原子寫入：先寫 .tmp，fsync 後再 os.replace，讀取時永遠是完整檔案。"""
+    os.makedirs(os.path.dirname(fpath), exist_ok=True)
+    tmp = fpath + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(data_str)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, fpath)
+
+
+def _gcs_write_feedback(data_str):
+    """寫入通用反饋至 GCS 或本地"""
+    if GCS_BUCKET:
+        try:
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(GCS_BUCKET)
+            blob = bucket.blob("general_feedback.json")
+            blob.upload_from_string(data_str, content_type="application/json")
+            return True
+        except:
+            pass
+    # Fallback 至本地
+    _atomic_write(GENERAL_FEEDBACK_FILE, data_str)
+    return True
 
 
 def _require_user():
@@ -147,6 +201,32 @@ def api_me():
         "picture": session.get("user_picture", ""),
         "is_admin": _is_admin(email),
     })
+
+
+@app.route("/api/general-feedback", methods=["GET"])
+def api_general_feedback_get():
+    """列出所有通用反饋"""
+    return jsonify(_load_general_feedback())
+
+
+@app.route("/api/general-feedback", methods=["POST"])
+def api_general_feedback():
+    """通用反饋"""
+    data = request.get_json() or {}
+    text = (data.get("text") or "").strip()
+    if not text:
+        return jsonify({"error": "請輸入意見內容"}), 400
+
+    entries = _load_general_feedback()
+    entries.append({
+        "text": text,
+        "category": data.get("category", ""),
+        "created_at": datetime.now().isoformat(),
+    })
+    data_str = json.dumps(entries, ensure_ascii=False, indent=2)
+    _gcs_write_feedback(data_str)
+
+    return jsonify({"ok": True, "total": len(entries)})
 
 
 @app.route("/")
