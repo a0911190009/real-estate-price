@@ -380,6 +380,77 @@
       .topbar-logo span { display: none; }
       .filter-fields { grid-template-columns: 1fr; }
     }
+
+    /* ── 通用意見反饋 ── */
+    .gf-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .gf-overlay.show { display: flex; }
+    .gf-dialog {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .gf-dialog h3 { margin: 0 0 0.8rem; font-size: 1.1rem; color: var(--text); }
+    .gf-dialog select {
+      width: 100%;
+      padding: 0.4rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .gf-dialog textarea {
+      width: 100%;
+      min-height: 80px;
+      resize: vertical;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      padding: 0.5rem;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .gf-dialog textarea:focus { outline: none; border-color: var(--primary); }
+    .gf-dialog .gf-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-top: 0.8rem;
+    }
+    .gf-dialog .gf-actions button {
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .gf-dialog .gf-actions button.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .gf-dialog .gf-toast {
+      margin-top: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--success);
+    }
   </style>
 </head>
 <body>
@@ -398,6 +469,7 @@
     <button class="btn btn-primary" onclick="doSearch()">查詢</button>
   </div>
 
+  <button onclick="document.getElementById('gf-overlay').classList.add('show');" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;transition:color 0.15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">💬 反饋</button>
   <a id="btn-portal" href="/" class="btn-portal">🏠 入口</a>
 </header>
 
@@ -785,6 +857,57 @@ function escHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+</script>
+
+  <!-- 通用意見反饋對話框 -->
+  <div class="gf-overlay" id="gf-overlay">
+    <div class="gf-dialog">
+      <h3>💬 意見反饋</h3>
+      <select id="gf-category">
+        <option value="功能建議">功能建議</option>
+        <option value="分類錯誤">分類錯誤回報</option>
+        <option value="資料問題">資料不準確</option>
+        <option value="介面體驗">介面體驗改進</option>
+        <option value="其他">其他</option>
+      </select>
+      <textarea id="gf-text" placeholder="請輸入您的意見或建議…"></textarea>
+      <div class="gf-actions">
+        <button id="gf-cancel">取消</button>
+        <button id="gf-submit" class="primary">送出</button>
+      </div>
+      <div class="gf-toast" id="gf-toast" style="display:none;"></div>
+    </div>
+  </div>
+
+<script>
+  // ── 通用意見反饋對話框 ──
+  (function() {
+    const overlay = document.getElementById("gf-overlay");
+    const cancelBtn = document.getElementById("gf-cancel");
+    const submitBtn = document.getElementById("gf-submit");
+    const textEl = document.getElementById("gf-text");
+    const catEl = document.getElementById("gf-category");
+    const toast = document.getElementById("gf-toast");
+
+    cancelBtn.addEventListener("click", () => { overlay.classList.remove("show"); });
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("show"); });
+
+    submitBtn.addEventListener("click", () => {
+      const text = textEl.value.trim();
+      if (!text) { textEl.style.borderColor = "var(--danger)"; return; }
+      textEl.style.borderColor = "";
+      fetch("/api/general-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, category: catEl.value }),
+      }).then(r => r.json()).then(d => {
+        toast.textContent = "✅ 感謝您的意見！已記錄。";
+        toast.style.display = "block";
+        textEl.value = "";
+        setTimeout(() => { toast.style.display = "none"; overlay.classList.remove("show"); }, 1500);
+      });
+    });
+  })();
 </script>
 </body>
 </html>
