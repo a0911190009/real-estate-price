@@ -9,6 +9,7 @@ import os
 import json
 import time
 import threading
+from datetime import timedelta
 from flask import Flask, request, session, redirect, jsonify, send_from_directory
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
@@ -31,12 +32,14 @@ app.secret_key = _secret or "dev-only-insecure-key"
 _is_production = bool(os.environ.get("K_SERVICE"))
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = _is_production
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)  # 手機瀏覽器會清除沒有到期日的 session cookie，設 30 天保持登入
 
 # ─── 開發模式：自動模擬登入 ───
 @app.before_request
 def auto_login_dev():
     """本地開發時，SKIP_AUTH=true 會自動模擬登入，跳過 Portal token 驗證"""
     if os.getenv('SKIP_AUTH'):
+        session.permanent = True  # 讓 cookie 帶 30 天到期日，手機不會被清除
         session['user_email'] = 'dev@test.com'
         session['user_name'] = '開發測試'
 
@@ -113,6 +116,7 @@ def auth_portal_login():
     email = payload.get("email", "")
     if not email:
         return redirect(PORTAL_URL or "/")
+    session.permanent = True  # 讓 cookie 帶 30 天到期日，手機不會被清除
     session["user_email"] = email
     session["user_name"] = payload.get("name", "")
     session["user_picture"] = payload.get("picture", "")
