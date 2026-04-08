@@ -106,8 +106,45 @@ def parse_floor(s):
     return mapping.get(s, 0)
 
 
-def parse_csv_file(filepath, batch_label):
-    """解析單一 CSV 檔，回傳清洗後的紀錄 list。"""
+def parse_land_file(filepath):
+    """解析 _land.csv（土地明細），回傳 {移轉編號: {'sect': 段名, 'land_no': 地號}} 取面積最大那筆。"""
+    land_map = {}
+    try:
+        with open(filepath, encoding='utf-8-sig') as f:
+            rows = list(csv.reader(f))
+    except UnicodeDecodeError:
+        with open(filepath, encoding='big5', errors='replace') as f:
+            rows = list(csv.reader(f))
+
+    if len(rows) < 3:
+        return land_map
+
+    headers = rows[0]
+    col = {name: i for i, name in enumerate(headers)}
+
+    for row in rows[2:]:  # 第1列欄位名、第2列英文說明，從第3列開始才是資料
+        if len(row) < 8:
+            continue
+        serial = row[col.get('編號', 0)].strip()
+        sect = row[col.get('土地位置', 1)].strip()
+        try:
+            area = float(row[col.get('土地移轉面積平方公尺', 2)].strip() or 0)
+        except Exception:
+            area = 0.0
+        land_no = row[col.get('地號', 7)].strip()
+
+        if not serial or not land_no:
+            continue
+
+        # 同一筆交易可能有多筆地號，保留面積最大的那筆
+        if serial not in land_map or area > land_map[serial]['area']:
+            land_map[serial] = {'sect': sect, 'land_no': land_no, 'area': area}
+
+    return land_map
+
+
+def parse_csv_file(filepath, batch_label, land_dict=None):
+    """解析單一 CSV 檔，回傳清洗後的紀錄 list。land_dict 為地號對照表（可選）。"""
     records = []
     try:
         with open(filepath, encoding='utf-8-sig') as f:
@@ -169,6 +206,10 @@ def parse_csv_file(filepath, batch_label):
         uid_src = f"{TARGET_COUNTY}_{address}_{date_str}_{total_price_ntd}"
         uid = hashlib.md5(uid_src.encode()).hexdigest()[:12]
 
+        # 從 _land.csv 對照表取得段名與地號（用長 ID「編號」串接）
+        serial_key = get('編號') or get('移轉編號')
+        land_info = (land_dict or {}).get(serial_key, {})
+
         records.append({
             'id': uid,
             'batch': batch_label,
@@ -201,7 +242,9 @@ def parse_csv_file(filepath, batch_label):
             'park_type': get('車位類別'),
             'park_price': round(park_price_ntd / 10000, 1) if park_price_ntd > 0 else 0,
             'note': get('備註'),
-            'serial': get('編號') or get('移轉編號'),
+            'serial': serial_key,
+            'land_sect': land_info.get('sect', ''),   # 段名，例如「順天段」
+            'land_no': land_info.get('land_no', ''),  # 地號（8碼），例如「04260001」
             'lat': None,
             'lng': None,
         })
@@ -305,6 +348,7 @@ def parse_source(batch, source_path, is_zip):
     """
     解析單一來源（ZIP 或 CSV 路徑）。
     ZIP 會解壓到暫存目錄，解析完自動清理。
+    同時解析 _land.csv 取得地號資訊，串接到主檔紀錄。
     """
     if is_zip:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -312,20 +356,25 @@ def parse_source(batch, source_path, is_zip):
                 zf.extractall(tmpdir)
             # 找臺東買賣主檔（內政部 ZIP 可能是 V_lvr_land_A.csv 大寫）
             want_name = f'{TARGET_COUNTY}_lvr_land_a.csv'
+            want_land = f'{TARGET_COUNTY}_lvr_land_a_land.csv'
             csv_path = None
+            land_path = None
             for root, dirs, files in os.walk(tmpdir):
                 for fname in files:
                     if fname.lower() == want_name.lower():
                         csv_path = os.path.join(root, fname)
-                        break
-                if csv_path:
-                    break
+                    if fname.lower() == want_land.lower():
+                        land_path = os.path.join(root, fname)
             if not csv_path:
                 print(f'  ⚠ ZIP 內找不到 {want_name}：{source_path}')
                 return []
-            return parse_csv_file(csv_path, batch)
+            land_dict = parse_land_file(land_path) if land_path else {}
+            return parse_csv_file(csv_path, batch, land_dict)
     else:
-        return parse_csv_file(source_path, batch)
+        # source_path 是主檔路徑，同目錄下找 _land.csv
+        land_path = source_path.replace('_a.csv', '_a_land.csv')
+        land_dict = parse_land_file(land_path) if os.path.isfile(land_path) else {}
+        return parse_csv_file(source_path, batch, land_dict)
 
 
 def main():
@@ -381,8 +430,15 @@ def main():
             merged[r['id']] = r
             added += 1
         else:
-            # 新批次資料覆蓋舊資料（可能有修正）
+            # 新批次資料覆蓋舊資料（可能有修正）；但保留已補好的座標和地號
             if merged[r['id']].get('batch') != r['batch']:
+                old = merged[r['id']]
+                if r.get('lat') is None and old.get('lat') is not None:
+                    r['lat'] = old['lat']
+                    r['lng'] = old['lng']
+                if not r.get('land_sect') and old.get('land_sect'):
+                    r['land_sect'] = old['land_sect']
+                    r['land_no'] = old['land_no']
                 merged[r['id']] = r
                 updated += 1
 

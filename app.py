@@ -6,11 +6,14 @@
 """
 
 import os
+import io
 import json
 import time
+import zipfile
+import tempfile
 import threading
 from datetime import timedelta, datetime
-from flask import Flask, request, session, redirect, jsonify, send_from_directory
+from flask import Flask, request, session, redirect, jsonify, send_from_directory, Response, stream_with_context
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 try:
@@ -357,6 +360,202 @@ def api_search():
         },
         "is_mock": False,
     })
+
+
+# ── 管理員：雲端匯入實價登錄資料（SSE 串流進度）──────────────────────────
+
+def _invalidate_cache():
+    """清除資料快取，讓下次查詢立即從 GCS 讀取最新資料。"""
+    global _data_cache, _data_cache_ts
+    with _data_lock:
+        _data_cache = []
+        _data_cache_ts = 0.0
+
+
+def _gcs_download_price():
+    """從 GCS 下載實價登錄 JSON，回傳 list。"""
+    if not GCS_BUCKET:
+        return []
+    from google.cloud import storage
+    client = storage.Client()
+    blob = client.bucket(GCS_BUCKET).blob(PRICE_DATA_GCS_KEY)
+    if not blob.exists():
+        return []
+    return json.loads(blob.download_as_text(encoding='utf-8'))
+
+
+def _gcs_upload_price(data):
+    """上傳實價登錄 JSON 到 GCS。"""
+    if not GCS_BUCKET:
+        return
+    from google.cloud import storage
+    client = storage.Client()
+    blob = client.bucket(GCS_BUCKET).blob(PRICE_DATA_GCS_KEY)
+    blob.upload_from_string(
+        json.dumps(data, ensure_ascii=False, indent=2),
+        content_type='application/json'
+    )
+
+
+def _sse(obj):
+    """把 dict 包成 SSE 格式字串。"""
+    return f"data: {json.dumps(obj, ensure_ascii=False)}\n\n"
+
+
+@app.route('/api/admin/import', methods=['POST'])
+def api_admin_import():
+    """
+    管理員上傳 ZIP → 解析 CSV → 合併 → 補座標（Easymap）→ 存回 GCS。
+    以 SSE（Server-Sent Events）串流回傳進度。
+    ⚠️ Cloud Run 請求 timeout 預設 60 秒，若資料量大（>50 筆新紀錄）
+       建議在 Cloud Run 主控台將 timeout 調高至 600 秒。
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+    if not _is_admin(email):
+        return jsonify({'error': '無管理員權限'}), 403
+    if not GCS_BUCKET:
+        return jsonify({'error': '未設定 GCS_BUCKET，無法使用雲端匯入'}), 500
+
+    f = request.files.get('file')
+    if not f or not f.filename.lower().endswith('.zip'):
+        return jsonify({'error': '請上傳 .zip 檔案'}), 400
+
+    # 在請求 context 內先讀完，generator 裡不再需要 request
+    file_bytes = f.read()
+    batch_label = f.filename.lower().replace('.zip', '').replace('_opendata', '')
+
+    def generate():
+        added = updated = geocoded = geo_fail = 0
+        try:
+            # ── Step 1：解析 ZIP ────────────────────────────────────
+            yield _sse({'type': 'log', 'msg': '📁 解析 ZIP...'})
+
+            from update_price_data import parse_land_file, parse_csv_file
+
+            TARGET_CSV  = 'v_lvr_land_a.csv'
+            TARGET_LAND = 'v_lvr_land_a_land.csv'
+
+            with tempfile.TemporaryDirectory() as tmpdir:
+                with zipfile.ZipFile(io.BytesIO(file_bytes)) as zf:
+                    zf.extractall(tmpdir)
+
+                csv_path = land_path = None
+                for root, _, files in os.walk(tmpdir):
+                    for fname in files:
+                        if fname.lower() == TARGET_CSV:
+                            csv_path = os.path.join(root, fname)
+                        if fname.lower() == TARGET_LAND:
+                            land_path = os.path.join(root, fname)
+
+                if not csv_path:
+                    yield _sse({'type': 'error', 'msg': f'ZIP 內找不到 {TARGET_CSV}，請確認是臺東縣資料'})
+                    return
+
+                land_dict = parse_land_file(land_path) if land_path else {}
+                new_records = parse_csv_file(csv_path, batch_label, land_dict)
+
+            yield _sse({'type': 'log', 'msg': f'✅ 解析完成：{len(new_records)} 筆'})
+
+            # ── Step 2：載入 GCS 現有資料 ─────────────────────────
+            yield _sse({'type': 'log', 'msg': '☁️ 載入 GCS 現有資料...'})
+            existing = _gcs_download_price()
+            yield _sse({'type': 'log', 'msg': f'   GCS 現有：{len(existing)} 筆'})
+
+            # ── Step 3：合併 ──────────────────────────────────────
+            merged = {r['id']: r for r in existing}
+            for r in new_records:
+                if r['id'] not in merged:
+                    merged[r['id']] = r
+                    added += 1
+                else:
+                    old = merged[r['id']]
+                    if old.get('batch') != r['batch']:
+                        # 保留已補好的座標和地號，不被新批次覆蓋
+                        if r.get('lat') is None and old.get('lat') is not None:
+                            r['lat'], r['lng'] = old['lat'], old['lng']
+                        if not r.get('land_sect') and old.get('land_sect'):
+                            r['land_sect'] = old['land_sect']
+                            r['land_no']   = old['land_no']
+                        merged[r['id']] = r
+                        updated += 1
+
+            final = sorted(merged.values(), key=lambda x: x.get('date', ''), reverse=True)
+            yield _sse({'type': 'log', 'msg': f'🔀 合併：新增 {added} 筆，更新 {updated} 筆，合計 {len(final)} 筆'})
+
+            # ── Step 4：上傳合併結果 ───────────────────────────────
+            _gcs_upload_price(final)
+            yield _sse({'type': 'log', 'msg': '☁️ 已儲存到 GCS'})
+
+            # ── Step 5：補座標 ─────────────────────────────────────
+            need = [r for r in final
+                    if r.get('lat') is None
+                    and r.get('land_sect', '').strip()
+                    and r.get('land_no', '').strip()]
+
+            if not need:
+                yield _sse({'type': 'log', 'msg': '📍 無需補座標（全部已有座標）'})
+            else:
+                yield _sse({'type': 'log', 'msg': f'📍 開始補座標：{len(need)} 筆...'})
+                yield _sse({'type': 'geocode_start', 'total': len(need)})
+
+                from geocode_price_data import EasymapCrawler
+                crawler = EasymapCrawler()
+                crawler.init()
+                coord_cache = {}
+
+                for i, r in enumerate(need):
+                    cache_key = (r.get('district', ''), r['land_sect'], r['land_no'])
+                    if cache_key not in coord_cache:
+                        time.sleep(1.0)
+                        try:
+                            coords = crawler.get_coordinates(
+                                '臺東縣', r.get('district', ''), r['land_sect'], r['land_no'])
+                        except Exception:
+                            coords = None
+                        coord_cache[cache_key] = coords
+                    else:
+                        coords = coord_cache[cache_key]
+
+                    if coords:
+                        r['lat'], r['lng'] = coords['lat'], coords['lng']
+                        geocoded += 1
+                    else:
+                        geo_fail += 1
+
+                    status = '✅' if coords else '❌'
+                    yield _sse({'type': 'geocode_progress',
+                                'current': i + 1, 'total': len(need),
+                                'msg': f'{status} [{i+1}/{len(need)}] {r.get("district","")} {r["land_sect"]} {r["land_no"]}'})
+
+                    # 每 50 筆重新初始化 session，防止 token 過期
+                    if (i + 1) % 50 == 0:
+                        try:
+                            crawler.init()
+                        except Exception:
+                            pass
+
+                # 補座標後再次上傳
+                _gcs_upload_price(final)
+                yield _sse({'type': 'log', 'msg': f'📍 補座標完成：✅ {geocoded} 筆，❌ {geo_fail} 筆'})
+                yield _sse({'type': 'log', 'msg': '☁️ 已儲存到 GCS（含座標）'})
+
+            # 清除 app 快取，讓查詢即時反映新資料
+            _invalidate_cache()
+            yield _sse({'type': 'done',
+                        'added': added, 'updated': updated,
+                        'geocoded': geocoded, 'geo_fail': geo_fail})
+
+        except Exception as e:
+            import traceback
+            yield _sse({'type': 'error', 'msg': str(e)})
+
+    return Response(
+        stream_with_context(generate()),
+        content_type='text/event-stream',
+        headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'},
+    )
 
 
 if __name__ == "__main__":

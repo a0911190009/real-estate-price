@@ -58,7 +58,9 @@ real-estate-price/
 | `building_ping` | 建物移轉總坪數 |
 | `building_type` | 建物型態 |
 | `age` | 屋齡（年） |
-| `lat`, `lng` | 座標（目前為 null，未來可加地理編碼） |
+| `land_sect` | 段名（來自 _land.csv，例如「建國段」） |
+| `land_no` | 地號（8碼，例如「08350001」，來自 _land.csv，面積最大筆） |
+| `lat`, `lng` | WGS84 座標，由 geocode_price_data.py 透過 Easymap 批次補入 |
 
 ## 環境變數
 | 變數 | 說明 |
@@ -80,6 +82,12 @@ real-estate-price/
 - **ZIP 檔名大小寫**：內政部 ZIP 內為 `V_lvr_land_A.csv`（大寫），`update_price_data.py` 已用 `.lower()` 比對
 - **資料快取 1 小時**：`_load_price_data()` 有快取機制，更新 GCS 後最多等 1 小時生效
 
+## 座標補齊流程（地號版）
+1. 執行 `update_price_data.py` 匯入新批次 CSV（同時解析 `_land.csv` 取得 land_sect / land_no）
+2. 執行 `geocode_price_data.py` 批次補座標（Easymap，免費，每筆 1 秒間隔）
+   - `--dry-run` 可先預覽待查筆數與預估時間
+3. 已有座標的紀錄自動略過，只查新增的
+
 ## 合作習慣
 - 修改完後直接執行 `cd ~/Projects && ./sync-to-cloud-and-github.sh "說明"` 部署
-- 資料更新（新批次 ZIP）只需在本機執行 `update_price_data.py`，不需重新部署服務
+- 資料更新（新批次 ZIP）只需在本機執行 `update_price_data.py` 再執行 `geocode_price_data.py`，不需重新部署服務

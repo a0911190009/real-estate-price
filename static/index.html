@@ -470,6 +470,7 @@
   </div>
 
   <button onclick="document.getElementById('gf-overlay').classList.add('show');" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;transition:color 0.15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">💬 反饋</button>
+  <button id="btn-admin-import" style="display:none;" onclick="openImportModal()" class="btn btn-ghost" title="匯入實價登錄資料（管理員）">📥 匯入</button>
   <a id="btn-portal" href="/" class="btn-portal">🏠 入口</a>
 </header>
 
@@ -602,6 +603,12 @@ var _results = [];        // 目前查詢結果
       });
     }
     return r.json();
+  }).then(function(me) {
+    if (!me) return;
+    // 管理員才顯示匯入按鈕
+    if (me.is_admin) {
+      document.getElementById('btn-admin-import').style.display = '';
+    }
   }).catch(function() {});
 
   // 初始化地圖（預設台東市中心）
@@ -840,6 +847,98 @@ function buildPopup(r) {
   '</div>';
 }
 
+// ── 管理員匯入 Modal ─────────────────────────────────────────────────
+function openImportModal() {
+  var modal = document.getElementById('import-modal');
+  modal.style.display = 'flex';
+  document.getElementById('import-init-panel').style.display = '';
+  document.getElementById('import-progress-panel').style.display = 'none';
+  document.getElementById('import-done-panel').style.display = 'none';
+  document.getElementById('import-log').innerHTML = '';
+  document.getElementById('import-file-input').value = '';
+  document.getElementById('geocode-bar-fill').style.width = '0%';
+  document.getElementById('import-geocode-bar').style.display = 'none';
+  document.getElementById('import-start-btn').disabled = false;
+}
+
+function closeImportModal() {
+  document.getElementById('import-modal').style.display = 'none';
+}
+
+function startImport() {
+  var fileInput = document.getElementById('import-file-input');
+  if (!fileInput.files.length) { alert('請選擇 ZIP 檔案'); return; }
+
+  document.getElementById('import-start-btn').disabled = true;
+  document.getElementById('import-init-panel').style.display = 'none';
+  document.getElementById('import-progress-panel').style.display = '';
+
+  var log    = document.getElementById('import-log');
+  var geoBar = document.getElementById('import-geocode-bar');
+  var geoFill = document.getElementById('geocode-bar-fill');
+  var geoText = document.getElementById('geocode-bar-text');
+
+  function addLog(msg, isErr) {
+    var line = document.createElement('div');
+    line.style.cssText = isErr ? 'color:var(--danger);padding:2px 0;' : 'padding:2px 0;';
+    line.textContent = msg;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  var fd = new FormData();
+  fd.append('file', fileInput.files[0]);
+
+  fetch('/api/admin/import', { method: 'POST', body: fd })
+    .then(function(resp) {
+      if (!resp.ok) {
+        return resp.json().then(function(e) { addLog('❌ ' + (e.error || '伺服器錯誤'), true); });
+      }
+      var reader  = resp.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '';
+
+      function pump(done, value) {
+        if (done) return;
+        buf += decoder.decode(value, { stream: true });
+        var parts = buf.split('\n\n');
+        buf = parts.pop();  // 最後一段可能未結束，留待下次
+        parts.forEach(function(block) {
+          block = block.trim();
+          if (!block.startsWith('data: ')) return;
+          try {
+            var e = JSON.parse(block.slice(6));
+            if (e.type === 'log') {
+              addLog(e.msg);
+            } else if (e.type === 'geocode_start') {
+              geoBar.style.display = '';
+              geoFill.style.width = '0%';
+              geoText.textContent = '0 / ' + e.total;
+            } else if (e.type === 'geocode_progress') {
+              var pct = Math.round(e.current / e.total * 100);
+              geoFill.style.width = pct + '%';
+              geoText.textContent = e.current + ' / ' + e.total;
+              addLog(e.msg);
+            } else if (e.type === 'error') {
+              addLog('❌ ' + e.msg, true);
+            } else if (e.type === 'done') {
+              document.getElementById('import-progress-panel').style.display = 'none';
+              var dp = document.getElementById('import-done-panel');
+              dp.style.display = 'flex';
+              document.getElementById('import-done-summary').innerHTML =
+                '✅ 匯入完成！<br>' +
+                '新增 <b>' + e.added + '</b> 筆 ／ 更新 <b>' + e.updated + '</b> 筆<br>' +
+                '補座標成功 <b>' + e.geocoded + '</b> 筆（查無 ' + e.geo_fail + ' 筆）';
+            }
+          } catch (_) {}
+        });
+        return reader.read().then(function(r) { return pump(r.done, r.value); });
+      }
+      return reader.read().then(function(r) { return pump(r.done, r.value); });
+    })
+    .catch(function(err) { addLog('❌ 連線失敗：' + err.message, true); });
+}
+
 // ── UI 狀態切換 ──────────────────────────────────────────────────────
 function setLoadingState(on) {
   document.getElementById('loading').style.display = on ? 'flex' : 'none';
@@ -858,6 +957,48 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 </script>
+
+  <!-- 管理員匯入 Modal -->
+  <div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:500;align-items:center;justify-content:center;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:min(520px,92vw);max-height:82vh;display:flex;flex-direction:column;overflow:hidden;">
+
+      <!-- Header -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+        <span style="font-weight:700;">📥 匯入實價登錄資料</span>
+        <button onclick="closeImportModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;line-height:1;" title="關閉">✕</button>
+      </div>
+
+      <!-- 選檔面板 -->
+      <div id="import-init-panel" style="padding:24px 20px;display:flex;flex-direction:column;gap:16px;">
+        <p style="color:var(--text-muted);font-size:0.88rem;">選擇從內政部實價登錄網站下載的 <b>.zip</b> 檔案（臺東縣）</p>
+        <input type="file" id="import-file-input" accept=".zip"
+               style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);cursor:pointer;">
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn btn-ghost" onclick="closeImportModal()">取消</button>
+          <button class="btn btn-primary" id="import-start-btn" onclick="startImport()">開始匯入</button>
+        </div>
+      </div>
+
+      <!-- 進度面板 -->
+      <div id="import-progress-panel" style="display:none;padding:16px 20px;overflow-y:auto;flex:1;min-height:0;">
+        <div id="import-log" style="font-family:monospace;font-size:0.82rem;display:flex;flex-direction:column;gap:4px;margin-bottom:12px;"></div>
+        <!-- 地號進度條 -->
+        <div id="import-geocode-bar" style="display:none;margin-top:8px;">
+          <div style="background:var(--bg);border-radius:6px;height:8px;overflow:hidden;margin-bottom:6px;">
+            <div id="geocode-bar-fill" style="height:100%;background:var(--success);border-radius:6px;width:0%;transition:width 0.3s;"></div>
+          </div>
+          <div id="geocode-bar-text" style="font-size:0.8rem;color:var(--text-muted);"></div>
+        </div>
+      </div>
+
+      <!-- 完成面板 -->
+      <div id="import-done-panel" style="display:none;padding:24px 20px;text-align:center;display:none;flex-direction:column;gap:16px;align-items:center;">
+        <div id="import-done-summary" style="font-size:0.95rem;line-height:2;"></div>
+        <button class="btn btn-primary" onclick="closeImportModal(); doSearch();">關閉並重新查詢</button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- 通用意見反饋對話框 -->
   <div class="gf-overlay" id="gf-overlay">
