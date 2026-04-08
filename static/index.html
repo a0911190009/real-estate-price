@@ -272,6 +272,115 @@
     }
     .card-unit strong { color: var(--warning); }
 
+    /* 卡片次要資訊列（格局/電梯/備註）+ 明細按鈕 */
+    .card-extra {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 7px;
+      gap: 6px;
+    }
+    .card-extra-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      flex: 1;
+    }
+    .tag.layout { color: #c4b5fd; border-color: #5b21b6; background: #2e1065; }
+    .tag.elev   { color: #6ee7b7; border-color: #065f46; background: #064e3b; }
+    .tag.note   { color: var(--warning); border-color: #78350f; background: #451a03; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn-detail {
+      font-size: 0.7rem;
+      padding: 3px 9px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--surface2);
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-detail:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* 明細 Modal */
+    .detail-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .detail-modal.show { display: flex; }
+    .detail-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .detail-head {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      z-index: 1;
+    }
+    .detail-head-left { flex: 1; }
+    .detail-addr { font-size: 0.92rem; font-weight: 700; color: var(--text); line-height: 1.4; }
+    .detail-price { font-size: 1.25rem; font-weight: 700; color: var(--danger); margin-top: 4px; }
+    .detail-sub { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
+    .detail-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      flex-shrink: 0;
+    }
+    .detail-close:hover { color: var(--text); }
+    .detail-body { padding: 14px 16px 20px; }
+    .detail-section { margin-bottom: 16px; }
+    .detail-section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.04em;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 14px;
+    }
+    .detail-grid.col3 { grid-template-columns: 1fr 1fr 1fr; }
+    .detail-row { display: flex; flex-direction: column; gap: 2px; }
+    .detail-label { font-size: 0.7rem; color: var(--text-muted); }
+    .detail-value { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+    .detail-note {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      color: var(--warning);
+      line-height: 1.5;
+    }
+
     /* Loading */
     .loading-spinner {
       display: none;
@@ -760,6 +869,17 @@ function renderResults(data) {
     var typeLabel = r.building_type || r.transaction_type || '—';
     var floorLabel = (r.floor != null && r.total_floor != null && r.total_floor > 0) ? (r.floor + '/' + r.total_floor + ' 樓') : ((r.floor ? r.floor + ' 樓' : '') || '—');
     var pingVal = (r.building_ping != null && r.building_ping > 0) ? (r.building_ping + ' 坪') : '—';
+
+    // 格局標籤（如：2房1廳1衛）
+    var layoutParts = [];
+    if (r.rooms > 0)     layoutParts.push(r.rooms + '房');
+    if (r.halls > 0)     layoutParts.push(r.halls + '廳');
+    if (r.bathrooms > 0) layoutParts.push(r.bathrooms + '衛');
+    var layoutLabel = layoutParts.join('') || '';
+
+    // 電梯
+    var elevLabel = (r.elevator === '有') ? '有電梯' : (r.elevator === '無' ? '無電梯' : '');
+
     html += '<div class="record-card" id="card-' + r.id + '" onclick="selectRecord(\'' + r.id + '\')">' +
       '<div class="card-header">' +
         '<div class="card-addr">' + escHtml(r.address) + '</div>' +
@@ -773,6 +893,15 @@ function renderResults(data) {
         '<span class="tag date">' + (r.date || '') + '</span>' +
       '</div>' +
       '<div class="card-unit">單價 <strong>' + (r.unit_price != null && r.unit_price > 0 ? r.unit_price + ' 萬/坪' : '—') + '</strong></div>' +
+      // 格局/電梯次要資訊 + 明細按鈕
+      '<div class="card-extra">' +
+        '<div class="card-extra-tags">' +
+          (layoutLabel ? '<span class="tag layout">' + layoutLabel + '</span>' : '') +
+          (elevLabel   ? '<span class="tag elev">'   + elevLabel   + '</span>' : '') +
+          (r.note      ? '<span class="tag note" title="' + escHtml(r.note) + '">' + escHtml(r.note) + '</span>' : '') +
+        '</div>' +
+        '<button class="btn-detail" onclick="event.stopPropagation();openDetailModal(\'' + r.id + '\')">明細</button>' +
+      '</div>' +
     '</div>';
   });
   list.innerHTML = html;
@@ -845,6 +974,106 @@ function buildPopup(r) {
       '<span class="tag date">' + (r.date || '') + '</span>' +
     '</div>' +
   '</div>';
+}
+
+// ── 明細 Modal ───────────────────────────────────────────────────────
+function openDetailModal(id) {
+  var r = _results.find(function(x) { return x.id === id; });
+  if (!r) return;
+
+  // 標頭
+  document.getElementById('dm-addr').textContent = r.address || '';
+  document.getElementById('dm-price').textContent = r.total_price + ' 萬元';
+
+  // 副標（單價、坪數、日期）
+  var subParts = [];
+  if (r.unit_price > 0) subParts.push('單價 ' + r.unit_price + ' 萬/坪');
+  if (r.building_ping > 0) subParts.push('建物 ' + r.building_ping + ' 坪');
+  subParts.push(r.date || '');
+  document.getElementById('dm-sub').textContent = subParts.join('　｜　');
+
+  // 主體
+  document.getElementById('dm-body').innerHTML = buildDetailBody(r);
+
+  document.getElementById('detail-modal').classList.add('show');
+}
+
+function closeDetailModal() {
+  document.getElementById('detail-modal').classList.remove('show');
+}
+
+function buildDetailBody(r) {
+  function row(label, val) {
+    return '<div class="detail-row"><span class="detail-label">' + label + '</span><span class="detail-value">' + escHtml(String(val || '—')) + '</span></div>';
+  }
+
+  // 格局字串
+  var layoutParts = [];
+  if (r.rooms > 0)     layoutParts.push(r.rooms + '房');
+  if (r.halls > 0)     layoutParts.push(r.halls + '廳');
+  if (r.bathrooms > 0) layoutParts.push(r.bathrooms + '衛');
+  var layoutStr = layoutParts.join('') || '—';
+
+  // 使用分區
+  var zoneStr = r.urban_zone || r.non_urban_zone || r.non_urban_use || '—';
+
+  // 車位
+  var parkStr = r.park_type ? (r.park_type + (r.park_price > 0 ? '（' + r.park_price + ' 萬）' : '')) : '無';
+
+  var html = '';
+
+  // ── 備註（只在有備註時顯示）
+  if (r.note) {
+    html += '<div class="detail-section">' +
+      '<div class="detail-section-title">備註資料</div>' +
+      '<div class="detail-note">' + escHtml(r.note) + '</div>' +
+    '</div>';
+  }
+
+  // ── 基本資料
+  html += '<div class="detail-section">' +
+    '<div class="detail-section-title">基本資料</div>' +
+    '<div class="detail-grid col3">' +
+      row('總價', r.total_price + ' 萬') +
+      row('單價', r.unit_price > 0 ? r.unit_price + ' 萬/坪' : '—') +
+      row('交易日期', r.date || '—') +
+      row('主要用途', r.main_use || '—') +
+      row('主要建材', r.material || '—') +
+      row('管理組織', r.mgmt || '—') +
+      row('電梯', r.elevator || '—') +
+      row('建物格局', layoutStr) +
+      row('車位', parkStr) +
+    '</div>' +
+  '</div>';
+
+  // ── 土地資料
+  html += '<div class="detail-section">' +
+    '<div class="detail-section-title">土地資料</div>' +
+    '<div class="detail-grid">' +
+      row('土地位置', (r.land_sect && r.land_no) ? r.land_sect + ' ' + r.land_no : '—') +
+      row('土地移轉面積', r.land_ping > 0 ? r.land_ping + ' 坪' : '—') +
+      row('使用分區', zoneStr) +
+      row('交易標的', r.transaction_type || '—') +
+    '</div>' +
+  '</div>';
+
+  // ── 建物資料（只在有建物時顯示）
+  if (r.building_ping > 0) {
+    var floorStr = (r.floor && r.total_floor > 0) ? (r.floor + ' 樓 / 共 ' + r.total_floor + ' 樓') : (r.floor ? r.floor + ' 樓' : '—');
+    html += '<div class="detail-section">' +
+      '<div class="detail-section-title">建物資料</div>' +
+      '<div class="detail-grid">' +
+        row('建物型態', r.building_type || '—') +
+        row('屋齡', r.age > 0 ? r.age + ' 年' : '—') +
+        row('樓層', floorStr) +
+        row('建物總面積', r.building_ping + ' 坪') +
+        row('主建物面積', r.main_building_ping > 0 ? r.main_building_ping + ' 坪' : '—') +
+        row('格局', layoutStr) +
+      '</div>' +
+    '</div>';
+  }
+
+  return html;
 }
 
 // ── 管理員匯入 Modal ─────────────────────────────────────────────────
@@ -1050,5 +1279,20 @@ function escHtml(str) {
     });
   })();
 </script>
+
+<!-- ── 明細 Modal ── -->
+<div id="detail-modal" class="detail-modal" onclick="if(event.target===this)closeDetailModal()">
+  <div class="detail-box">
+    <div class="detail-head">
+      <div class="detail-head-left">
+        <div class="detail-addr" id="dm-addr"></div>
+        <div class="detail-price" id="dm-price"></div>
+        <div class="detail-sub" id="dm-sub"></div>
+      </div>
+      <button class="detail-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="detail-body" id="dm-body"></div>
+  </div>
+</div>
 </body>
 </html>

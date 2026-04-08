@@ -430,15 +430,17 @@ def main():
             merged[r['id']] = r
             added += 1
         else:
-            # 新批次資料覆蓋舊資料（可能有修正）；但保留已補好的座標和地號
-            if merged[r['id']].get('batch') != r['batch']:
-                old = merged[r['id']]
-                if r.get('lat') is None and old.get('lat') is not None:
-                    r['lat'] = old['lat']
-                    r['lng'] = old['lng']
-                if not r.get('land_sect') and old.get('land_sect'):
-                    r['land_sect'] = old['land_sect']
-                    r['land_no'] = old['land_no']
+            # 新資料覆蓋舊資料；保留已補好的座標，但 land_sect/land_no 優先用新版（可能舊版沒有）
+            old = merged[r['id']]
+            # 保留已有座標（不覆蓋補好的 lat/lng）
+            if r.get('lat') is None and old.get('lat') is not None:
+                r['lat'] = old['lat']
+                r['lng'] = old['lng']
+            # land_sect/land_no：新資料有就用新的，新資料沒有才保留舊的
+            if not r.get('land_sect') and old.get('land_sect'):
+                r['land_sect'] = old['land_sect']
+                r['land_no'] = old['land_no']
+            if old != r:  # 有實質變化才算更新
                 merged[r['id']] = r
                 updated += 1
 
