@@ -730,7 +730,8 @@ var _results = [];        // 目前查詢結果
   }).catch(function() {});
 
   // 初始化地圖（預設台東市中心）
-  _map = L.map('map', { zoomControl: true }).setView([22.7583, 121.1444], 14);
+  _map = L.map('map', { zoomControl: false }).setView([22.7583, 121.1444], 14);
+  L.control.zoom({ position: 'bottomright' }).addTo(_map);
 
   // OSM 底圖
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
