@@ -32,8 +32,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPTNMLTJKHLGFBV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "高原段",
+    "land_no": "13720000",
+    "lat": 23.00152,
+    "lng": 121.26503
   },
   {
     "id": "c2cf386f1a11",
@@ -68,8 +70,10 @@
     "park_price": 0,
     "note": "包含:未辦保存登記房屋一間台東市昆明街94號",
     "serial": "RPXNMLMJKHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建國段",
+    "land_no": "08350001",
+    "lat": 22.706039,
+    "lng": 121.05161
   },
   {
     "id": "afd93dfe341a",
@@ -104,8 +108,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLSLJHLGFBV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "城山段彭仔存小段",
+    "land_no": "00500000",
+    "lat": 23.275164,
+    "lng": 121.409375
   },
   {
     "id": "9879c3ce0b21",
@@ -140,8 +146,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTLJHLGFBV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "城山段彭仔存小段",
+    "land_no": "00500003",
+    "lat": 23.274933,
+    "lng": 121.409389
   },
   {
     "id": "b32b4243e329",
@@ -176,8 +184,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLSLJHLGFBV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永福段",
+    "land_no": "10600000",
+    "lat": 23.286784,
+    "lng": 121.428059
   },
   {
     "id": "6615efe33cc8",
@@ -212,8 +222,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPQNMLKKKHLGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中正段",
+    "land_no": "05650000",
+    "lat": 22.759703,
+    "lng": 121.141959
   },
   {
     "id": "55c528a03429",
@@ -248,8 +260,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLPJKHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建樂段",
+    "land_no": "04240000",
+    "lat": 22.703527,
+    "lng": 121.029188
   },
   {
     "id": "273a65f579a2",
@@ -284,8 +298,10 @@
     "park_price": 0,
     "note": "雙方合意之價金。親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLQLJHLGFCV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "德高段",
+    "land_no": "03060000",
+    "lat": 23.082984,
+    "lng": 121.178372
   },
   {
     "id": "b0ed79c71b9a",
@@ -320,8 +336,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLLMJHLGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "00080004",
+    "lat": 22.758708,
+    "lng": 121.157121
   },
   {
     "id": "eefc81c99cfd",
@@ -356,6 +374,8 @@
     "park_price": 0,
     "note": "本案僅建物買賣 不包含土地；建物坐落地號：隆昌段1132地號；親友、員工、共有人或其他特殊關係間之交易；未登記建物；",
     "serial": "RPRNMLQJKHLGFCV17DA",
+    "land_sect": "",
+    "land_no": "",
     "lat": null,
     "lng": null
   },
@@ -392,8 +412,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTLJHLGFCV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "瑞和段",
+    "land_no": "00460000",
+    "lat": 22.989471,
+    "lng": 121.156504
   },
   {
     "id": "d36efc2643bd",
@@ -428,8 +450,10 @@
     "park_price": 0,
     "note": "屋齡老舊需整修其他增建；",
     "serial": "RPQNMLQJKHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐榮段",
+    "land_no": "02760000",
+    "lat": 22.747015,
+    "lng": 121.14026
   },
   {
     "id": "9025037481cc",
@@ -464,8 +488,10 @@
     "park_price": 0,
     "note": "雙方合意之價金親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLQLJHLGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "德高段",
+    "land_no": "03120001",
+    "lat": 23.082529,
+    "lng": 121.178143
   },
   {
     "id": "fb6ef56ddf41",
@@ -500,8 +526,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPRNMLMLJHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "利家段",
+    "land_no": "65430001",
+    "lat": 22.777801,
+    "lng": 121.105738
   },
   {
     "id": "45061849db05",
@@ -536,8 +564,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPSNMLKMJHLGFBV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "高原段",
+    "land_no": "02330000",
+    "lat": 23.036461,
+    "lng": 121.287045
   },
   {
     "id": "f101041c43a6",
@@ -572,8 +602,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLQLJHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "旭川段",
+    "land_no": "08180000",
+    "lat": 22.746138,
+    "lng": 121.109493
   },
   {
     "id": "24a9ab4b8d57",
@@ -608,8 +640,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPPNMLMLJHLGFBV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠勇段",
+    "land_no": "08530000",
+    "lat": 23.103003,
+    "lng": 121.379932
   },
   {
     "id": "47c21c9587a3",
@@ -644,8 +678,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLSLJHLGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02350000",
+    "lat": 22.753322,
+    "lng": 121.155516
   },
   {
     "id": "8cad5e129ab2",
@@ -680,8 +716,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLTJKHLGFBV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "興隆段",
+    "land_no": "02730001",
+    "lat": 22.910528,
+    "lng": 121.2519
   },
   {
     "id": "fc79d4eba91a",
@@ -716,8 +754,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPPNMLKLJHLGFAV88DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "18330000",
+    "lat": 22.762643,
+    "lng": 121.146855
   },
   {
     "id": "344684fbcf1e",
@@ -752,8 +792,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPWNMLNJKHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南榮段",
+    "land_no": "11710000",
+    "lat": 22.774369,
+    "lng": 121.129943
   },
   {
     "id": "dbc4a4dc85d3",
@@ -788,8 +830,10 @@
     "park_price": 0,
     "note": "包含公共設施保留地用地；",
     "serial": "RPSNMLQKJHLGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永清段",
+    "land_no": "00220001",
+    "lat": 22.777212,
+    "lng": 121.125722
   },
   {
     "id": "81dad2cfbf1f",
@@ -824,8 +868,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLLLJHLGFCV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "鸞山段",
+    "land_no": "00620000",
+    "lat": 22.926549,
+    "lng": 121.162442
   },
   {
     "id": "98640ee50b48",
@@ -860,8 +906,10 @@
     "park_price": 0,
     "note": "土地款440萬元；建物款660萬元。包含公共設施保留地用地；",
     "serial": "RPVNMLMJKHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "04640000",
+    "lat": 22.751282,
+    "lng": 121.152354
   },
   {
     "id": "433f463ef69a",
@@ -896,8 +944,10 @@
     "park_price": 0,
     "note": "土地款360萬元；建物款540萬元。包含公共設施保留地用地；",
     "serial": "RPRNMLNJKHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "04640000",
+    "lat": 22.751282,
+    "lng": 121.152354
   },
   {
     "id": "83818dc1c3da",
@@ -932,6 +982,8 @@
     "park_price": 0,
     "note": "",
     "serial": "RPVNMLSLJHLGFAV67DA",
+    "land_sect": "青林段",
+    "land_no": "11060000",
     "lat": null,
     "lng": null
   },
@@ -968,8 +1020,10 @@
     "park_price": 100.0,
     "note": "土地款:280萬元整；建物款420萬元整；車位款100萬元整。親友、員工、共有人或其他特殊關係間之交易；包含公共設施保留地用地；",
     "serial": "RPWNMLMJKHLGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "04640000",
+    "lat": 22.751282,
+    "lng": 121.152354
   },
   {
     "id": "741b8947cbf8",
@@ -1004,8 +1058,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKLJHLGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永清段",
+    "land_no": "01540000",
+    "lat": 22.777486,
+    "lng": 121.120367
   },
   {
     "id": "f9d56fde8072",
@@ -1040,8 +1096,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLLKKHLGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "知本段",
+    "land_no": "83800000",
+    "lat": 22.714042,
+    "lng": 121.090262
   },
   {
     "id": "a28815b81f69",
@@ -1076,8 +1134,10 @@
     "park_price": 0,
     "note": "雙方合意之價格。親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLNKJHLGFCV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "月野段",
+    "land_no": "08580000",
+    "lat": 22.99932,
+    "lng": 121.14933
   },
   {
     "id": "e078c72337f9",
@@ -1112,8 +1172,10 @@
     "park_price": 0,
     "note": "建物坐落關山鎮豐泉段766-11地號，買賣價款新台幣522萬元整",
     "serial": "RPRNMLLLJHLGFCV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐泉段",
+    "land_no": "07660011",
+    "lat": 23.053478,
+    "lng": 121.163477
   },
   {
     "id": "15b5c86f4f64",
@@ -1148,8 +1210,10 @@
     "park_price": 0,
     "note": "未登記建物；包含公共設施保留地用地；",
     "serial": "RPQNMLNLJHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中心段",
+    "land_no": "10930000",
+    "lat": 22.762893,
+    "lng": 121.137124
   },
   {
     "id": "b22c95b8c88a",
@@ -1184,8 +1248,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLTLJHLGFAV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "岩灣段",
+    "land_no": "03740000",
+    "lat": 22.790516,
+    "lng": 121.123658
   },
   {
     "id": "c89ec47f640f",
@@ -1220,8 +1286,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPUNMLTKJHLGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南王段",
+    "land_no": "03070002",
+    "lat": 22.78539,
+    "lng": 121.11747
   },
   {
     "id": "f733ddeaa26a",
@@ -1256,8 +1324,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLRLJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "00270000",
+    "lat": 22.769209,
+    "lng": 121.123907
   },
   {
     "id": "5ff2e2801967",
@@ -1292,8 +1362,10 @@
     "park_price": 0,
     "note": "土地款7875000元整房屋款9625000元整合建案建商與地主間之交易；",
     "serial": "RPQNMLPKJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐康段",
+    "land_no": "08160044",
+    "lat": 22.750743,
+    "lng": 121.111239
   },
   {
     "id": "b68fa9034eb1",
@@ -1328,8 +1400,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLKLJHLGFCV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "瑞里段",
+    "land_no": "07270002",
+    "lat": 22.952885,
+    "lng": 121.156859
   },
   {
     "id": "b9c3a708d631",
@@ -1364,8 +1438,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPPNMLMKJHLGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "12720016",
+    "lat": 22.761527,
+    "lng": 121.145727
   },
   {
     "id": "10b04132ad8a",
@@ -1400,8 +1476,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPPNMLQLJHLGFDV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "蘭里段",
+    "land_no": "06040000",
+    "lat": 22.587321,
+    "lng": 120.99133
   },
   {
     "id": "3efdd4a4d260",
@@ -1436,8 +1514,10 @@
     "park_price": 0,
     "note": "原住民保留地",
     "serial": "RPSNMLNLJHLGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "東明段",
+    "land_no": "05100000",
+    "lat": 23.061137,
+    "lng": 121.187918
   },
   {
     "id": "739a20ff7a24",
@@ -1472,8 +1552,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLOKJHLGFDV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "愛國段",
+    "land_no": "03960029",
+    "lat": 22.433878,
+    "lng": 120.91073
   },
   {
     "id": "56166a4ab3d2",
@@ -1508,8 +1590,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPUNMLKLJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "常德段",
+    "land_no": "06970000",
+    "lat": 22.747989,
+    "lng": 121.135198
   },
   {
     "id": "8499154b75fe",
@@ -1544,6 +1628,8 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLNLJHLGFBV86DA",
+    "land_sect": "三間屋段",
+    "land_no": "02580001",
     "lat": null,
     "lng": null
   },
@@ -1580,6 +1666,8 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPSNMLNLJHLGFBV96DA",
+    "land_sect": "三間屋段",
+    "land_no": "02560002",
     "lat": null,
     "lng": null
   },
@@ -1616,8 +1704,10 @@
     "park_price": 0,
     "note": "土地價款:18萬；房屋價款:32萬",
     "serial": "RPVNMLRJJHLGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建樂段",
+    "land_no": "04800000",
+    "lat": 22.698419,
+    "lng": 121.02504
   },
   {
     "id": "54471208b78b",
@@ -1652,8 +1742,10 @@
     "park_price": 0,
     "note": "土地價款13萬；建物價款22萬",
     "serial": "RPWNMLRJJHLGFAV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建樂段",
+    "land_no": "04800000",
+    "lat": 22.698419,
+    "lng": 121.02504
   },
   {
     "id": "ddec1dd8328d",
@@ -1688,8 +1780,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLQKJHLGFDV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大竹段",
+    "land_no": "01180041",
+    "lat": 22.447045,
+    "lng": 120.928539
   },
   {
     "id": "b20343848391",
@@ -1724,8 +1818,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLNJKHLGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "太平段",
+    "land_no": "04930000",
+    "lat": 22.787709,
+    "lng": 121.082328
   },
   {
     "id": "9d1e65f1a1aa",
@@ -1760,8 +1856,10 @@
     "park_price": 0,
     "note": "包含公共設施保留地用地；",
     "serial": "RPPNMLOJKHLGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "順天段",
+    "land_no": "04260000",
+    "lat": 22.760334,
+    "lng": 121.113667
   },
   {
     "id": "e1674b908594",
@@ -1796,8 +1894,10 @@
     "park_price": 0,
     "note": "農作物；機電設備；農業設施；",
     "serial": "SPPNMLOJKHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "順天段",
+    "land_no": "04280000",
+    "lat": 22.760569,
+    "lng": 121.114559
   },
   {
     "id": "9c29f4ea36fa",
@@ -1832,8 +1932,10 @@
     "park_price": 0,
     "note": "包含公共設施保留地用地；",
     "serial": "RPQNMLOJKHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "順天段",
+    "land_no": "04260001",
+    "lat": 22.760194,
+    "lng": 121.113627
   },
   {
     "id": "5aae593702a9",
@@ -1868,8 +1970,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "SPQNMLOJKHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "順天段",
+    "land_no": "04270001",
+    "lat": 22.760136,
+    "lng": 121.11398
   },
   {
     "id": "a846184f0706",
@@ -1904,8 +2008,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLMKJHLGFCV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "月野段",
+    "land_no": "02660000",
+    "lat": 23.023823,
+    "lng": 121.147951
   },
   {
     "id": "42570ae0f594",
@@ -1940,8 +2046,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPUNMLNJKHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "東海段",
+    "land_no": "10260000",
+    "lat": 22.743638,
+    "lng": 121.137147
   },
   {
     "id": "978815115606",
@@ -1976,8 +2084,10 @@
     "park_price": 0,
     "note": "鄰地房屋台東市吉林路2段595號有占用情形畸零地或有合併使用效益；",
     "serial": "RPTNMLRJJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富岡南段",
+    "land_no": "03960001",
+    "lat": 22.790341,
+    "lng": 121.184188
   },
   {
     "id": "ca5206a406b8",
@@ -2012,8 +2122,10 @@
     "park_price": 0,
     "note": "房屋占用鄰地土地。頂樓加蓋；其他增建；未登記建物；",
     "serial": "RPQNMLOKJHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富岡南段",
+    "land_no": "03950000",
+    "lat": 22.790285,
+    "lng": 121.184257
   },
   {
     "id": "c091a8fd0cdc",
@@ -2048,8 +2160,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPRNMLKKKHLGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中山段",
+    "land_no": "08700003",
+    "lat": 22.76936,
+    "lng": 121.134703
   },
   {
     "id": "3c2147c2ba21",
@@ -2084,8 +2198,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；農作物；",
     "serial": "RPPNMLRKJHLGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "月野段",
+    "land_no": "17660000",
+    "lat": 22.993602,
+    "lng": 121.152252
   },
   {
     "id": "107e956e5a51",
@@ -2120,8 +2236,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPRNMLRJJHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "知本段",
+    "land_no": "79070017",
+    "lat": 22.716199,
+    "lng": 121.083705
   },
   {
     "id": "a85a0ea9d5b8",
@@ -2156,8 +2274,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLPJJHLGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "00100250",
+    "lat": 22.760526,
+    "lng": 121.150968
   },
   {
     "id": "5cdda84a5f63",
@@ -2192,8 +2312,10 @@
     "park_price": 0,
     "note": "政府機關標讓售；",
     "serial": "RPSNMLMKJHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "08310000",
+    "lat": 22.764218,
+    "lng": 121.149032
   },
   {
     "id": "9ada30eb0569",
@@ -2228,8 +2350,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLTKJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建興段",
+    "land_no": "04120002",
+    "lat": 22.705823,
+    "lng": 121.039005
   },
   {
     "id": "89b9087ba4a5",
@@ -2264,8 +2388,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPQNMLMKJHLGFDV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07100000",
+    "lat": 22.693124,
+    "lng": 121.014331
   },
   {
     "id": "be2a4248bc5f",
@@ -2300,8 +2426,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPPNMLNJKHLGFBV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "萬年段",
+    "land_no": "09150000",
+    "lat": 22.876154,
+    "lng": 121.227268
   },
   {
     "id": "e3c383b35e20",
@@ -2336,8 +2464,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTJKHLGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "常德段",
+    "land_no": "06970000",
+    "lat": 22.747989,
+    "lng": 121.135198
   },
   {
     "id": "dc550ce67d82",
@@ -2372,8 +2502,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPPNMLLLJHLGFDV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "泰王段",
+    "land_no": "02690000",
+    "lat": 22.611337,
+    "lng": 121.005999
   },
   {
     "id": "375f14c4c3a2",
@@ -2408,8 +2540,10 @@
     "park_price": 0,
     "note": "含仲介費；含地政士服務費；",
     "serial": "RPPNMLKMJHLGFCV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "里壠段",
+    "land_no": "07140000",
+    "lat": 23.045698,
+    "lng": 121.163755
   },
   {
     "id": "d33ad2ef888c",
@@ -2444,8 +2578,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPVNMLNJKHLGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "利卡夢段",
+    "land_no": "04490000",
+    "lat": 22.774411,
+    "lng": 121.064369
   },
   {
     "id": "66b570a17331",
@@ -2480,8 +2616,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLKMKIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "馬蘭段",
+    "land_no": "16590000",
+    "lat": 22.769443,
+    "lng": 121.1415
   },
   {
     "id": "5a9923c1cec6",
@@ -2516,8 +2654,10 @@
     "park_price": 0,
     "note": "房屋現況點交，賣方實拿180萬元整，全部費用及稅捐均由買方負擔。親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPUNMLLMKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中山段",
+    "land_no": "00770007",
+    "lat": 22.763822,
+    "lng": 121.136183
   },
   {
     "id": "e2e91d3047fa",
@@ -2552,8 +2692,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLNLJHLGFCV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "錦富段",
+    "land_no": "04610000",
+    "lat": 23.091172,
+    "lng": 121.222482
   },
   {
     "id": "bac0137077b4",
@@ -2588,8 +2730,10 @@
     "park_price": 0,
     "note": "含裝潢費；含傢俱設備費；",
     "serial": "RPVNMLLMKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "馬蘭段",
+    "land_no": "15990000",
+    "lat": 22.770321,
+    "lng": 121.141236
   },
   {
     "id": "941ed40d5ee4",
@@ -2624,8 +2768,10 @@
     "park_price": 0,
     "note": "本總價款為新台幣2410萬元整，將價款分為：土地總價款新台幣675萬元整；建物總價款為1735萬元整。",
     "serial": "RPTNMLKMKIKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "梧州段",
+    "land_no": "02600030",
+    "lat": 22.742171,
+    "lng": 121.134591
   },
   {
     "id": "b8ab0d21ec4f",
@@ -2660,8 +2806,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLOJJHLGFDV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "06590003",
+    "lat": 22.692264,
+    "lng": 121.018492
   },
   {
     "id": "117ab3afa51f",
@@ -2696,8 +2844,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLQJJHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "18230000",
+    "lat": 22.763333,
+    "lng": 121.147194
   },
   {
     "id": "f992b09c6c7f",
@@ -2732,8 +2882,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLLJJHLGFBV88DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "成功段",
+    "land_no": "05960000",
+    "lat": 23.097909,
+    "lng": 121.373902
   },
   {
     "id": "c2c68138207b",
@@ -2768,8 +2920,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPVNMLPKJHLGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "知本段",
+    "land_no": "76670000",
+    "lat": 22.708106,
+    "lng": 121.072889
   },
   {
     "id": "a1a5872c484b",
@@ -2804,8 +2958,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLNKJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐谷段",
+    "land_no": "09270000",
+    "lat": 22.742878,
+    "lng": 121.133421
   },
   {
     "id": "c72701437d63",
@@ -2840,8 +2996,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLNLJHLGFCV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "鹿寮段",
+    "land_no": "06190002",
+    "lat": 22.93753,
+    "lng": 121.132677
   },
   {
     "id": "891990879a0d",
@@ -2876,8 +3034,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLPLKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建華段",
+    "land_no": "14140005",
+    "lat": 22.716013,
+    "lng": 121.062605
   },
   {
     "id": "4bbea7f585a9",
@@ -2912,8 +3072,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPTNMLNKJHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "常德段",
+    "land_no": "10850000",
+    "lat": 22.747024,
+    "lng": 121.133305
   },
   {
     "id": "371726b4cdc1",
@@ -2948,8 +3110,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPXNMLPJJHLGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新生段",
+    "land_no": "10810000",
+    "lat": 22.769028,
+    "lng": 121.136968
   },
   {
     "id": "2eb62a5b0f76",
@@ -2984,8 +3148,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLSJJHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "00080004",
+    "lat": 22.758708,
+    "lng": 121.157121
   },
   {
     "id": "16b42febd57e",
@@ -3020,8 +3186,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLPKJHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "石壁段",
+    "land_no": "08660000",
+    "lat": 22.78985,
+    "lng": 121.113847
   },
   {
     "id": "ce5483d08125",
@@ -3056,8 +3224,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLLLJHLGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中山段",
+    "land_no": "03160000",
+    "lat": 22.765497,
+    "lng": 121.1379
   },
   {
     "id": "c2ea25572f99",
@@ -3092,8 +3262,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPPNMLNLKIKGFCV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "桃源段",
+    "land_no": "01970000",
+    "lat": 22.907375,
+    "lng": 121.095877
   },
   {
     "id": "c694ee6c0ea5",
@@ -3128,8 +3300,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；其他增建；",
     "serial": "RPXNMLKMJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建國段",
+    "land_no": "06830000",
+    "lat": 22.705727,
+    "lng": 121.0533
   },
   {
     "id": "1e0fcd835bf9",
@@ -3164,8 +3338,10 @@
     "park_price": 0,
     "note": "含土地增值稅或其他稅費；含地政士服務費；",
     "serial": "RPQNMLOLKIKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "太平段",
+    "land_no": "16740000",
+    "lat": 22.776327,
+    "lng": 121.089616
   },
   {
     "id": "4a35943d9b87",
@@ -3200,8 +3376,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPWNMLMLKIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "00270000",
+    "lat": 22.769209,
+    "lng": 121.123907
   },
   {
     "id": "53b68eb05c3d",
@@ -3236,8 +3414,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLLMKIKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "18050000",
+    "lat": 22.764743,
+    "lng": 121.146785
   },
   {
     "id": "e4a349c7abac",
@@ -3272,8 +3452,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLMKJHLGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐康段",
+    "land_no": "03710000",
+    "lat": 22.748936,
+    "lng": 121.114502
   },
   {
     "id": "c54794d50b7b",
@@ -3308,8 +3490,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；未登記建物；",
     "serial": "RPRNMLLMKIKGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐聖段",
+    "land_no": "02910000",
+    "lat": 22.773164,
+    "lng": 121.078152
   },
   {
     "id": "2b8f932cbad5",
@@ -3344,8 +3528,10 @@
     "park_price": 0,
     "note": "農業設施；",
     "serial": "RPQNMLQKJHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "石壁段",
+    "land_no": "09630000",
+    "lat": 22.789439,
+    "lng": 121.114174
   },
   {
     "id": "673696d1ef8a",
@@ -3380,8 +3566,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPWNMLSLJHLGFAV77DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "清榮段",
+    "land_no": "00860002",
+    "lat": 22.783728,
+    "lng": 121.127302
   },
   {
     "id": "b93eacb76ed4",
@@ -3416,8 +3604,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPPNMLNLKIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "03450000",
+    "lat": 22.755996,
+    "lng": 121.148454
   },
   {
     "id": "1d15d6a7f2d9",
@@ -3452,8 +3642,10 @@
     "park_price": 0,
     "note": "農作物；農業設施；",
     "serial": "RPTNMLLMKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "龍過脈段",
+    "land_no": "00070000",
+    "lat": 22.877094,
+    "lng": 121.103463
   },
   {
     "id": "db8c286e891c",
@@ -3488,8 +3680,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPSNMLMLJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南榮段",
+    "land_no": "01400004",
+    "lat": 22.783812,
+    "lng": 121.135936
   },
   {
     "id": "8c3966cc12e5",
@@ -3524,8 +3718,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPXNMLSLJHLGFAV87DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "清榮段",
+    "land_no": "00860005",
+    "lat": 22.783548,
+    "lng": 121.127276
   },
   {
     "id": "147b16476a7f",
@@ -3560,8 +3756,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPPNMLKLKIKGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "旭川段",
+    "land_no": "08570000",
+    "lat": 22.743403,
+    "lng": 121.110349
   },
   {
     "id": "63946987196e",
@@ -3596,8 +3794,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLMJJHLGFCV56EA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "07600000",
+    "lat": 22.898742,
+    "lng": 121.106039
   },
   {
     "id": "b2571e5adfe1",
@@ -3632,8 +3832,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTLJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建成段",
+    "land_no": "03190004",
+    "lat": 22.708535,
+    "lng": 121.058688
   },
   {
     "id": "b28c9ea97f95",
@@ -3668,8 +3870,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLLLJHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "00840004",
+    "lat": 22.756941,
+    "lng": 121.153732
   },
   {
     "id": "ec111421f74e",
@@ -3704,8 +3908,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPTNMLTKKIKGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建樂段",
+    "land_no": "04240000",
+    "lat": 22.703527,
+    "lng": 121.029188
   },
   {
     "id": "70420f801100",
@@ -3740,8 +3946,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTKKIKGFCV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "萬朝段",
+    "land_no": "09620000",
+    "lat": 23.132089,
+    "lng": 121.187113
   },
   {
     "id": "63202a0e784a",
@@ -3776,8 +3984,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLTKKIKGFBV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "小湊段小港小段",
+    "land_no": "05840001",
+    "lat": 23.159854,
+    "lng": 121.391922
   },
   {
     "id": "bd037ee9ec8a",
@@ -3812,8 +4022,10 @@
     "park_price": 0,
     "note": "急買急賣；",
     "serial": "RPPNMLRJJHLGFCV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "瑞里段",
+    "land_no": "04480000",
+    "lat": 22.952796,
+    "lng": 121.157849
   },
   {
     "id": "1715ba5d84b9",
@@ -3848,8 +4060,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPTNMLSKKIKGFAV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "利家段",
+    "land_no": "72590000",
+    "lat": 22.777484,
+    "lng": 121.077402
   },
   {
     "id": "3310f33545c4",
@@ -3884,8 +4098,10 @@
     "park_price": 0,
     "note": "未登記建物；包含公共設施保留地用地；",
     "serial": "RPPNMLPLKIKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "上南寮段",
+    "land_no": "11820000",
+    "lat": 22.667781,
+    "lng": 121.469195
   },
   {
     "id": "855bbd8231a3",
@@ -3920,8 +4136,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；未登記建物；",
     "serial": "RPOPMLMJJHLGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建業段",
+    "land_no": "07260000",
+    "lat": 22.706754,
+    "lng": 121.043459
   },
   {
     "id": "3274be44accf",
@@ -3956,8 +4174,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLPJJHLGFDV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "多良段",
+    "land_no": "15260000",
+    "lat": 22.467707,
+    "lng": 120.939132
   },
   {
     "id": "796c1bc31973",
@@ -3992,8 +4212,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLRJJHLGFDV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "多良段",
+    "land_no": "14550000",
+    "lat": 22.469825,
+    "lng": 120.945691
   },
   {
     "id": "f9ec6750625b",
@@ -4028,8 +4250,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPPNMLMLJHLGFCV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "福文段",
+    "land_no": "09140000",
+    "lat": 23.12552,
+    "lng": 121.216371
   },
   {
     "id": "515ce3262bcb",
@@ -4064,8 +4288,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPRNMLKMKIKGFCV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "鹿野段",
+    "land_no": "32810000",
+    "lat": 22.907289,
+    "lng": 121.085127
   },
   {
     "id": "ddc805c3e960",
@@ -4100,8 +4326,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPUNMLRJJHLGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新田段",
+    "land_no": "00590000",
+    "lat": 22.768693,
+    "lng": 121.064575
   },
   {
     "id": "823b5f523e66",
@@ -4136,8 +4364,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTKJHLGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建康段",
+    "land_no": "06940000",
+    "lat": 22.70444,
+    "lng": 121.072012
   },
   {
     "id": "201217347c9b",
@@ -4172,8 +4402,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPRNMLTKKIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中清段",
+    "land_no": "01120000",
+    "lat": 22.786267,
+    "lng": 121.122418
   },
   {
     "id": "ab91ff655b35",
@@ -4208,8 +4440,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLTLKIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐成段",
+    "land_no": "05180000",
+    "lat": 22.736067,
+    "lng": 121.13624
   },
   {
     "id": "d9aa06661608",
@@ -4244,8 +4478,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPRNMLQKJHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大南段",
+    "land_no": "02020000",
+    "lat": 22.74643,
+    "lng": 121.04141
   },
   {
     "id": "defc648059d2",
@@ -4280,8 +4516,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPPNMLMKKIKGFDV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "06590003",
+    "lat": 22.692264,
+    "lng": 121.018492
   },
   {
     "id": "5f0ba4d021eb",
@@ -4316,8 +4554,10 @@
     "park_price": 0,
     "note": "農作物；機電設備；",
     "serial": "RPPNMLPKKIKGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "07760001",
+    "lat": 22.744397,
+    "lng": 121.149085
   },
   {
     "id": "6eebfe4f368b",
@@ -4352,8 +4592,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPUNMLKMJHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "03390024",
+    "lat": 22.75701,
+    "lng": 121.15025
   },
   {
     "id": "7eaf19cc1906",
@@ -4388,8 +4630,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLNLKIKGFDV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "多良段",
+    "land_no": "04880282",
+    "lat": 22.517193,
+    "lng": 120.91645
   },
   {
     "id": "ea31850bc9ea",
@@ -4424,8 +4668,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLQLKIKGFDV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07280000",
+    "lat": 22.692344,
+    "lng": 121.014741
   },
   {
     "id": "1516d48ca1e4",
@@ -4460,8 +4706,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLNLKIKGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "東農段",
+    "land_no": "03070000",
+    "lat": 22.745384,
+    "lng": 121.12407
   },
   {
     "id": "375fa646ca0e",
@@ -4496,8 +4744,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLLMKIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "18230000",
+    "lat": 22.763333,
+    "lng": 121.147194
   },
   {
     "id": "4b369d0bcc6a",
@@ -4532,8 +4782,10 @@
     "park_price": 0,
     "note": "土地價款:陸佰萬元整；建物款:陸佰萬元整含傢俱設備費；",
     "serial": "RPRNMLSKKIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐成段",
+    "land_no": "08230003",
+    "lat": 22.735,
+    "lng": 121.122811
   },
   {
     "id": "675e5cba61a5",
@@ -4568,8 +4820,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPQNMLPKKIKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "常德段",
+    "land_no": "05200000",
+    "lat": 22.750587,
+    "lng": 121.134933
   },
   {
     "id": "506c86e95b90",
@@ -4604,8 +4858,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLMKJHLGFDV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台拉段",
+    "land_no": "01770000",
+    "lat": 22.475551,
+    "lng": 120.91034
   },
   {
     "id": "06534dba4bcb",
@@ -4640,8 +4896,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLNLKIKGFCV96EA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大同段",
+    "land_no": "10020000",
+    "lat": 23.128788,
+    "lng": 121.213263
   },
   {
     "id": "fc8dbe5723ac",
@@ -4676,8 +4934,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPSNMLLKKIKGFCV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "06620000",
+    "lat": 22.897327,
+    "lng": 121.109286
   },
   {
     "id": "f776e0e1b045",
@@ -4712,8 +4972,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPTNMLLKKIKGFCV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "06640000",
+    "lat": 22.898366,
+    "lng": 121.109694
   },
   {
     "id": "1b8095cf6abc",
@@ -4748,8 +5010,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPUNMLLKKIKGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "06660000",
+    "lat": 22.898282,
+    "lng": 121.110176
   },
   {
     "id": "dce119586233",
@@ -4784,8 +5048,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPRNMLMKKIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐谷段",
+    "land_no": "07410000",
+    "lat": 22.744077,
+    "lng": 121.134321
   },
   {
     "id": "0968dae82536",
@@ -4820,8 +5086,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLSKKIKGFDV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "森永段",
+    "land_no": "09300000",
+    "lat": 22.264161,
+    "lng": 120.836975
   },
   {
     "id": "68735a31f6d8",
@@ -4856,8 +5124,10 @@
     "park_price": 0,
     "note": "土地款：806萬元整；房屋款：2074萬元整",
     "serial": "RPXNMLRJJHLGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "梧州段",
+    "land_no": "02600007",
+    "lat": 22.742115,
+    "lng": 121.134014
   },
   {
     "id": "74e0d6e82574",
@@ -4892,8 +5162,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLTKJHLGFAV17EA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐田段",
+    "land_no": "30020046",
+    "lat": 22.761655,
+    "lng": 121.093273
   },
   {
     "id": "0f4bb2e180b5",
@@ -4928,8 +5200,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLNLJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "自強段",
+    "land_no": "01180000",
+    "lat": 22.757179,
+    "lng": 121.140897
   },
   {
     "id": "d4d59d17e5cb",
@@ -4964,8 +5238,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLQKKIKGFCV17EA",
-    "lat": null,
-    "lng": null
+    "land_sect": "福原段",
+    "land_no": "00260005",
+    "lat": 23.123442,
+    "lng": 121.215865
   },
   {
     "id": "913cffb236c6",
@@ -5000,8 +5276,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLSKKIKGFDV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大鳥段",
+    "land_no": "10500001",
+    "lat": 22.394213,
+    "lng": 120.893726
   },
   {
     "id": "45084261ba8e",
@@ -5036,8 +5314,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKKKIKGFBV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠勇段",
+    "land_no": "06860000",
+    "lat": 23.102135,
+    "lng": 121.38213
   },
   {
     "id": "ad49d7498510",
@@ -5072,8 +5352,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLQKKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐田段",
+    "land_no": "30020046",
+    "lat": 22.761655,
+    "lng": 121.093273
   },
   {
     "id": "c513b0f1b933",
@@ -5108,8 +5390,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPVNMLTJKIKGFAV67DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "太平段",
+    "land_no": "16020000",
+    "lat": 22.77731,
+    "lng": 121.091271
   },
   {
     "id": "5b5d2d0b8cb0",
@@ -5144,8 +5428,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLKKKIKGFAV88DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "下南寮段",
+    "land_no": "11780000",
+    "lat": 22.645548,
+    "lng": 121.484171
   },
   {
     "id": "cfb563e8403d",
@@ -5180,8 +5466,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLQJJHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富岡段",
+    "land_no": "12610002",
+    "lat": 22.792246,
+    "lng": 121.186645
   },
   {
     "id": "5719741bd0fc",
@@ -5216,8 +5504,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLRJJHLGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富岡段",
+    "land_no": "12610001",
+    "lat": 22.792231,
+    "lng": 121.1866
   },
   {
     "id": "f9ba8d466790",
@@ -5252,8 +5542,10 @@
     "park_price": 0,
     "note": "頂樓加蓋；其他增建；未登記建物；",
     "serial": "RPVNMLTKJHLGFAV67DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "岩灣段",
+    "land_no": "03410001",
+    "lat": 22.790553,
+    "lng": 121.126239
   },
   {
     "id": "1c07f514dc6c",
@@ -5288,8 +5580,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPRNMLMLKIKGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "04580012",
+    "lat": 22.751184,
+    "lng": 121.15314
   },
   {
     "id": "e3b02287eabe",
@@ -5324,8 +5618,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLRJJHLGFDV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大鳥段",
+    "land_no": "01090000",
+    "lat": 22.405829,
+    "lng": 120.917695
   },
   {
     "id": "1dbfe25d9441",
@@ -5360,8 +5656,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLLKKIKGFDV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "金峯段",
+    "land_no": "00140048",
+    "lat": 22.551578,
+    "lng": 120.895567
   },
   {
     "id": "32d7e5190067",
@@ -5396,8 +5694,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLLKKIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "00030288",
+    "lat": 22.76097,
+    "lng": 121.156436
   },
   {
     "id": "1350a452a3b8",
@@ -5432,8 +5732,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTJKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "上岩灣段",
+    "land_no": "01980000",
+    "lat": 22.808356,
+    "lng": 121.124748
   },
   {
     "id": "30532ab38658",
@@ -5468,8 +5770,10 @@
     "park_price": 0,
     "note": "此筆交易包含未保存建物未登記建物；",
     "serial": "RPPNMLQJJHLGFCV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "福文段",
+    "land_no": "08470000",
+    "lat": 23.126238,
+    "lng": 121.216217
   },
   {
     "id": "74cf00a41f35",
@@ -5504,8 +5808,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPUNMLSLJHLGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大豐段",
+    "land_no": "00080001",
+    "lat": 22.717126,
+    "lng": 121.115982
   },
   {
     "id": "1fdfd4389931",
@@ -5540,8 +5846,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPTNMLKMJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中正段",
+    "land_no": "02450000",
+    "lat": 22.761173,
+    "lng": 121.141877
   },
   {
     "id": "43471463b23c",
@@ -5576,8 +5884,10 @@
     "park_price": 0,
     "note": "賣方賣清，所有費用均由買方支付。未登記建物；",
     "serial": "RPQNMLMLKIKGFCV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "萬福段",
+    "land_no": "04910000",
+    "lat": 23.132429,
+    "lng": 121.211639
   },
   {
     "id": "953a7cc26cdb",
@@ -5612,8 +5922,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLPLKIKGFDV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大竹段",
+    "land_no": "01180029",
+    "lat": 22.447203,
+    "lng": 120.927998
   },
   {
     "id": "358932530240",
@@ -5648,8 +5960,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLTJKIKGFDV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07230000",
+    "lat": 22.692454,
+    "lng": 121.014106
   },
   {
     "id": "9efcddca84eb",
@@ -5684,8 +5998,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；其他增建；",
     "serial": "RPXOMLMJJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "東海段",
+    "land_no": "04970000",
+    "lat": 22.744612,
+    "lng": 121.140385
   },
   {
     "id": "cb33538b518b",
@@ -5720,8 +6036,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLPLKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "東海段",
+    "land_no": "01300000",
+    "lat": 22.743036,
+    "lng": 121.143351
   },
   {
     "id": "4b3f5120e7e9",
@@ -5756,8 +6074,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLQKJHLGFCV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "鸞山段",
+    "land_no": "01060008",
+    "lat": 22.918426,
+    "lng": 121.156015
   },
   {
     "id": "8ee732747b89",
@@ -5792,8 +6112,10 @@
     "park_price": 0,
     "note": "1.增建位於一樓前側及三樓前後側2.前方道路台東市永和段0511-0001地號不動產役權供通行使用.權利人變更為買方其他增建；",
     "serial": "RPRNMLLKKIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永和段",
+    "land_no": "05190000",
+    "lat": 22.793818,
+    "lng": 121.13069
   },
   {
     "id": "36b4f00186bd",
@@ -5828,8 +6150,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPUNMLSJKIKGFBV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "黃金橋段",
+    "land_no": "09230000",
+    "lat": 23.414757,
+    "lng": 121.48342
   },
   {
     "id": "674e00bbf9d9",
@@ -5864,8 +6188,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLMJJHLGFBV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠勇段",
+    "land_no": "07980000",
+    "lat": 23.102775,
+    "lng": 121.380615
   },
   {
     "id": "1f8ac70067fb",
@@ -5900,8 +6226,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPTNMLSJKIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "順天段",
+    "land_no": "00450003",
+    "lat": 22.764264,
+    "lng": 121.12244
   },
   {
     "id": "ee70838e4a42",
@@ -5936,8 +6264,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLQLKIKGFDV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "壢坵段",
+    "land_no": "06050000",
+    "lat": 22.523667,
+    "lng": 120.912103
   },
   {
     "id": "eeb6e96e1968",
@@ -5972,8 +6302,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKMKIKGFDV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大竹段",
+    "land_no": "07490017",
+    "lat": 22.416556,
+    "lng": 120.89605
   },
   {
     "id": "1e3564c9ef5e",
@@ -6008,8 +6340,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLKMKIKGFDV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "多良段",
+    "land_no": "02080000",
+    "lat": 22.511777,
+    "lng": 120.956822
   },
   {
     "id": "c1eb70092051",
@@ -6044,8 +6378,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLOJKIKGFCV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大同段",
+    "land_no": "02070000",
+    "lat": 23.127327,
+    "lng": 121.216249
   },
   {
     "id": "c10f3770501c",
@@ -6080,8 +6416,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKKKIKGFDV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07280000",
+    "lat": 22.692344,
+    "lng": 121.014741
   },
   {
     "id": "68998b9afe21",
@@ -6116,8 +6454,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPPNMLMJKIKGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "18230000",
+    "lat": 22.763333,
+    "lng": 121.147194
   },
   {
     "id": "2b626b4d30e9",
@@ -6152,8 +6492,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLSLJIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "常德段",
+    "land_no": "07510000",
+    "lat": 22.749784,
+    "lng": 121.135047
   },
   {
     "id": "dc0decb02064",
@@ -6188,8 +6530,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPRNMLSJKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐田段",
+    "land_no": "30020046",
+    "lat": 22.761655,
+    "lng": 121.093273
   },
   {
     "id": "37679d65041f",
@@ -6224,8 +6568,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLQLKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "岩灣段",
+    "land_no": "01050013",
+    "lat": 22.797276,
+    "lng": 121.124088
   },
   {
     "id": "44104c343963",
@@ -6260,8 +6606,10 @@
     "park_price": 0,
     "note": "頂樓加蓋；",
     "serial": "RPPNMLSJJHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "利家段",
+    "land_no": "83460003",
+    "lat": 22.813671,
+    "lng": 121.08637
   },
   {
     "id": "23e2edd8d542",
@@ -6332,8 +6680,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPRNMLQKKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "利家段",
+    "land_no": "58770000",
+    "lat": 22.790714,
+    "lng": 121.08826
   },
   {
     "id": "2f3411f35858",
@@ -6368,8 +6718,10 @@
     "park_price": 0,
     "note": "含裝潢費；含傢俱設備費；其他增建；",
     "serial": "RPQNMLMJKIKGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永清段",
+    "land_no": "09890003",
+    "lat": 22.781339,
+    "lng": 121.120879
   },
   {
     "id": "23d7190cd7c1",
@@ -6440,8 +6792,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPSNMLTKKIKGFBV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "玉長段",
+    "land_no": "08280000",
+    "lat": 23.244002,
+    "lng": 121.417009
   },
   {
     "id": "3fb740eb82dd",
@@ -6476,8 +6830,10 @@
     "park_price": 0,
     "note": "陽台外推；其他增建；",
     "serial": "RPQNMLTKKIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "興安段",
+    "land_no": "00860000",
+    "lat": 22.797233,
+    "lng": 121.12717
   },
   {
     "id": "ce5cb9370a9a",
@@ -6512,8 +6868,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPTNMLPKKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建本段",
+    "land_no": "03050000",
+    "lat": 22.715678,
+    "lng": 121.050246
   },
   {
     "id": "46089874eb76",
@@ -6548,8 +6906,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；其他增建；",
     "serial": "RPRNMLMJKIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "06200000",
+    "lat": 22.767333,
+    "lng": 121.115842
   },
   {
     "id": "383e3c61989d",
@@ -6584,8 +6944,10 @@
     "park_price": 0,
     "note": "土地售價25萬未保存建物2萬公有地耕作權讓渡8萬未登記建物；未登記建物；",
     "serial": "RPPNMLKMKIKGFBV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "樟原段姑仔律小段",
+    "land_no": "03510001",
+    "lat": 23.413448,
+    "lng": 121.475184
   },
   {
     "id": "1052b93555ce",
@@ -6620,8 +6982,10 @@
     "park_price": 0,
     "note": "地清或未辦繼承標售；",
     "serial": "RPPNMLNLJHLGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "康樂段",
+    "land_no": "06650000",
+    "lat": 22.740982,
+    "lng": 121.092229
   },
   {
     "id": "077a54410ac1",
@@ -6656,8 +7020,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLNLJHLGFBV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "三仙段",
+    "land_no": "07720000",
+    "lat": 23.112957,
+    "lng": 121.391296
   },
   {
     "id": "22c600ee5da1",
@@ -6692,8 +7058,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLLLKIKGFBV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新竹湖段",
+    "land_no": "11850000",
+    "lat": 23.269974,
+    "lng": 121.416177
   },
   {
     "id": "fd5650a8e7bd",
@@ -6728,8 +7096,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPSNMLPLKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "12720005",
+    "lat": 22.761651,
+    "lng": 121.146141
   },
   {
     "id": "ad430523c2ed",
@@ -6764,8 +7134,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "RPTNMLRLJIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "龍過脈段",
+    "land_no": "00450001",
+    "lat": 22.874207,
+    "lng": 121.099656
   },
   {
     "id": "6b0e7405a3ac",
@@ -6800,8 +7172,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLLJKIKGFBV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠勇段",
+    "land_no": "07810000",
+    "lat": 23.102632,
+    "lng": 121.380145
   },
   {
     "id": "e42216035eb0",
@@ -6836,8 +7210,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；未登記建物；",
     "serial": "RPPNMLLJKIKGFDV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "西勢湖段",
+    "land_no": "00470000",
+    "lat": 22.345527,
+    "lng": 120.880441
   },
   {
     "id": "cdc1af776e2a",
@@ -6872,8 +7248,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLLKKIKGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "馬蘭段",
+    "land_no": "15700000",
+    "lat": 22.769138,
+    "lng": 121.144107
   },
   {
     "id": "4cd51deb3927",
@@ -6908,8 +7286,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPRNMLTLJIKGFBV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠仁段",
+    "land_no": "10190000",
+    "lat": 23.098891,
+    "lng": 121.376784
   },
   {
     "id": "8fb387199898",
@@ -6944,8 +7324,10 @@
     "park_price": 0,
     "note": "陽台外推；其他增建；",
     "serial": "RPVNMLPJKIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "興安段",
+    "land_no": "00860000",
+    "lat": 22.797233,
+    "lng": 121.12717
   },
   {
     "id": "6e8fb16b4788",
@@ -6980,8 +7362,10 @@
     "park_price": 0,
     "note": "含租約；",
     "serial": "RPOOMLPJJHLGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "知本段",
+    "land_no": "75650001",
+    "lat": 22.71732,
+    "lng": 121.077927
   },
   {
     "id": "75ffc5974d61",
@@ -7052,8 +7436,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLRLJIKGFBV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新美山段",
+    "land_no": "06230000",
+    "lat": 23.148681,
+    "lng": 121.395542
   },
   {
     "id": "acce5d371b1a",
@@ -7088,8 +7474,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLQLKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "09430024",
+    "lat": 22.770704,
+    "lng": 121.110152
   },
   {
     "id": "fb6984cd4899",
@@ -7124,8 +7512,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLNKJHLGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "25450000",
+    "lat": 22.751707,
+    "lng": 121.141613
   },
   {
     "id": "c531a269e15d",
@@ -7160,8 +7550,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPUNMLTJKIKGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐里段",
+    "land_no": "08980000",
+    "lat": 22.729243,
+    "lng": 121.118031
   },
   {
     "id": "ff18e754211e",
@@ -7196,8 +7588,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "RPPNMLOJKIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南榮段",
+    "land_no": "02450000",
+    "lat": 22.784887,
+    "lng": 121.128016
   },
   {
     "id": "c41590816c71",
@@ -7232,8 +7626,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPSNMLNLKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "00080057",
+    "lat": 22.759118,
+    "lng": 121.156741
   },
   {
     "id": "a2bbf3efa7a3",
@@ -7268,8 +7664,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLMJJHLGFCV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南山段",
+    "land_no": "05600000",
+    "lat": 23.046205,
+    "lng": 121.15833
   },
   {
     "id": "767af6a0750a",
@@ -7304,8 +7702,10 @@
     "park_price": 0,
     "note": "地清或未辦繼承標售；",
     "serial": "RPPNMLPJJHLGFBV76EA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠仁段",
+    "land_no": "00440000",
+    "lat": 23.101388,
+    "lng": 121.381696
   },
   {
     "id": "040bb7ce77d3",
@@ -7340,12 +7740,14 @@
     "park_price": 0,
     "note": "農地上有資材室。主建物之廁所在資材室內。未登記建物；",
     "serial": "RPQNMLNLJHLGFBV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南都蘭段",
+    "land_no": "02200000",
+    "lat": 22.874561,
+    "lng": 121.209069
   },
   {
     "id": "f06b961b38b3",
-    "batch": "20251121",
+    "batch": "20251201",
     "county": "臺東縣",
     "county_code": "v",
     "district": "卑南鄉",
@@ -7375,9 +7777,11 @@
     "park_type": "",
     "park_price": 0,
     "note": "",
-    "serial": "RPTNMLTJKIKGFAV47DA",
-    "lat": null,
-    "lng": null
+    "serial": "RPSNMLTJKIKGFAV37DA",
+    "land_sect": "明峰段",
+    "land_no": "03630001",
+    "lat": 22.87095,
+    "lng": 121.113215
   },
   {
     "id": "a41c8ed7a9bd",
@@ -7448,8 +7852,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；未登記建物；瑕疵物件；",
     "serial": "RPQNMLLKKIKGFBV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新港段新港小段",
+    "land_no": "09800003",
+    "lat": 23.105238,
+    "lng": 121.36404
   },
   {
     "id": "20eb00851c7c",
@@ -7484,8 +7890,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；未登記建物；",
     "serial": "RPPNMLRKKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "射馬干段",
+    "land_no": "07230000",
+    "lat": 22.731485,
+    "lng": 121.05845
   },
   {
     "id": "22f475a1658a",
@@ -7520,8 +7928,10 @@
     "park_price": 0,
     "note": "未登記建物；農作物；",
     "serial": "RPPNMLTLJIKGFBV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "高原段",
+    "land_no": "07640000",
+    "lat": 22.993961,
+    "lng": 121.285615
   },
   {
     "id": "e51d5d3fce69",
@@ -7556,8 +7966,10 @@
     "park_price": 0,
     "note": "地清或未辦繼承標售；",
     "serial": "RPPNMLMKJHLGFAV09EA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐利段",
+    "land_no": "09940000",
+    "lat": 22.771779,
+    "lng": 121.087934
   },
   {
     "id": "b43c17bde497",
@@ -7592,8 +8004,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPRNMLLJKIKGFCV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中福段",
+    "land_no": "06120002",
+    "lat": 23.04813,
+    "lng": 121.161953
   },
   {
     "id": "a7d1bd28599d",
@@ -7628,8 +8042,10 @@
     "park_price": 0,
     "note": "含租約；",
     "serial": "RPPNMLMLKIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "知本段",
+    "land_no": "84470001",
+    "lat": 22.717814,
+    "lng": 121.092405
   },
   {
     "id": "88c6b3df15b5",
@@ -7664,8 +8080,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPQNMLSKKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐成段",
+    "land_no": "08230000",
+    "lat": 22.735037,
+    "lng": 121.122781
   },
   {
     "id": "a2b5b6ce3253",
@@ -7700,8 +8118,10 @@
     "park_price": 0,
     "note": "含土地增值稅或其他稅費；",
     "serial": "RPQNMLSLJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中山段",
+    "land_no": "05610000",
+    "lat": 22.767024,
+    "lng": 121.136346
   },
   {
     "id": "25bb99a7c664",
@@ -7844,8 +8264,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLTKJIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "路頂段",
+    "land_no": "01520002",
+    "lat": 22.735808,
+    "lng": 121.094325
   },
   {
     "id": "68d3b880562c",
@@ -7880,8 +8302,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLMLKIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "利泰段",
+    "land_no": "11720000",
+    "lat": 22.772164,
+    "lng": 121.072791
   },
   {
     "id": "2d90ae46b27c",
@@ -7916,8 +8340,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPPNMLTKJIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "公舘西段",
+    "land_no": "04320000",
+    "lat": 22.676646,
+    "lng": 121.489428
   },
   {
     "id": "5d5607544a19",
@@ -7952,8 +8378,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPPNMLKKKIKGFDV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07230000",
+    "lat": 22.692454,
+    "lng": 121.014106
   },
   {
     "id": "eafef2460d30",
@@ -7988,8 +8416,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLQLJIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "常德段",
+    "land_no": "07520000",
+    "lat": 22.74949,
+    "lng": 121.134704
   },
   {
     "id": "5cccaea28d41",
@@ -8024,8 +8454,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；其他增建；",
     "serial": "RPPNMLQKKIKGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大池段",
+    "land_no": "07810000",
+    "lat": 23.104444,
+    "lng": 121.222759
   },
   {
     "id": "02a4621b7cd9",
@@ -8060,8 +8492,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPRNMLPJKIKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐康段",
+    "land_no": "07950000",
+    "lat": 22.751739,
+    "lng": 121.112855
   },
   {
     "id": "e4f6882a87a2",
@@ -8096,8 +8530,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPVNMLMJKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永清段",
+    "land_no": "03580000",
+    "lat": 22.777811,
+    "lng": 121.125241
   },
   {
     "id": "3ea6e23e844a",
@@ -8132,8 +8568,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；農作物；",
     "serial": "RPRNMLNLJHLGFCV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大原段",
+    "land_no": "17410000",
+    "lat": 22.983008,
+    "lng": 121.139743
   },
   {
     "id": "dbe0aecfd294",
@@ -8204,8 +8642,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPPNMLMJKIKGFCV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "福原段",
+    "land_no": "00260000",
+    "lat": 23.123482,
+    "lng": 121.216078
   },
   {
     "id": "191384b96611",
@@ -8312,8 +8752,10 @@
     "park_price": 0,
     "note": "未登記建物；未登記建物；",
     "serial": "RPPNMLMLKIKGFCV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "瑞里段",
+    "land_no": "07270001",
+    "lat": 22.953126,
+    "lng": 121.156896
   },
   {
     "id": "b5f612b08a5a",
@@ -8348,8 +8790,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPPNMLRKJIKGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "鹿寮段",
+    "land_no": "03000000",
+    "lat": 22.931608,
+    "lng": 121.118653
   },
   {
     "id": "baf890e1be8d",
@@ -8384,8 +8828,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLLLJHLGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中山段",
+    "land_no": "09170000",
+    "lat": 22.767476,
+    "lng": 121.134008
   },
   {
     "id": "4bd6327400fb",
@@ -8456,8 +8902,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；其他增建；",
     "serial": "RPTNMLKKKHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永清段",
+    "land_no": "04220000",
+    "lat": 22.778734,
+    "lng": 121.123328
   },
   {
     "id": "b14527cdfef8",
@@ -8492,8 +8940,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPQNMLLKKIKGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南王段",
+    "land_no": "00440007",
+    "lat": 22.784128,
+    "lng": 121.118889
   },
   {
     "id": "9529c1cd058c",
@@ -8528,8 +8978,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPSNMLPJKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐谷段",
+    "land_no": "09840000",
+    "lat": 22.742718,
+    "lng": 121.133918
   },
   {
     "id": "933293256c95",
@@ -8564,8 +9016,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLRKKIKGFDV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "多良段",
+    "land_no": "10500000",
+    "lat": 22.498651,
+    "lng": 120.943987
   },
   {
     "id": "3c590ecede39",
@@ -8636,8 +9090,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLOKJIKGFDV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07230000",
+    "lat": 22.692454,
+    "lng": 121.014106
   },
   {
     "id": "eb1e40e36fe2",
@@ -8672,8 +9128,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "RPQNMLTJKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "光明段",
+    "land_no": "07050002",
+    "lat": 22.760042,
+    "lng": 121.132767
   },
   {
     "id": "f9efd3f0e6c5",
@@ -8708,8 +9166,10 @@
     "park_price": 0,
     "note": "雙方合意之價金。",
     "serial": "RPPNMLKMKIKGFCV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "加拿段",
+    "land_no": "04000000",
+    "lat": 23.002558,
+    "lng": 121.127591
   },
   {
     "id": "9494acf9399d",
@@ -8744,8 +9204,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLTJKIKGFCV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "07030000",
+    "lat": 22.896891,
+    "lng": 121.111222
   },
   {
     "id": "8ec5be46c426",
@@ -8780,8 +9242,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLTJKIKGFCV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "07100000",
+    "lat": 22.897786,
+    "lng": 121.111676
   },
   {
     "id": "79f9cb52e3ee",
@@ -8816,8 +9280,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLTJKIKGFCV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "07110000",
+    "lat": 22.897683,
+    "lng": 121.111513
   },
   {
     "id": "bcbf426f0f94",
@@ -8852,8 +9318,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLLKKIKGFCV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "07050000",
+    "lat": 22.896808,
+    "lng": 121.111571
   },
   {
     "id": "3ce1f63fcfcb",
@@ -8888,8 +9356,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLLKKIKGFCV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "07060000",
+    "lat": 22.896714,
+    "lng": 121.111697
   },
   {
     "id": "707aa8be9f92",
@@ -8960,8 +9430,10 @@
     "park_price": 0,
     "note": "本案係特目用地老人養護中心農作物；",
     "serial": "RPSNMLRKKIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "班鳩段",
+    "land_no": "08700000",
+    "lat": 22.835758,
+    "lng": 121.079932
   },
   {
     "id": "77f34526895a",
@@ -9032,8 +9504,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPPNMLSLJIKGFBV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠智段",
+    "land_no": "01830000",
+    "lat": 23.106098,
+    "lng": 121.379634
   },
   {
     "id": "30dfc08ba9f8",
@@ -9068,8 +9542,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLKMJHLGFBV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "東柄段",
+    "land_no": "05960000",
+    "lat": 23.343638,
+    "lng": 121.461494
   },
   {
     "id": "69dd1d112d8b",
@@ -9140,8 +9616,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPQNMLMKKIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "11920000",
+    "lat": 22.760505,
+    "lng": 121.14668
   },
   {
     "id": "f4edc240eb7c",
@@ -9392,8 +9870,10 @@
     "park_price": 0,
     "note": "未登記建物；包含公共設施保留地用地；",
     "serial": "RPQNMLLKJIKGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "06980000",
+    "lat": 22.771454,
+    "lng": 121.11389
   },
   {
     "id": "d2b0ed6ecadc",
@@ -9608,8 +10088,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLPJJIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建樂段",
+    "land_no": "04800000",
+    "lat": 22.698419,
+    "lng": 121.02504
   },
   {
     "id": "261bf8acb1a8",
@@ -9644,8 +10126,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；未登記建物；",
     "serial": "RPRNMLSKKIKGFDV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "達人段",
+    "land_no": "05870000",
+    "lat": 22.294032,
+    "lng": 120.866928
   },
   {
     "id": "28b590666b58",
@@ -9680,8 +10164,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPUNMLKMKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "普優瑪段",
+    "land_no": "00620000",
+    "lat": 22.784237,
+    "lng": 121.117083
   },
   {
     "id": "498f92b9dbdb",
@@ -9860,8 +10346,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTJKIKGFBV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "都豐段",
+    "land_no": "11810000",
+    "lat": 23.038969,
+    "lng": 121.334357
   },
   {
     "id": "94e8212ca0ac",
@@ -10076,8 +10564,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPVNMLNJJIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "18230000",
+    "lat": 22.763333,
+    "lng": 121.147194
   },
   {
     "id": "cb68e8ad847e",
@@ -10112,8 +10602,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLRKKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02660002",
+    "lat": 22.754256,
+    "lng": 121.154948
   },
   {
     "id": "1745e86c8767",
@@ -10148,8 +10640,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPVNMLRLJIKGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02660002",
+    "lat": 22.754256,
+    "lng": 121.154948
   },
   {
     "id": "107783f4aea7",
@@ -10184,8 +10678,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLMLJHLGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐康段",
+    "land_no": "05490000",
+    "lat": 22.752601,
+    "lng": 121.1136
   },
   {
     "id": "bbfc6f162315",
@@ -10220,8 +10716,10 @@
     "park_price": 0,
     "note": "不含獎勵金。協議價購；",
     "serial": "RPPNMLQKJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "康樂段",
+    "land_no": "09520002",
+    "lat": 22.753427,
+    "lng": 121.081844
   },
   {
     "id": "172e129ca54c",
@@ -10256,8 +10754,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLMKKIKGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "德安段",
+    "land_no": "00630000",
+    "lat": 22.750819,
+    "lng": 121.108273
   },
   {
     "id": "2126d071ef5e",
@@ -10292,8 +10792,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLPLJIKGFBV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新竹湖段",
+    "land_no": "09890002",
+    "lat": 23.274099,
+    "lng": 121.421787
   },
   {
     "id": "31c58e7fded6",
@@ -10328,6 +10830,8 @@
     "park_price": 0,
     "note": "建物坐落地號：新竹湖段983地號；其他增建；",
     "serial": "RPQNMLPLJIKGFBV96DA",
+    "land_sect": "",
+    "land_no": "",
     "lat": null,
     "lng": null
   },
@@ -10436,8 +10940,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPRNMLPKKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "知本段",
+    "land_no": "75410000",
+    "lat": 22.716185,
+    "lng": 121.075796
   },
   {
     "id": "aa6bcbceb421",
@@ -10472,8 +10978,10 @@
     "park_price": 0,
     "note": "買賣價款包含地上未保存登記之竹湖43-11號資材室未登記建物；",
     "serial": "RPPNMLTKKIKGFBV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新竹湖段",
+    "land_no": "01450000",
+    "lat": 23.284162,
+    "lng": 121.422377
   },
   {
     "id": "37e27a213225",
@@ -10832,8 +11340,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPPNMLNJKIKGFCV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "月野段",
+    "land_no": "03130000",
+    "lat": 23.023322,
+    "lng": 121.148869
   },
   {
     "id": "62e68011429b",
@@ -10868,8 +11378,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKMKIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "自強段",
+    "land_no": "07170000",
+    "lat": 22.757067,
+    "lng": 121.137728
   },
   {
     "id": "e29269edd07c",
@@ -10904,8 +11416,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPQNMLRJJHLGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南清段",
+    "land_no": "09310000",
+    "lat": 22.779577,
+    "lng": 121.126844
   },
   {
     "id": "74013bc7646b",
@@ -11156,8 +11670,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPPNMLMKJIKGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "興安段",
+    "land_no": "00860000",
+    "lat": 22.797233,
+    "lng": 121.12717
   },
   {
     "id": "54ba5c2cb65d",
@@ -11192,8 +11708,10 @@
     "park_price": 0,
     "note": "含土地增值稅或其他稅費；含地政士服務費；未登記建物；",
     "serial": "RPPNMLSJJIKGFBV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "都豐段",
+    "land_no": "07980000",
+    "lat": 23.049221,
+    "lng": 121.336737
   },
   {
     "id": "677cd90320cf",
@@ -11228,8 +11746,10 @@
     "park_price": 0,
     "note": "頂樓加蓋；其他增建；",
     "serial": "RPRNMLTLIIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "06540241",
+    "lat": 22.746796,
+    "lng": 121.143695
   },
   {
     "id": "8f8ac64a268d",
@@ -11300,8 +11820,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPQNMLLLIIKGFBV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "北八里段",
+    "land_no": "01010000",
+    "lat": 22.912993,
+    "lng": 121.247605
   },
   {
     "id": "c010512b4b54",
@@ -11336,8 +11858,10 @@
     "park_price": 0,
     "note": "有其他增建。農作物；農業設施；",
     "serial": "RPRNMLPJJIKGFBV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "南佳里段",
+    "land_no": "12110000",
+    "lat": 22.907192,
+    "lng": 121.253293
   },
   {
     "id": "b6f54d69ba57",
@@ -11372,8 +11896,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；",
     "serial": "RPPNMLSKKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "24120000",
+    "lat": 22.75488,
+    "lng": 121.138937
   },
   {
     "id": "dab8ca0ce4f9",
@@ -11408,8 +11934,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLMKJIKGFDV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新化段",
+    "land_no": "04940002",
+    "lat": 22.366838,
+    "lng": 120.858243
   },
   {
     "id": "464d15d48157",
@@ -11552,8 +12080,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPSNMLTLIIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "自強段",
+    "land_no": "07170000",
+    "lat": 22.757067,
+    "lng": 121.137728
   },
   {
     "id": "84a947dc1f29",
@@ -11624,8 +12154,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLPKJIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建樂段",
+    "land_no": "04840000",
+    "lat": 22.698211,
+    "lng": 121.02448
   },
   {
     "id": "7117eb990438",
@@ -11768,8 +12300,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPXNMLRLJIKGFAV77DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02660002",
+    "lat": 22.754256,
+    "lng": 121.154948
   },
   {
     "id": "9cd18a61a182",
@@ -11840,8 +12374,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLTLIIKGFDV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07230000",
+    "lat": 22.692454,
+    "lng": 121.014106
   },
   {
     "id": "1f4b3f6a6f56",
@@ -12164,8 +12700,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；頂樓加蓋；",
     "serial": "RPRNMLLLIIKGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中心段",
+    "land_no": "06850000",
+    "lat": 22.762808,
+    "lng": 121.139376
   },
   {
     "id": "a2a3dfe6ca6e",
@@ -12200,8 +12738,10 @@
     "park_price": 0,
     "note": "陽台外推；其他增建；",
     "serial": "RPRNMLQLKIKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "興安段",
+    "land_no": "00860000",
+    "lat": 22.797233,
+    "lng": 121.12717
   },
   {
     "id": "2ef1dfc748e9",
@@ -12236,8 +12776,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPVNMLKMJHLGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建樂段",
+    "land_no": "01980005",
+    "lat": 22.704593,
+    "lng": 121.02919
   },
   {
     "id": "0d36cc4ba406",
@@ -12524,8 +13066,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPPNMLLJKIKGFAV88DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "下賓朗段",
+    "land_no": "13710000",
+    "lat": 22.794299,
+    "lng": 121.102667
   },
   {
     "id": "b226ea1e973d",
@@ -12560,8 +13104,10 @@
     "park_price": 0,
     "note": "本案總價未包含未登記建物親友、員工、共有人或其他特殊關係間之交易；未登記建物；",
     "serial": "RPQNMLQJJHLGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富山段",
+    "land_no": "02800000",
+    "lat": 22.840597,
+    "lng": 121.187672
   },
   {
     "id": "468717b89df5",
@@ -12596,8 +13142,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPWNMLKLIIKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "中正段",
+    "land_no": "10570000",
+    "lat": 22.759928,
+    "lng": 121.139752
   },
   {
     "id": "c9d375623742",
@@ -12704,8 +13252,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPUNMLSJKIKGFAV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建本段",
+    "land_no": "03940000",
+    "lat": 22.714125,
+    "lng": 121.053742
   },
   {
     "id": "2a474fccd4c3",
@@ -12812,8 +13362,10 @@
     "park_price": 0,
     "note": "未登記建物；",
     "serial": "RPQNMLNLIIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建康段",
+    "land_no": "00060000",
+    "lat": 22.711833,
+    "lng": 121.07008
   },
   {
     "id": "59042989883d",
@@ -12848,8 +13400,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPVNMLKMKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富岡南段",
+    "land_no": "04000000",
+    "lat": 22.790242,
+    "lng": 121.184212
   },
   {
     "id": "5475b9d67718",
@@ -12956,8 +13510,10 @@
     "park_price": 0,
     "note": "不包含獎勵金。協議價購；",
     "serial": "RPSNMLKKOHKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "康樂段",
+    "land_no": "09360002",
+    "lat": 22.754828,
+    "lng": 121.082563
   },
   {
     "id": "9291650eccd4",
@@ -12992,8 +13548,10 @@
     "park_price": 0,
     "note": "不包含獎勵金。協議價購；",
     "serial": "RPTNMLKKOHKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "康樂段",
+    "land_no": "09380002",
+    "lat": 22.754723,
+    "lng": 121.082474
   },
   {
     "id": "939948cb94b1",
@@ -13388,8 +13946,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；農作物；",
     "serial": "RPPNMLLMKIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "知本段",
+    "land_no": "79840000",
+    "lat": 22.702584,
+    "lng": 121.076391
   },
   {
     "id": "183687577e51",
@@ -13604,8 +14164,10 @@
     "park_price": 0,
     "note": "含傢俱設備費；",
     "serial": "RPPNMLPKIIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "馬蘭段",
+    "land_no": "16590000",
+    "lat": 22.769443,
+    "lng": 121.1415
   },
   {
     "id": "2de3993aac64",
@@ -13640,8 +14202,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPPNMLOLKIKGFCV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "北庄段",
+    "land_no": "04220000",
+    "lat": 23.110096,
+    "lng": 121.180843
   },
   {
     "id": "eba8184ab6b6",
@@ -13892,8 +14456,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKKKIKGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "永清段",
+    "land_no": "08200001",
+    "lat": 22.780482,
+    "lng": 121.120968
   },
   {
     "id": "63930dd6d801",
@@ -13928,8 +14494,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLOJJIKGFDV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "秀山段",
+    "land_no": "07230000",
+    "lat": 22.692454,
+    "lng": 121.014106
   },
   {
     "id": "c54e9d1d5967",
@@ -14324,8 +14892,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPTNMLPLKIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富岡南段",
+    "land_no": "12500003",
+    "lat": 22.783587,
+    "lng": 121.159445
   },
   {
     "id": "2d94950a2dd9",
@@ -14792,8 +15362,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLSJKIKGFBV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "和平南段",
+    "land_no": "04240000",
+    "lat": 23.060694,
+    "lng": 121.345223
   },
   {
     "id": "83856804684a",
@@ -14828,8 +15400,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPTNMLSJKIKGFBV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "和平南段",
+    "land_no": "04240001",
+    "lat": 23.061105,
+    "lng": 121.345267
   },
   {
     "id": "324af1408afc",
@@ -14864,8 +15438,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLNKJIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "下南寮段",
+    "land_no": "06230000",
+    "lat": 22.657508,
+    "lng": 121.476586
   },
   {
     "id": "b4daba5d5ab3",
@@ -15080,8 +15656,10 @@
     "park_price": 0,
     "note": "頂樓加蓋；其他增建；",
     "serial": "RPSNMLPKKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "常德段",
+    "land_no": "09660020",
+    "lat": 22.746802,
+    "lng": 121.133998
   },
   {
     "id": "d2a83dddb626",
@@ -15872,8 +16450,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLOJJHLGFAV09DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "自強段",
+    "land_no": "09450000",
+    "lat": 22.760391,
+    "lng": 121.136839
   },
   {
     "id": "dcaaaec988e3",
@@ -16124,8 +16704,10 @@
     "park_price": 0,
     "note": "其他增建；",
     "serial": "RPTNMLKLJHLGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "11920000",
+    "lat": 22.760505,
+    "lng": 121.14668
   },
   {
     "id": "78148ea30dd6",
@@ -16592,8 +17174,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQOMLKLIIKGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐利段",
+    "land_no": "02410000",
+    "lat": 22.773986,
+    "lng": 121.086096
   },
   {
     "id": "d4ca90271dc1",
@@ -16628,8 +17212,10 @@
     "park_price": 0,
     "note": "停車位位於一樓法定空地上車位編號7",
     "serial": "RPPNMLMJKHLGFAV98DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "04590000",
+    "lat": 22.769535,
+    "lng": 121.115793
   },
   {
     "id": "6bd1f19c2b09",
@@ -16988,8 +17574,10 @@
     "park_price": 0,
     "note": "頂樓加蓋；",
     "serial": "RPSNMLTKKIKGFAV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐里段",
+    "land_no": "06160000",
+    "lat": 22.734783,
+    "lng": 121.120214
   },
   {
     "id": "47c1ddcd1499",
@@ -17420,8 +18008,10 @@
     "park_price": 0,
     "note": "農業設施；",
     "serial": "RPPNMLLLRHKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "富岡段",
+    "land_no": "03600000",
+    "lat": 22.811494,
+    "lng": 121.190548
   },
   {
     "id": "e784bb32add5",
@@ -18464,8 +19054,10 @@
     "park_price": 0,
     "note": "親友、員工、共有人或其他特殊關係間之交易；頂樓加蓋；",
     "serial": "RPTNMLTLIIKGFAV47DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "建業段",
+    "land_no": "00370000",
+    "lat": 22.707485,
+    "lng": 121.051211
   },
   {
     "id": "0ca2886c9db6",
@@ -19040,8 +19632,10 @@
     "park_price": 0,
     "note": "土地款：440萬元整；房屋款：660萬元整",
     "serial": "RPQNMLPKJHLGFBV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠智段",
+    "land_no": "12180002",
+    "lat": 23.10308,
+    "lng": 121.374586
   },
   {
     "id": "7e206e13b321",
@@ -19076,8 +19670,10 @@
     "park_price": 0,
     "note": "土地款：560萬元整；房屋款：840萬元整",
     "serial": "RPRNMLPKJHLGFBV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "忠智段",
+    "land_no": "12180003",
+    "lat": 23.103049,
+    "lng": 121.374523
   },
   {
     "id": "4515488ed3eb",
@@ -19724,8 +20320,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKMKIKGFCV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐泉段",
+    "land_no": "07730004",
+    "lat": 23.053032,
+    "lng": 121.163171
   },
   {
     "id": "d21b40c75502",
@@ -19760,8 +20358,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPPNMLSJJHLGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐泉段",
+    "land_no": "07730018",
+    "lat": 23.053057,
+    "lng": 121.1631
   },
   {
     "id": "c3e6d7c852fc",
@@ -20156,8 +20756,10 @@
     "park_price": 0,
     "note": "含裝潢費；含傢俱設備費；其他增建；",
     "serial": "RPPNMLOLJIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "利卡夢段",
+    "land_no": "03520000",
+    "lat": 22.773477,
+    "lng": 121.062067
   },
   {
     "id": "caf8fd57c12d",
@@ -20804,8 +21406,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLSJKIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新生段",
+    "land_no": "00440000",
+    "lat": 22.765295,
+    "lng": 121.142907
   },
   {
     "id": "f70ab5161515",
@@ -22352,8 +22956,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPTNMLLMIIKGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新生段",
+    "land_no": "13030012",
+    "lat": 22.769037,
+    "lng": 121.138844
   },
   {
     "id": "3fd7317c98bf",
@@ -26708,8 +27314,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPRNMLRKIIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "梧州段",
+    "land_no": "03860000",
+    "lat": 22.741528,
+    "lng": 121.132951
   },
   {
     "id": "317e4170aa54",
@@ -27644,8 +28252,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPSNMLPLJIKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐聖段",
+    "land_no": "06850000",
+    "lat": 22.770031,
+    "lng": 121.075884
   },
   {
     "id": "f183f4f578b0",
@@ -28148,8 +28758,10 @@
     "park_price": 0,
     "note": "不包含獎勵金。協議價購；",
     "serial": "RPUNMLKKOHKGFAV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "康樂段",
+    "land_no": "09390002",
+    "lat": 22.754616,
+    "lng": 121.082444
   },
   {
     "id": "999e31e05e71",
@@ -28184,8 +28796,10 @@
     "park_price": 0,
     "note": "不包含獎勵金。協議價購；",
     "serial": "RPVNMLKKOHKGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "康樂段",
+    "land_no": "09500002",
+    "lat": 22.754056,
+    "lng": 121.082161
   },
   {
     "id": "da9fa5b20635",
@@ -28220,8 +28834,10 @@
     "park_price": 0,
     "note": "不包含獎勵金。協議價購；",
     "serial": "RPSNMLKKOHKGFCV07DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "月美段",
+    "land_no": "02200001",
+    "lat": 23.001427,
+    "lng": 121.151159
   },
   {
     "id": "bb6bb267d1de",
@@ -35096,8 +35712,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPPNMLKKOHKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "石山段",
+    "land_no": "03410000",
+    "lat": 22.792369,
+    "lng": 121.171355
   },
   {
     "id": "73c5ad071a52",
@@ -37508,8 +38126,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "RPQNMLQJQHKGFCV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "11640001",
+    "lat": 22.897448,
+    "lng": 121.094245
   },
   {
     "id": "da33a6094a3e",
@@ -37976,8 +38596,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "RPWOMLPJQHKGFCV18DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "11630001",
+    "lat": 22.897525,
+    "lng": 121.094267
   },
   {
     "id": "a2456c0c4014",
@@ -38012,8 +38634,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "SPWOMLPJQHKGFCV28DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "11900001",
+    "lat": 22.897219,
+    "lng": 121.094039
   },
   {
     "id": "043a9679e9ba",
@@ -38048,8 +38672,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "RPXOMLPJQHKGFCV28DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "四維段",
+    "land_no": "11640001",
+    "lat": 22.897448,
+    "lng": 121.094245
   },
   {
     "id": "ac76d8d82acc",
@@ -41900,8 +42526,10 @@
     "park_price": 0,
     "note": "協議價購；",
     "serial": "RPROMLQJQHKGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "山里段",
+    "land_no": "06000001",
+    "lat": 22.891319,
+    "lng": 121.091867
   },
   {
     "id": "ca3603f9f710",
@@ -48128,8 +48756,10 @@
     "park_price": 0,
     "note": "本案件之未保存登記建物持分1/2為買賣方式移轉，餘1/2為贈與方式移轉。未登記建物；",
     "serial": "RPVNMLPJJHLGFAV17DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "新生段",
+    "land_no": "16490000",
+    "lat": 22.775218,
+    "lng": 121.135109
   },
   {
     "id": "470f77d984eb",
@@ -48272,8 +48902,10 @@
     "park_price": 0,
     "note": "",
     "serial": "RPQNMLKMJHLGFBV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "北都歷段",
+    "land_no": "00420000",
+    "lat": 23.033397,
+    "lng": 121.336422
   },
   {
     "id": "2b8e6baf6fe2",
@@ -55112,8 +55744,10 @@
     "park_price": 0,
     "note": "農作物；",
     "serial": "RPPNMLSJMHKGFCV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "大原段",
+    "land_no": "10900000",
+    "lat": 22.982405,
+    "lng": 121.148944
   },
   {
     "id": "ec76923873c1",
@@ -56696,8 +57330,10 @@
     "park_price": 0,
     "note": "預售屋、或土地及建物分件登記案件；",
     "serial": "RPXNMLPJJIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02660002",
+    "lat": 22.754256,
+    "lng": 121.154948
   },
   {
     "id": "14e76cfbaf95",
@@ -62384,8 +63020,10 @@
     "park_price": 0,
     "note": "114.1.4轉售配偶交易價格為新台幣伍佰伍拾陸萬元整預售屋、或土地及建物分件登記案件；",
     "serial": "RPQOMLPJJIKGFAV76DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02660002",
+    "lat": 22.754256,
+    "lng": 121.154948
   },
   {
     "id": "49e8a6d0fb4a",
@@ -71240,8 +71878,10 @@
     "park_price": 0,
     "note": "預售屋、或土地及建物分件登記案件；",
     "serial": "RPOOMLPJJIKGFAV56DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02660002",
+    "lat": 22.754256,
+    "lng": 121.154948
   },
   {
     "id": "719e873d3cc8",
@@ -75740,8 +76380,10 @@
     "park_price": 0,
     "note": "預售屋、或土地及建物分件登記案件；",
     "serial": "RPPOMLPJJIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "台東段",
+    "land_no": "02660002",
+    "lat": 22.754256,
+    "lng": 121.154948
   },
   {
     "id": "bc702385650e",
@@ -79376,8 +80018,10 @@
     "park_price": 0,
     "note": "車位編號1預售屋、或土地及建物分件登記案件；",
     "serial": "RPQNMLQKKIKGFAV96DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "04590000",
+    "lat": 22.769535,
+    "lng": 121.115793
   },
   {
     "id": "86d4b5492ca6",
@@ -79448,8 +80092,10 @@
     "park_price": 0,
     "note": "預售屋、或土地及建物分件登記案件；",
     "serial": "RPPNMLTLKIKGFAV27DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐年段",
+    "land_no": "04590000",
+    "lat": 22.769535,
+    "lng": 121.115793
   },
   {
     "id": "05a15d9c7b33",
@@ -80348,8 +80994,10 @@
     "park_price": 0,
     "note": "預售屋、或土地及建物分件登記案件；",
     "serial": "RPQNMLOJNHKGFAV86DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "岩灣段",
+    "land_no": "00310000",
+    "lat": 22.798813,
+    "lng": 121.124701
   },
   {
     "id": "3562c57a9c3e",
@@ -81068,8 +81716,10 @@
     "park_price": 0,
     "note": "土地交易總價款:伍佰貳拾伍萬元整建物交易總價款:伍佰貳拾伍萬元整含傢俱設備費；預售屋、或土地及建物分件登記案件；",
     "serial": "RPSNMLSKKIKGFAV37DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐成段",
+    "land_no": "08230001",
+    "lat": 22.735057,
+    "lng": 121.123043
   },
   {
     "id": "f8d7466c6d00",
@@ -81104,8 +81754,10 @@
     "park_price": 0,
     "note": "土地交易總價款:伍佰肆拾萬元整；建物交易總價款:伍佰肆拾萬元整含傢俱設備費；預售屋、或土地及建物分件登記案件；",
     "serial": "RPUNMLSKKIKGFAV57DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐成段",
+    "land_no": "08230001",
+    "lat": 22.735057,
+    "lng": 121.123043
   },
   {
     "id": "d32123b5cb16",
@@ -81140,8 +81792,10 @@
     "park_price": 0,
     "note": "土地交易總價款:壹仟壹佰萬元整；建物交易總價款:壹仟壹佰萬元整含傢俱設備費；預售屋、或土地及建物分件登記案件；",
     "serial": "RPPOMLMLKIKGFAV66DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐成段",
+    "land_no": "08230001",
+    "lat": 22.735057,
+    "lng": 121.123043
   },
   {
     "id": "7ef8714fa83a",
@@ -81716,8 +82370,10 @@
     "park_price": 0,
     "note": "土地交易總價款:伍佰壹拾萬元整；建物交易總價款:伍佰壹拾萬元整含傢俱設備費；預售屋、或土地及建物分件登記案件；",
     "serial": "RPUNMLTKKIKGFAV67DA",
-    "lat": null,
-    "lng": null
+    "land_sect": "豐成段",
+    "land_no": "08230001",
+    "lat": 22.735057,
+    "lng": 121.123043
   },
   {
     "id": "28babfd3957a",
