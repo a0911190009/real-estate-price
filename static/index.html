@@ -423,18 +423,22 @@
 
     /* 自訂地圖標記 */
     .price-marker {
-      background: var(--danger);
       color: #fff;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
-      padding: 3px 7px;
+      padding: 3px 7px 3px 5px;
       border-radius: 12px;
       white-space: nowrap;
       box-shadow: 0 2px 6px rgba(0,0,0,0.5);
       border: 1.5px solid rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      line-height: 1.3;
     }
+    .price-marker .m-icon { font-size: 0.8rem; line-height: 1; }
     .price-marker.active {
-      background: var(--primary);
+      background: var(--primary) !important;
       transform: scale(1.15);
     }
 
@@ -910,10 +914,13 @@ function renderResults(data) {
   var bounds = [];
   _results.forEach(function(r) {
     if (!r.lat || !r.lng) return;
+    var mi = getMarkerInfo(r);
     var icon = L.divIcon({
       className: '',
-      html: '<div class="price-marker">' + r.total_price + '萬</div>',
-      iconAnchor: [30, 12],
+      html: '<div class="price-marker" style="background:' + mi.bg + '">' +
+              '<span class="m-icon">' + mi.icon + '</span>' + r.total_price + '萬' +
+            '</div>',
+      iconAnchor: [36, 14],
     });
     var marker = L.marker([r.lat, r.lng], { icon: icon }).addTo(_map);
     marker.bindPopup(buildPopup(r), { maxWidth: 240 });
@@ -960,13 +967,28 @@ function selectRecord(id) {
   }
 }
 
+// ── 建物類型 → 圖示 + 顏色 ─────────────────────────────────────────
+function getMarkerInfo(r) {
+  var type = r.building_type || '';
+  if (type.indexOf('透天') !== -1) return { icon: '🏠', bg: '#f97316' }; // 橘：透天厝
+  if (type.indexOf('大樓') !== -1) return { icon: '🏢', bg: '#3b82f6' }; // 藍：住宅大樓
+  if (type.indexOf('華廈') !== -1) return { icon: '🏙', bg: '#8b5cf6' }; // 紫：華廈
+  if (type.indexOf('公寓') !== -1) return { icon: '🏘', bg: '#10b981' }; // 綠：公寓
+  if (type.indexOf('套房') !== -1) return { icon: '🛏', bg: '#06b6d4' }; // 青：套房
+  if (type.indexOf('店面') !== -1 || type.indexOf('店鋪') !== -1) return { icon: '🏪', bg: '#f59e0b' }; // 黃：店面
+  if (type.indexOf('辦公') !== -1) return { icon: '🏬', bg: '#6366f1' }; // 靛：辦公
+  if (type.indexOf('廠') !== -1)   return { icon: '🏭', bg: '#6b7280' }; // 灰：廠辦
+  return { icon: '🌿', bg: '#64748b' }; // 預設：土地/其他
+}
+
 // ── 建立 popup HTML ──────────────────────────────────────────────────
 function buildPopup(r) {
+  var mi = getMarkerInfo(r);
   var typeLabel = r.building_type || r.transaction_type || '—';
   var unitStr = (r.unit_price != null && r.unit_price > 0) ? (r.unit_price + ' 萬/坪') : '—';
   var pingStr = (r.building_ping != null && r.building_ping > 0) ? (r.building_ping + ' 坪') : '—';
   return '<div class="popup-inner">' +
-    '<div class="popup-addr">' + escHtml(r.address) + '</div>' +
+    '<div class="popup-addr">' + mi.icon + ' ' + escHtml(r.address) + '</div>' +
     '<div class="popup-price">' + r.total_price + ' 萬元</div>' +
     '<div class="popup-unit">單價 ' + unitStr + ' ｜ ' + pingStr + '</div>' +
     '<div class="popup-meta">' +
