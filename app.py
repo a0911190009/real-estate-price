@@ -655,27 +655,43 @@ def api_valuation():
         candidates.append(r)
 
     # ── Step 2：相似度評分，取最相近 15 筆 ───────────────────────────
+    import re as _re
+
+    def _extract_road(addr):
+        """從地址擷取路名（含段），例如「台東市中山路123號」→「中山路」"""
+        m = _re.search(r'([^\s市縣鄉鎮區村里]+?(?:路|街|大道|道路)(?:[一二三四五六七八九十]段)?)', addr or '')
+        return m.group(1) if m else ''
+
+    subject_road = _extract_road(address)  # 待估物件的路名
+
     def similarity_score(r):
         score = 0.0
-        # 建物型態相符
+        # ── 地理位置：路名相符（最高優先級）────────────────────────
+        comp_road = _extract_road(r.get('address', ''))
+        if subject_road and comp_road:
+            if comp_road == subject_road:
+                score += 35   # 同一條路：強力加分
+            elif comp_road[:2] == subject_road[:2]:
+                score += 10   # 路名前兩字相同（同系路段）：小幅加分
+        # ── 建物型態相符 ─────────────────────────────────────────────
         if bld_type and r.get('building_type'):
             score += 30 if bld_type in r['building_type'] else 0
-        # 坪數接近（建物）
+        # ── 坪數接近（建物）──────────────────────────────────────────
         if bld_ping > 0 and r.get('building_ping', 0) > 0:
             diff_ratio = abs(r['building_ping'] - bld_ping) / bld_ping
             score += max(0, 20 - diff_ratio * 40)
-        # 土地坪數接近
+        # ── 土地坪數接近 ─────────────────────────────────────────────
         if land_ping > 0 and r.get('land_ping', 0) > 0:
             diff_ratio = abs(r['land_ping'] - land_ping) / land_ping
             score += max(0, 15 - diff_ratio * 30)
-        # 屋齡接近
+        # ── 屋齡接近 ─────────────────────────────────────────────────
         if age_val > 0 and r.get('age', 0) > 0:
             diff = abs(r['age'] - age_val)
             score += max(0, 10 - diff * 1)
-        # 樓層接近
+        # ── 樓層接近 ─────────────────────────────────────────────────
         if floor_val > 0 and r.get('floor', 0) > 0:
             score += 5 if r['floor'] == floor_val else 0
-        # 日期越新越好
+        # ── 日期越新越好 ─────────────────────────────────────────────
         date_str = r.get('date', '')
         if date_str:
             try:
