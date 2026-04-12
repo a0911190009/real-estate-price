@@ -13,18 +13,32 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --surface2: #263347;
-      --border: #334155;
-      --text: #e2e8f0;
-      --text-muted: #94a3b8;
-      --primary: #3b82f6;
-      --primary-dark: #2563eb;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
+    /* ── Portal 主題系統（與物件庫同步） ── */
+    [data-theme="navy-dark"]{--bg-p:#0f172a;--bg-s:#1e293b;--bg-t:#293548;--bg-h:#334155;--bd:#334155;--bdl:#475569;--tx:#f1f5f9;--txs:#94a3b8;--txm:#64748b;--ac:#3b82f6;--ach:#2563eb;--act:#fff;--acs:rgba(59,130,246,0.15);--dg:#f87171;--dgb:rgba(239,68,68,0.15);--ok:#34d399;--warn:#fbbf24;--tg:#1d4ed8;--tgt:#bfdbfe;--sh:0 8px 32px rgba(0,0,0,0.5);}
+    [data-theme="navy-light"]{--bg-p:#f0f4f8;--bg-s:#fff;--bg-t:#f8fafc;--bg-h:#e2e8f0;--bd:#cbd5e1;--bdl:#e2e8f0;--tx:#0f172a;--txs:#475569;--txm:#94a3b8;--ac:#2563eb;--ach:#1d4ed8;--act:#fff;--acs:rgba(37,99,235,0.1);--dg:#dc2626;--dgb:rgba(220,38,38,0.08);--ok:#16a34a;--warn:#d97706;--tg:#dbeafe;--tgt:#1e40af;--sh:0 4px 16px rgba(0,0,0,0.1);}
+    [data-theme="forest-dark"]{--bg-p:#0a1a12;--bg-s:#132218;--bg-t:#1a3024;--bg-h:#1e3d2a;--bd:#1e3d2a;--bdl:#2d5a3e;--tx:#ecfdf5;--txs:#86efac;--txm:#4ade80;--ac:#22c55e;--ach:#16a34a;--act:#fff;--acs:rgba(34,197,94,0.15);--dg:#f87171;--dgb:rgba(239,68,68,0.15);--ok:#34d399;--warn:#fbbf24;--tg:#14532d;--tgt:#86efac;--sh:0 8px 32px rgba(0,0,0,0.6);}
+    [data-theme="forest-light"]{--bg-p:#f0fdf4;--bg-s:#fff;--bg-t:#f7fef9;--bg-h:#dcfce7;--bd:#bbf7d0;--bdl:#dcfce7;--tx:#14532d;--txs:#166534;--txm:#4ade80;--ac:#16a34a;--ach:#15803d;--act:#fff;--acs:rgba(22,163,74,0.1);--dg:#dc2626;--dgb:rgba(220,38,38,0.08);--ok:#16a34a;--warn:#d97706;--tg:#dcfce7;--tgt:#14532d;--sh:0 4px 16px rgba(0,80,40,0.1);}
+    [data-theme="amber-dark"]{--bg-p:#1a1208;--bg-s:#261a0c;--bg-t:#332210;--bg-h:#3d2b14;--bd:#3d2b14;--bdl:#5c3d1e;--tx:#fef3c7;--txs:#fcd34d;--txm:#d97706;--ac:#f59e0b;--ach:#d97706;--act:#1a1208;--acs:rgba(245,158,11,0.15);--dg:#f87171;--dgb:rgba(239,68,68,0.15);--ok:#34d399;--warn:#fbbf24;--tg:#78350f;--tgt:#fde68a;--sh:0 8px 32px rgba(0,0,0,0.6);}
+    [data-theme="amber-light"]{--bg-p:#fffbeb;--bg-s:#fff;--bg-t:#fefce8;--bg-h:#fef3c7;--bd:#fde68a;--bdl:#fef3c7;--tx:#451a03;--txs:#92400e;--txm:#b45309;--ac:#d97706;--ach:#b45309;--act:#fff;--acs:rgba(217,119,6,0.1);--dg:#dc2626;--dgb:rgba(220,38,38,0.08);--ok:#16a34a;--warn:#d97706;--tg:#fef3c7;--tgt:#78350f;--sh:0 4px 16px rgba(180,100,0,0.1);}
+    [data-theme="minimal-light"]{--bg-p:#f9fafb;--bg-s:#fff;--bg-t:#f3f4f6;--bg-h:#f3f4f6;--bd:#e5e7eb;--bdl:#f3f4f6;--tx:#111827;--txs:#6b7280;--txm:#9ca3af;--ac:#4f46e5;--ach:#4338ca;--act:#fff;--acs:rgba(79,70,229,0.08);--dg:#ef4444;--dgb:rgba(239,68,68,0.08);--ok:#10b981;--warn:#f59e0b;--tg:#ede9fe;--tgt:#4c1d95;--sh:0 1px 8px rgba(0,0,0,0.08);}
+    [data-theme="minimal-dark"]{--bg-p:#18181b;--bg-s:#27272a;--bg-t:#3f3f46;--bg-h:#3f3f46;--bd:#3f3f46;--bdl:#52525b;--tx:#fafafa;--txs:#a1a1aa;--txm:#71717a;--ac:#6366f1;--ach:#4f46e5;--act:#fff;--acs:rgba(99,102,241,0.15);--dg:#f87171;--dgb:rgba(239,68,68,0.15);--ok:#34d399;--warn:#fbbf24;--tg:#312e81;--tgt:#c7d2fe;--sh:0 8px 32px rgba(0,0,0,0.5);}
+    [data-theme="rose-light"]{--bg-p:#fff1f2;--bg-s:#fff;--bg-t:#fff1f2;--bg-h:#ffe4e6;--bd:#fecdd3;--bdl:#ffe4e6;--tx:#4c0519;--txs:#9f1239;--txm:#e11d48;--ac:#e11d48;--ach:#be123c;--act:#fff;--acs:rgba(225,29,72,0.08);--dg:#be123c;--dgb:rgba(190,18,60,0.08);--ok:#16a34a;--warn:#d97706;--tg:#ffe4e6;--tgt:#9f1239;--sh:0 4px 16px rgba(200,0,50,0.1);}
+    [data-theme="rose-dark"]{--bg-p:#1a0810;--bg-s:#2a0f1c;--bg-t:#3a1528;--bg-h:#4a1a32;--bd:#4a1a32;--bdl:#6b2545;--tx:#fff1f2;--txs:#fda4af;--txm:#fb7185;--ac:#fb7185;--ach:#f43f5e;--act:#fff;--acs:rgba(251,113,133,0.15);--dg:#f87171;--dgb:rgba(239,68,68,0.15);--ok:#34d399;--warn:#fbbf24;--tg:#881337;--tgt:#fda4af;--sh:0 8px 32px rgba(0,0,0,0.6);}
+    [data-theme="oled-dark"]{--bg-p:#000;--bg-s:#0a0a0a;--bg-t:#141414;--bg-h:#1f1f1f;--bd:#1f1f1f;--bdl:#2d2d2d;--tx:#fff;--txs:#a3a3a3;--txm:#525252;--ac:#fff;--ach:#e5e5e5;--act:#000;--acs:rgba(255,255,255,0.08);--dg:#f87171;--dgb:rgba(239,68,68,0.15);--ok:#34d399;--warn:#fbbf24;--tg:#1f1f1f;--tgt:#a3a3a3;--sh:0 8px 32px rgba(0,0,0,0.8);}
+
+    /* 變數別名（從 [data-theme] 映射到此工具原本的命名）*/
+    :root, body {
+      --bg:          var(--bg-p, #0f172a);
+      --surface:     var(--bg-s, #1e293b);
+      --surface2:    var(--bg-t, #293548);
+      --border:      var(--bd,   #334155);
+      --text:        var(--tx,   #e2e8f0);
+      --text-muted:  var(--txs,  #94a3b8);
+      --primary:     var(--ac,   #3b82f6);
+      --primary-dark:var(--ach,  #2563eb);
+      --success:     var(--ok,   #10b981);
+      --warning:     var(--warn, #f59e0b);
+      --danger:      var(--dg,   #f87171);
     }
 
     body {
@@ -563,7 +577,22 @@
     }
   </style>
 </head>
-<body>
+<body data-theme="navy-dark">
+<script>
+/* 防閃白：從 localStorage 立即套用主題 */
+(function(){
+  var STYLE_MODES={navy:{dark:'navy-dark',light:'navy-light'},forest:{dark:'forest-dark',light:'forest-light'},amber:{dark:'amber-dark',light:'amber-light'},minimal:{dark:'minimal-dark',light:'minimal-light'},rose:{dark:'rose-dark',light:'rose-light'},oled:{dark:'oled-dark',light:'oled-dark'}};
+  var DARK_ONLY=['oled'];
+  var s=localStorage.getItem('up_style')||'navy';
+  var m=localStorage.getItem('up_mode')||'system';
+  var sys=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var eff=m==='system'?(sys?'dark':'light'):m;
+  if(DARK_ONLY.indexOf(s)>=0)eff='dark';
+  var val=(STYLE_MODES[s]||STYLE_MODES.navy)[eff];
+  document.documentElement.setAttribute('data-theme',val);
+  document.body.setAttribute('data-theme',val);
+})();
+</script>
 
 <!-- ── 頂部工具列 ── -->
 <header class="topbar">
@@ -701,6 +730,33 @@ var _markers = {};        // id -> Leaflet marker
 var _mapDotMode = false;  // false = 標籤模式，true = 圓點模式
 var _activeId = null;     // 目前選中的成交紀錄 id
 var _results = [];        // 目前查詢結果
+
+// ── Portal 主題同步 ───────────────────────────────────────────────────
+(function(){
+  var STYLE_MODES={navy:{dark:'navy-dark',light:'navy-light'},forest:{dark:'forest-dark',light:'forest-light'},amber:{dark:'amber-dark',light:'amber-light'},minimal:{dark:'minimal-dark',light:'minimal-light'},rose:{dark:'rose-dark',light:'rose-light'},oled:{dark:'oled-dark',light:'oled-dark'}};
+  var DARK_ONLY=['oled'];
+  var _style=localStorage.getItem('up_style')||'navy';
+  var _mode=localStorage.getItem('up_mode')||'system';
+  function applyTheme(){
+    var sys=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var eff=_mode==='system'?(sys?'dark':'light'):_mode;
+    if(DARK_ONLY.indexOf(_style)>=0)eff='dark';
+    var val=(STYLE_MODES[_style]||STYLE_MODES.navy)[eff];
+    document.documentElement.setAttribute('data-theme',val);
+    document.body.setAttribute('data-theme',val);
+  }
+  applyTheme();
+  // 從 Firestore 讀取最新主題設定
+  fetch('/api/theme').then(function(r){return r.json();}).then(function(d){
+    var changed=false;
+    if(d.style&&d.style!==_style){_style=d.style;localStorage.setItem('up_style',_style);changed=true;}
+    if(d.mode!=null&&d.mode!==_mode){_mode=d.mode;localStorage.setItem('up_mode',_mode);changed=true;}
+    if(changed)applyTheme();
+  }).catch(function(){});
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){
+    if(_mode==='system')applyTheme();
+  });
+})();
 
 // ── 初始化 ────────────────────────────────────────────────────────────
 (function init() {

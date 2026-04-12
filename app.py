@@ -206,6 +206,39 @@ def api_me():
     })
 
 
+@app.route("/api/theme", methods=["GET"])
+def api_theme_get():
+    """讀取主題（與 Portal 共用 Firestore system_settings/theme）。"""
+    try:
+        from google.cloud import firestore as _fs
+        db = _fs.Client()
+        doc = db.collection("system_settings").document("theme").get()
+        if doc.exists:
+            return jsonify(doc.to_dict())
+    except Exception:
+        pass
+    return jsonify({})
+
+
+@app.route("/api/theme", methods=["POST"])
+def api_theme_set():
+    """儲存主題（僅管理員）。"""
+    email = session.get("user_email", "")
+    admin_emails = [e.strip() for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
+    if email not in admin_emails:
+        return jsonify({"error": "unauthorized"}), 403
+    data = request.get_json() or {}
+    try:
+        from google.cloud import firestore as _fs
+        db = _fs.Client()
+        update = {k: data[k] for k in ("style", "mode") if k in data}
+        if update:
+            db.collection("system_settings").document("theme").set(update, merge=True)
+    except Exception:
+        pass
+    return jsonify({"ok": True})
+
+
 @app.route("/api/general-feedback", methods=["GET"])
 def api_general_feedback_get():
     """列出所有通用反饋"""

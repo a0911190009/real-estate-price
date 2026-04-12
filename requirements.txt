@@ -3,4 +3,5 @@ itsdangerous>=2.1
 python-dotenv>=1.0
 gunicorn>=21.0
 google-cloud-storage>=2.10
+google-cloud-firestore>=2.13
 requests>=2.28
