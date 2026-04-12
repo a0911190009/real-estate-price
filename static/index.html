@@ -671,15 +671,32 @@
 
     /* 列印樣式 */
     @media print {
-      body > *:not(#val-print-root) { display: none !important; }
-      #val-print-root {
+      /* 隱藏 modal 以外的所有東西 */
+      body > *:not(#val-modal) { display: none !important; }
+      /* modal overlay 改靜態排版，去背景遮罩 */
+      #val-modal {
         display: block !important; position: static !important;
-        background: #fff !important; color: #000 !important;
-        padding: 20px; font-family: sans-serif;
+        background: transparent !important; padding: 0 !important;
+        overflow: visible !important;
       }
+      /* 報告框去掉陰影、圓角、max-width 限制 */
+      #val-print-root {
+        box-shadow: none !important; border: 1px solid #ccc !important;
+        border-radius: 0 !important; max-width: 100% !important;
+        background: #fff !important; color: #000 !important;
+      }
+      .val-head { position: static !important; background: #fff !important; }
       .val-print-hide { display: none !important; }
+      /* 文字顏色在白紙上要深色 */
       .val-price-range { color: #c00 !important; }
+      .val-section-title { color: #1a4080 !important; }
+      .val-factor-tag { background: #e8eef8 !important; color: #1a4080 !important; border-color: #9ab !important; }
+      .val-comp-table th { color: #444 !important; }
       .val-comp-table th, .val-comp-table td { border-color: #ccc !important; }
+      .val-comp-table .price-col { color: #c00 !important; }
+      .val-analysis, .val-comp-table td { color: #000 !important; }
+      .val-price-sub, .val-report-footer { color: #555 !important; }
+      .val-price-hero { background: #f5f5f5 !important; }
     }
   </style>
 </head>
