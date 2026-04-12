@@ -1259,6 +1259,51 @@ function resetValuation() {
   document.getElementById('val-head-title').textContent = '🏷️ AI 市場估價';
 }
 
+function clearParcelCoords() {
+  // 清除已查到的座標
+  document.getElementById('val-lat').value = '';
+  document.getElementById('val-lng').value = '';
+  document.getElementById('val-coord-row').style.display = 'none';
+  document.getElementById('val-parcel-btn').textContent = '查座標';
+}
+
+async function lookupParcelCoords() {
+  // 用段別+地號透過 Easymap 查 WGS84 座標
+  var sect = document.getElementById('val-land-sect').value.trim();
+  var no   = document.getElementById('val-land-no').value.trim();
+  var dist = document.getElementById('val-district').value.trim() || '台東市';
+  if (!sect || !no) { alert('請先填入段別和地號'); return; }
+
+  var btn = document.getElementById('val-parcel-btn');
+  btn.textContent = '查詢中…';
+  btn.disabled = true;
+
+  try {
+    var res  = await fetch('/api/geocode-parcel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ district: dist, land_sect: sect, land_no: no })
+    });
+    var data = await res.json();
+    if (data.lat) {
+      // 填入隱藏欄位，顯示已定位提示
+      document.getElementById('val-lat').value = data.lat;
+      document.getElementById('val-lng').value = data.lng;
+      document.getElementById('val-coord-display').textContent =
+        dist + ' ' + sect + ' ' + no + '（' + data.lat.toFixed(5) + ', ' + data.lng.toFixed(5) + '）';
+      document.getElementById('val-coord-row').style.display = '';
+      btn.textContent = '✓ 已定位';
+    } else {
+      alert('查無座標：' + (data.error || '未知錯誤'));
+      btn.textContent = '查座標';
+    }
+  } catch (e) {
+    alert('查詢失敗：' + e.message);
+    btn.textContent = '查座標';
+  }
+  btn.disabled = false;
+}
+
 function startValuation() {
   var address = document.getElementById('val-address').value.trim();
   if (!address) { alert('請輸入地址或地號描述'); return; }
@@ -1279,6 +1324,11 @@ function startValuation() {
     total_floor:      parseInt(document.getElementById('val-total-floor').value) || 0,
     age:              parseInt(document.getElementById('val-age').value)         || 0,
     note:             document.getElementById('val-note').value.trim(),
+    // 地理座標（有才傳，讓後端優先用距離比對）
+    lat:              parseFloat(document.getElementById('val-lat').value) || 0,
+    lng:              parseFloat(document.getElementById('val-lng').value) || 0,
+    land_sect:        document.getElementById('val-land-sect').value.trim(),
+    land_no:          document.getElementById('val-land-no').value.trim(),
   };
 
   fetch('/api/valuation', {
@@ -1679,6 +1729,31 @@ function escHtml(str) {
             <input id="val-address" type="text" placeholder="例：台東市中華路 123 號 或 豐成段 0518 地號">
           </div>
         </div>
+
+        <!-- 地號查座標（選填，可提升比較精準度）-->
+        <div class="val-form-grid" style="margin-bottom:4px;">
+          <div class="val-field">
+            <label>段別 <span style="font-weight:400;font-size:0.78rem;color:var(--tx);opacity:.55;">（選填，更精準）</span></label>
+            <input id="val-land-sect" type="text" placeholder="例：建國段">
+          </div>
+          <div class="val-field">
+            <label>地號</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input id="val-land-no" type="text" placeholder="例：08350001" style="flex:1;min-width:0;">
+              <button type="button" id="val-parcel-btn" onclick="lookupParcelCoords()" class="btn" style="white-space:nowrap;padding:0 12px;flex-shrink:0;">查座標</button>
+            </div>
+          </div>
+        </div>
+        <div id="val-coord-row" style="display:none;margin-bottom:12px;">
+          <div style="display:flex;gap:8px;align-items:center;padding:6px 10px;background:var(--bg-s);border:1px solid var(--ok);border-radius:8px;font-size:0.82rem;color:var(--ok);">
+            <span>✓ 已定位：</span>
+            <span id="val-coord-display">—</span>
+            <button type="button" onclick="clearParcelCoords()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--tx);opacity:.5;font-size:1rem;line-height:1;">✕</button>
+          </div>
+          <input type="hidden" id="val-lat">
+          <input type="hidden" id="val-lng">
+        </div>
+
         <div class="val-form-grid" style="margin-bottom:12px;">
           <div class="val-field">
             <label>鄉鎮市區</label>

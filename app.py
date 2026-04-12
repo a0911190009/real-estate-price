@@ -591,6 +591,49 @@ def api_admin_import():
     )
 
 
+def _haversine_m(lat1, lng1, lat2, lng2):
+    """計算兩點 WGS84 座標的直線距離（公尺）"""
+    import math
+    R = 6371000
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlam = math.radians(lng2 - lng1)
+    a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlam/2)**2
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+@app.route('/api/geocode-parcel', methods=['POST'])
+def api_geocode_parcel():
+    """
+    地號 → WGS84 座標（透過 Easymap 內政部地籍圖資）。
+    輸入：{ "district": "台東市", "land_sect": "建國段", "land_no": "08350001" }
+    輸出：{ "lat": 22.xxx, "lng": 121.xxx }
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+
+    body     = request.get_json() or {}
+    district  = (body.get('district') or '').strip()
+    land_sect = (body.get('land_sect') or '').strip()
+    land_no   = (body.get('land_no') or '').strip()
+
+    if not district or not land_sect or not land_no:
+        return jsonify({'error': '請填入鄉鎮、段別、地號'}), 400
+
+    try:
+        # 複用本機 geocode_price_data.py 中的 EasymapCrawler
+        from geocode_price_data import EasymapCrawler
+        crawler = EasymapCrawler()
+        crawler.init()
+        coords = crawler.get_coordinates('臺東縣', district, land_sect, land_no)
+        if coords:
+            return jsonify({'lat': coords['lat'], 'lng': coords['lng']})
+        return jsonify({'error': f'查無座標：{district} {land_sect} {land_no}'}), 404
+    except Exception as e:
+        return jsonify({'error': f'Easymap 查詢失敗：{str(e)}'}), 500
+
+
 @app.route('/api/valuation', methods=['POST'])
 def api_valuation():
     """
@@ -631,9 +674,27 @@ def api_valuation():
     total_floor= int(body.get('total_floor') or 0)
     age_val    = int(body.get('age') or 0)
     note_val   = (body.get('note') or '').strip()
+    # 座標（由前端查地號或手動帶入）
+    lat_val    = float(body.get('lat') or 0)
+    lng_val    = float(body.get('lng') or 0)
+    land_sect_val = (body.get('land_sect') or '').strip()
+    land_no_val   = (body.get('land_no') or '').strip()
 
     if not address:
         return jsonify({'error': '請輸入地址或地號'}), 400
+
+    # ── 若有地號但無座標，嘗試自動透過 Easymap 補座標 ──────────────────
+    if (not lat_val or not lng_val) and land_sect_val and land_no_val and district:
+        try:
+            from geocode_price_data import EasymapCrawler
+            _crawler = EasymapCrawler()
+            _crawler.init()
+            _coords = _crawler.get_coordinates('臺東縣', district, land_sect_val, land_no_val)
+            if _coords:
+                lat_val = _coords['lat']
+                lng_val = _coords['lng']
+        except Exception:
+            pass  # 查不到就退回路名比對，不阻斷流程
 
     # ── Step 1：從資料庫找相似案例 ────────────────────────────────────
     all_data = _load_price_data()
@@ -666,13 +727,28 @@ def api_valuation():
 
     def similarity_score(r):
         score = 0.0
-        # ── 地理位置：路名相符（最高優先級）────────────────────────
-        comp_road = _extract_road(r.get('address', ''))
-        if subject_road and comp_road:
-            if comp_road == subject_road:
-                score += 35   # 同一條路：強力加分
-            elif comp_road[:2] == subject_road[:2]:
-                score += 10   # 路名前兩字相同（同系路段）：小幅加分
+        # ── 地理位置：優先用直線距離，沒座標才用路名比對 ────────────
+        has_coords = lat_val and lng_val and r.get('lat') and r.get('lng')
+        if has_coords:
+            # 有座標：用 Haversine 直線距離評分
+            dist_m = _haversine_m(lat_val, lng_val, r['lat'], r['lng'])
+            if dist_m <= 300:
+                score += 40   # 300 公尺內：最高分
+            elif dist_m <= 600:
+                score += 30   # 600 公尺內
+            elif dist_m <= 1000:
+                score += 18   # 1 公里內
+            elif dist_m <= 2000:
+                score += 8    # 2 公里內
+            # 超過 2 公里：無距離加分
+        else:
+            # 無座標：退回路名比對
+            comp_road = _extract_road(r.get('address', ''))
+            if subject_road and comp_road:
+                if comp_road == subject_road:
+                    score += 35   # 同一條路：強力加分
+                elif comp_road[:2] == subject_road[:2]:
+                    score += 10   # 路名前兩字相同（同系路段）：小幅加分
         # ── 建物型態相符 ─────────────────────────────────────────────
         if bld_type and r.get('building_type'):
             score += 30 if bld_type in r['building_type'] else 0
@@ -826,6 +902,7 @@ def api_valuation():
             'building_ping': bld_ping, 'land_ping': land_ping,
             'floor': floor_val, 'total_floor': total_floor,
             'age': age_val, 'note': note_val,
+            'lat': lat_val or None, 'lng': lng_val or None,
         }
     })
 
