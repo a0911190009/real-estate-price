@@ -591,5 +591,228 @@ def api_admin_import():
     )
 
 
+@app.route('/api/valuation', methods=['POST'])
+def api_valuation():
+    """
+    AI 市場估價。
+    輸入：{
+      "address": "地址或地號描述",
+      "district": "鄉鎮（可選，不填則全縣）",
+      "transaction_type": "交易標的（可選）",
+      "building_type": "建物型態（可選）",
+      "building_ping": 坪數（可選）,
+      "land_ping": 土地坪數（可選）,
+      "floor": 樓層（可選）,
+      "total_floor": 總樓層（可選）,
+      "age": 屋齡（可選）,
+      "note": "備注說明（可選）"
+    }
+    輸出：{
+      "suggested_min": 數字（萬）,
+      "suggested_max": 數字（萬）,
+      "median": 數字（萬）,
+      "analysis": "AI 分析文字",
+      "comparables": [ ...最相近的案例... ],
+      "generated_at": "ISO 日期"
+    }
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+
+    body = request.get_json() or {}
+    address    = (body.get('address') or '').strip()
+    district   = (body.get('district') or '').strip()
+    tx_type    = (body.get('transaction_type') or '').strip()
+    bld_type   = (body.get('building_type') or '').strip()
+    bld_ping   = float(body.get('building_ping') or 0)
+    land_ping  = float(body.get('land_ping') or 0)
+    floor_val  = int(body.get('floor') or 0)
+    total_floor= int(body.get('total_floor') or 0)
+    age_val    = int(body.get('age') or 0)
+    note_val   = (body.get('note') or '').strip()
+
+    if not address:
+        return jsonify({'error': '請輸入地址或地號'}), 400
+
+    # ── Step 1：從資料庫找相似案例 ────────────────────────────────────
+    all_data = _load_price_data()
+    from datetime import date
+    today = date.today()
+    two_years_ago = f"{today.year - 2}-{today.month:02d}-{today.day:02d}"
+
+    candidates = []
+    for r in all_data:
+        # 只取近 2 年
+        if (r.get('date') or '') < two_years_ago:
+            continue
+        # 地區過濾
+        if district and r.get('district') != district:
+            continue
+        # 交易標的過濾（有填才過濾）
+        if tx_type and tx_type not in r.get('transaction_type', ''):
+            continue
+        candidates.append(r)
+
+    # ── Step 2：相似度評分，取最相近 15 筆 ───────────────────────────
+    def similarity_score(r):
+        score = 0.0
+        # 建物型態相符
+        if bld_type and r.get('building_type'):
+            score += 30 if bld_type in r['building_type'] else 0
+        # 坪數接近（建物）
+        if bld_ping > 0 and r.get('building_ping', 0) > 0:
+            diff_ratio = abs(r['building_ping'] - bld_ping) / bld_ping
+            score += max(0, 20 - diff_ratio * 40)
+        # 土地坪數接近
+        if land_ping > 0 and r.get('land_ping', 0) > 0:
+            diff_ratio = abs(r['land_ping'] - land_ping) / land_ping
+            score += max(0, 15 - diff_ratio * 30)
+        # 屋齡接近
+        if age_val > 0 and r.get('age', 0) > 0:
+            diff = abs(r['age'] - age_val)
+            score += max(0, 10 - diff * 1)
+        # 樓層接近
+        if floor_val > 0 and r.get('floor', 0) > 0:
+            score += 5 if r['floor'] == floor_val else 0
+        # 日期越新越好
+        date_str = r.get('date', '')
+        if date_str:
+            try:
+                days_ago = (today - date.fromisoformat(date_str)).days
+                score += max(0, 10 - days_ago / 60)
+            except Exception:
+                pass
+        return score
+
+    candidates.sort(key=similarity_score, reverse=True)
+    comparables = candidates[:15]
+
+    if not comparables:
+        return jsonify({'error': f'找不到符合條件的參考案例（{district or "全縣"}，近 2 年）'}), 404
+
+    # ── Step 3：計算統計數值 ──────────────────────────────────────────
+    prices = [r['total_price'] for r in comparables if r.get('total_price', 0) > 0]
+    prices.sort()
+    median_price = prices[len(prices) // 2] if prices else 0
+    avg_price = round(sum(prices) / len(prices), 1) if prices else 0
+
+    unit_prices = [r['unit_price'] for r in comparables if r.get('unit_price', 0) > 0]
+    avg_unit = round(sum(unit_prices) / len(unit_prices), 1) if unit_prices else 0
+
+    # ── Step 4：呼叫 Claude API ────────────────────────────────────────
+    api_key = os.environ.get('ANTHROPIC_API_KEY', '')
+    if not api_key:
+        return jsonify({'error': '未設定 ANTHROPIC_API_KEY'}), 500
+
+    # 整理參考案例給 AI
+    comp_lines = []
+    for i, r in enumerate(comparables[:10], 1):
+        parts = [
+            f"案例{i}：{r.get('address', '')}",
+            f"成交日：{r.get('date', '')}",
+            f"總價：{r.get('total_price', '')}萬",
+        ]
+        if r.get('unit_price', 0) > 0:
+            parts.append(f"單價：{r['unit_price']}萬/坪")
+        if r.get('building_ping', 0) > 0:
+            parts.append(f"建物：{r['building_ping']}坪")
+        if r.get('land_ping', 0) > 0:
+            parts.append(f"地坪：{r['land_ping']}坪")
+        if r.get('building_type'):
+            parts.append(f"型態：{r['building_type']}")
+        if r.get('age', 0) > 0:
+            parts.append(f"屋齡：{r['age']}年")
+        if r.get('floor', 0) > 0:
+            parts.append(f"樓層：{r['floor']}/{r.get('total_floor', '?')}樓")
+        comp_lines.append('  ' + '，'.join(parts))
+
+    # 待估物件條件
+    subject_parts = [f"地址/地號：{address}"]
+    if district:       subject_parts.append(f"鄉鎮：{district}")
+    if tx_type:        subject_parts.append(f"交易標的：{tx_type}")
+    if bld_type:       subject_parts.append(f"建物型態：{bld_type}")
+    if bld_ping > 0:   subject_parts.append(f"建物面積：{bld_ping}坪")
+    if land_ping > 0:  subject_parts.append(f"土地面積：{land_ping}坪")
+    if floor_val > 0:  subject_parts.append(f"樓層：{floor_val}" + (f"/{total_floor}樓" if total_floor > 0 else "樓"))
+    if age_val > 0:    subject_parts.append(f"屋齡：{age_val}年")
+    if note_val:       subject_parts.append(f"備注：{note_val}")
+
+    prompt = f"""你是一位台東縣的專業不動產估價顧問。
+請根據以下「參考成交案例」，對「待估物件」給出合理的市場開價建議。
+
+【待估物件條件】
+{chr(10).join(subject_parts)}
+
+【近期參考成交案例（臺東縣，近2年實價登錄）】
+{chr(10).join(comp_lines)}
+
+【統計摘要】
+- 參考案例數：{len(comparables)} 筆
+- 總價中位數：{median_price} 萬
+- 總價平均：{avg_price} 萬
+- 建物單價平均：{avg_unit} 萬/坪
+
+請以 JSON 格式回覆，格式如下：
+{{
+  "suggested_min": 數字（萬，建議最低開價）,
+  "suggested_max": 數字（萬，建議最高開價），
+  "key_factors": ["影響價格的關鍵因素1", "因素2", "因素3"],
+  "analysis": "2~4段的市場分析說明（繁體中文，給一般民眾看，說明如何得出這個開價範圍）",
+  "strategy": "給業務員的議價建議（1~2句，說明開高或保守的理由）"
+}}
+
+只回覆 JSON，不要加任何其他文字。"""
+
+    try:
+        import urllib.request
+        req_data = json.dumps({
+            'model': 'claude-haiku-4-5-20251001',
+            'max_tokens': 1024,
+            'messages': [{'role': 'user', 'content': prompt}]
+        }).encode('utf-8')
+        req = urllib.request.Request(
+            'https://api.anthropic.com/v1/messages',
+            data=req_data,
+            headers={
+                'x-api-key': api_key,
+                'anthropic-version': '2023-06-01',
+                'content-type': 'application/json',
+            },
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            resp_data = json.loads(resp.read().decode('utf-8'))
+        ai_text = resp_data['content'][0]['text'].strip()
+        # 清除 markdown code block（如果有的話）
+        if ai_text.startswith('```'):
+            ai_text = ai_text.split('\n', 1)[1].rsplit('```', 1)[0].strip()
+        ai_result = json.loads(ai_text)
+    except Exception as e:
+        return jsonify({'error': f'AI 分析失敗：{e}'}), 500
+
+    # ── Step 5：組合回傳 ──────────────────────────────────────────────
+    return jsonify({
+        'suggested_min':  ai_result.get('suggested_min', 0),
+        'suggested_max':  ai_result.get('suggested_max', 0),
+        'median':         median_price,
+        'avg':            avg_price,
+        'avg_unit':       avg_unit,
+        'key_factors':    ai_result.get('key_factors', []),
+        'analysis':       ai_result.get('analysis', ''),
+        'strategy':       ai_result.get('strategy', ''),
+        'comparables':    comparables[:10],
+        'total_candidates': len(candidates),
+        'generated_at':   datetime.now().strftime('%Y-%m-%d %H:%M'),
+        'subject': {
+            'address': address, 'district': district,
+            'transaction_type': tx_type, 'building_type': bld_type,
+            'building_ping': bld_ping, 'land_ping': land_ping,
+            'floor': floor_val, 'total_floor': total_floor,
+            'age': age_val, 'note': note_val,
+        }
+    })
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5010)), debug=bool(os.environ.get("FLASK_DEBUG")))

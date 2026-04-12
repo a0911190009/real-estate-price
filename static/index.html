@@ -575,6 +575,112 @@
       font-size: 0.82rem;
       color: var(--success);
     }
+    /* ── AI 估價 Modal ── */
+    .val-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 4000;
+      justify-content: center; align-items: flex-start;
+      padding: 20px 16px; overflow-y: auto;
+    }
+    .val-modal.show { display: flex; }
+    .val-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; width: 100%; max-width: 680px;
+      box-shadow: var(--sh, 0 12px 40px rgba(0,0,0,0.5));
+      margin: auto;
+    }
+    .val-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px 14px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--surface); border-radius: 14px 14px 0 0; z-index: 1;
+    }
+    .val-head h2 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0; }
+    .val-close { background: none; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; padding: 2px 6px; }
+    .val-close:hover { color: var(--text); }
+    .val-body { padding: 18px 20px 24px; }
+
+    /* 輸入表單 */
+    .val-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+    .val-form-grid.col1 { grid-template-columns: 1fr; }
+    .val-field { display: flex; flex-direction: column; gap: 4px; }
+    .val-field label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    .val-field input, .val-field select, .val-field textarea {
+      background: var(--bg, #0f172a); border: 1px solid var(--border);
+      border-radius: 7px; color: var(--text); font-size: 0.85rem;
+      padding: 7px 10px; font-family: inherit;
+    }
+    .val-field input:focus, .val-field select:focus, .val-field textarea:focus {
+      outline: none; border-color: var(--primary);
+    }
+    .val-field textarea { min-height: 60px; resize: vertical; }
+    .val-field select option { background: var(--surface); }
+    .val-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+    /* 分析中 */
+    .val-loading { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+    .val-loading .spinner { margin: 0 auto 16px; }
+    .val-loading p { font-size: 0.9rem; }
+
+    /* 報告 */
+    .val-report { }
+    .val-price-hero {
+      background: var(--surface2); border-radius: 10px;
+      padding: 18px 20px; margin-bottom: 16px; text-align: center;
+    }
+    .val-price-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+    .val-price-range {
+      font-size: 2rem; font-weight: 800; color: var(--danger);
+      letter-spacing: -0.5px; line-height: 1.1;
+    }
+    .val-price-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
+    .val-section { margin-bottom: 16px; }
+    .val-section-title {
+      font-size: 0.78rem; font-weight: 700; color: var(--primary);
+      margin-bottom: 8px; padding-bottom: 5px;
+      border-bottom: 1px solid var(--border); letter-spacing: 0.04em;
+    }
+    .val-factors { display: flex; flex-wrap: wrap; gap: 6px; }
+    .val-factor-tag {
+      font-size: 0.75rem; padding: 3px 10px; border-radius: 20px;
+      background: var(--acs, rgba(59,130,246,0.15));
+      color: var(--ac, #3b82f6); border: 1px solid var(--ac, #3b82f6);
+    }
+    .val-analysis { font-size: 0.85rem; color: var(--text); line-height: 1.75; white-space: pre-wrap; }
+    .val-strategy {
+      background: var(--dgb, rgba(239,68,68,0.12)); border: 1px solid var(--danger);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 0.83rem; color: var(--text); line-height: 1.6;
+    }
+    .val-comp-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .val-comp-table th {
+      text-align: left; padding: 6px 8px;
+      color: var(--text-muted); border-bottom: 1px solid var(--border);
+      font-weight: 600; white-space: nowrap;
+    }
+    .val-comp-table td {
+      padding: 6px 8px; border-bottom: 1px solid var(--border);
+      color: var(--text); vertical-align: top;
+    }
+    .val-comp-table tr:last-child td { border-bottom: none; }
+    .val-comp-table .price-col { color: var(--danger); font-weight: 700; white-space: nowrap; }
+    .val-report-footer {
+      font-size: 0.7rem; color: var(--text-muted); margin-top: 14px;
+      border-top: 1px solid var(--border); padding-top: 10px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;
+    }
+
+    /* 列印樣式 */
+    @media print {
+      body > *:not(#val-print-root) { display: none !important; }
+      #val-print-root {
+        display: block !important; position: static !important;
+        background: #fff !important; color: #000 !important;
+        padding: 20px; font-family: sans-serif;
+      }
+      .val-print-hide { display: none !important; }
+      .val-price-range { color: #c00 !important; }
+      .val-comp-table th, .val-comp-table td { border-color: #ccc !important; }
+    }
   </style>
 </head>
 <body data-theme="navy-dark">
@@ -608,6 +714,7 @@
     <button class="btn btn-primary" onclick="doSearch()">查詢</button>
   </div>
 
+  <button onclick="openValuationModal()" class="btn btn-primary" style="font-size:0.85rem;padding:6px 14px;">🏷️ AI 估價</button>
   <button onclick="document.getElementById('gf-overlay').classList.add('show');" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;transition:color 0.15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">💬 反饋</button>
   <button id="btn-admin-import" style="display:none;" onclick="openImportModal()" class="btn btn-ghost" title="匯入實價登錄資料（管理員）">📥 匯入</button>
   <a id="btn-portal" href="/" class="btn-portal">🏠 入口</a>
@@ -1103,6 +1210,136 @@ function buildPopup(r) {
   '</div>';
 }
 
+// ── AI 估價 Modal ────────────────────────────────────────────────────
+function openValuationModal() {
+  // 預先填入鄉鎮選單（從現有資料取得）
+  var sel = document.getElementById('val-district');
+  if (sel.options.length <= 1) {
+    fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ limit: 1 })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      (d.filter_options && d.filter_options.districts || []).forEach(function(dist) {
+        var opt = document.createElement('option');
+        opt.value = dist; opt.textContent = dist;
+        sel.appendChild(opt);
+      });
+    }).catch(function() {});
+  }
+  resetValuation();
+  document.getElementById('val-modal').classList.add('show');
+}
+
+function closeValuationModal() {
+  document.getElementById('val-modal').classList.remove('show');
+}
+
+function resetValuation() {
+  document.getElementById('val-step-form').style.display = '';
+  document.getElementById('val-step-loading').style.display = 'none';
+  document.getElementById('val-step-report').style.display = 'none';
+  document.getElementById('val-head-title').textContent = '🏷️ AI 市場估價';
+}
+
+function startValuation() {
+  var address = document.getElementById('val-address').value.trim();
+  if (!address) { alert('請輸入地址或地號描述'); return; }
+
+  // 切換到 loading 頁
+  document.getElementById('val-step-form').style.display = 'none';
+  document.getElementById('val-step-loading').style.display = '';
+  document.getElementById('val-step-report').style.display = 'none';
+
+  var payload = {
+    address:          address,
+    district:         document.getElementById('val-district').value,
+    transaction_type: document.getElementById('val-tx-type').value,
+    building_type:    document.getElementById('val-bld-type').value,
+    building_ping:    parseFloat(document.getElementById('val-bld-ping').value) || 0,
+    land_ping:        parseFloat(document.getElementById('val-land-ping').value) || 0,
+    floor:            parseInt(document.getElementById('val-floor').value)       || 0,
+    total_floor:      parseInt(document.getElementById('val-total-floor').value) || 0,
+    age:              parseInt(document.getElementById('val-age').value)         || 0,
+    note:             document.getElementById('val-note').value.trim(),
+  };
+
+  fetch('/api/valuation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d.error) { alert('❌ ' + d.error); resetValuation(); return; }
+    renderValuationReport(d, payload);
+  }).catch(function(e) {
+    alert('網路錯誤，請重試');
+    resetValuation();
+  });
+}
+
+function renderValuationReport(d, subject) {
+  // 標頭
+  document.getElementById('val-head-title').textContent = '📋 估價報告';
+
+  // 建議開價
+  var minP = d.suggested_min, maxP = d.suggested_max;
+  document.getElementById('val-price-range').textContent =
+    (minP && maxP) ? (minP + ' ~ ' + maxP + ' 萬') : (d.median + ' 萬（中位數）');
+  var subParts = [];
+  if (d.median)   subParts.push('市場中位數 ' + d.median + ' 萬');
+  if (d.avg)      subParts.push('平均 ' + d.avg + ' 萬');
+  if (d.avg_unit) subParts.push('均單價 ' + d.avg_unit + ' 萬/坪');
+  document.getElementById('val-price-sub').textContent = subParts.join('　｜　');
+
+  // 關鍵因素
+  var factors = d.key_factors || [];
+  document.getElementById('val-factors').innerHTML = factors.map(function(f) {
+    return '<span class="val-factor-tag">' + escHtml(f) + '</span>';
+  }).join('');
+  document.getElementById('val-factors-section').style.display = factors.length ? '' : 'none';
+
+  // 市場分析
+  document.getElementById('val-analysis').textContent = d.analysis || '';
+
+  // 業務議價建議
+  document.getElementById('val-strategy').textContent = d.strategy || '';
+  document.getElementById('val-strategy-section').style.display = d.strategy ? '' : 'none';
+
+  // 參考案例表格
+  var tbody = document.getElementById('val-comp-tbody');
+  tbody.innerHTML = (d.comparables || []).map(function(r) {
+    return '<tr>' +
+      '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escHtml(r.address || '') + '">' + escHtml((r.address || '').replace(/^臺東縣/, '')) + '</td>' +
+      '<td style="white-space:nowrap;">' + (r.date || '') + '</td>' +
+      '<td class="price-col">' + (r.total_price || '—') + ' 萬</td>' +
+      '<td>' + (r.unit_price > 0 ? r.unit_price + ' 萬/坪' : '—') + '</td>' +
+      '<td>' + (r.building_ping > 0 ? r.building_ping + ' 坪' : '—') + '</td>' +
+      '<td>' + escHtml(r.building_type || r.transaction_type || '—') + '</td>' +
+      '<td>' + (r.age > 0 ? r.age + ' 年' : '—') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  // 頁尾
+  var subjectDesc = escHtml(subject.address);
+  if (subject.district) subjectDesc += '　' + escHtml(subject.district);
+  document.getElementById('val-footer-info').innerHTML =
+    '評估對象：' + subjectDesc + '　｜　產生時間：' + (d.generated_at || '') +
+    '　｜　參考筆數：' + (d.total_candidates || 0) + ' 筆中取 ' + (d.comparables || []).length + ' 筆';
+
+  // 切換到報告頁
+  document.getElementById('val-step-loading').style.display = 'none';
+  document.getElementById('val-step-report').style.display = '';
+}
+
+function printValuation() {
+  // 列印前隱藏議價建議（客戶不應看到）
+  var strategyEl = document.getElementById('val-strategy-section');
+  var origDisplay = strategyEl.style.display;
+  strategyEl.style.display = 'none';
+  window.print();
+  strategyEl.style.display = origDisplay;
+}
+
 // ── 明細 Modal ───────────────────────────────────────────────────────
 function openDetailModal(id) {
   var r = _results.find(function(x) { return x.id === id; });
@@ -1408,6 +1645,150 @@ function escHtml(str) {
 </script>
 
 <!-- ── 明細 Modal ── -->
+<!-- ── AI 估價 Modal ── -->
+<div id="val-modal" class="val-modal" onclick="if(event.target===this)closeValuationModal()">
+  <div class="val-box" id="val-print-root">
+    <div class="val-head">
+      <h2 id="val-head-title">🏷️ AI 市場估價</h2>
+      <button class="val-close val-print-hide" onclick="closeValuationModal()">✕</button>
+    </div>
+    <div class="val-body">
+
+      <!-- Step 1: 輸入表單 -->
+      <div id="val-step-form">
+        <div class="val-form-grid col1" style="margin-bottom:12px;">
+          <div class="val-field">
+            <label>地址 或 地號描述 *</label>
+            <input id="val-address" type="text" placeholder="例：台東市中華路 123 號 或 豐成段 0518 地號">
+          </div>
+        </div>
+        <div class="val-form-grid" style="margin-bottom:12px;">
+          <div class="val-field">
+            <label>鄉鎮市區</label>
+            <select id="val-district">
+              <option value="">全縣（不限）</option>
+            </select>
+          </div>
+          <div class="val-field">
+            <label>交易標的</label>
+            <select id="val-tx-type">
+              <option value="">不限</option>
+              <option value="土地">土地</option>
+              <option value="房地(土地+建物)">房地（土地+建物）</option>
+              <option value="房地(土地+建物)+車位">房地+車位</option>
+              <option value="建物">建物</option>
+            </select>
+          </div>
+          <div class="val-field">
+            <label>建物型態</label>
+            <select id="val-bld-type">
+              <option value="">不限</option>
+              <option value="透天厝">透天厝</option>
+              <option value="華廈">華廈（10層以下有電梯）</option>
+              <option value="住宅大樓">住宅大樓（11層以上）</option>
+              <option value="公寓">公寓（5樓以下無電梯）</option>
+            </select>
+          </div>
+          <div class="val-field">
+            <label>建物坪數</label>
+            <input id="val-bld-ping" type="number" min="0" step="0.1" placeholder="例：32.5">
+          </div>
+          <div class="val-field">
+            <label>土地坪數</label>
+            <input id="val-land-ping" type="number" min="0" step="0.1" placeholder="例：15.0">
+          </div>
+          <div class="val-field">
+            <label>屋齡（年）</label>
+            <input id="val-age" type="number" min="0" placeholder="例：20">
+          </div>
+          <div class="val-field">
+            <label>樓層</label>
+            <input id="val-floor" type="number" min="0" placeholder="例：3">
+          </div>
+          <div class="val-field">
+            <label>總樓層</label>
+            <input id="val-total-floor" type="number" min="0" placeholder="例：4">
+          </div>
+        </div>
+        <div class="val-form-grid col1">
+          <div class="val-field">
+            <label>備注說明（特殊條件、優缺點）</label>
+            <textarea id="val-note" placeholder="例：面寬 8 米、近市場、屋況良好、需整修..."></textarea>
+          </div>
+        </div>
+        <div class="val-actions val-print-hide">
+          <button class="btn" onclick="closeValuationModal()">取消</button>
+          <button class="btn btn-primary" onclick="startValuation()">🔍 開始分析</button>
+        </div>
+      </div>
+
+      <!-- Step 2: 分析中 -->
+      <div id="val-step-loading" style="display:none;" class="val-loading">
+        <div class="spinner"></div>
+        <p>AI 正在比對實價登錄資料並分析中⋯</p>
+        <p style="font-size:0.78rem;margin-top:6px;">通常需要 10~20 秒</p>
+      </div>
+
+      <!-- Step 3: 報告 -->
+      <div id="val-step-report" style="display:none;">
+        <!-- 建議開價 -->
+        <div class="val-price-hero">
+          <div class="val-price-label">建議市場開價範圍</div>
+          <div class="val-price-range" id="val-price-range">—</div>
+          <div class="val-price-sub" id="val-price-sub"></div>
+        </div>
+
+        <!-- 關鍵因素 -->
+        <div class="val-section" id="val-factors-section">
+          <div class="val-section-title">影響價格的關鍵因素</div>
+          <div class="val-factors" id="val-factors"></div>
+        </div>
+
+        <!-- 市場分析 -->
+        <div class="val-section">
+          <div class="val-section-title">市場分析</div>
+          <div class="val-analysis" id="val-analysis"></div>
+        </div>
+
+        <!-- 議價建議（僅業務可見，列印時隱藏） -->
+        <div class="val-section val-print-hide" id="val-strategy-section">
+          <div class="val-section-title">💼 業務議價建議（客戶不可見）</div>
+          <div class="val-strategy" id="val-strategy"></div>
+        </div>
+
+        <!-- 參考案例 -->
+        <div class="val-section">
+          <div class="val-section-title">參考成交案例</div>
+          <div style="overflow-x:auto;">
+            <table class="val-comp-table" id="val-comp-table">
+              <thead>
+                <tr>
+                  <th>地址</th><th>日期</th><th>總價</th>
+                  <th>單價</th><th>建物坪</th><th>型態</th><th>屋齡</th>
+                </tr>
+              </thead>
+              <tbody id="val-comp-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 報告頁尾 -->
+        <div class="val-report-footer">
+          <span id="val-footer-info"></span>
+          <span>資料來源：內政部實價登錄</span>
+        </div>
+
+        <!-- 操作按鈕 -->
+        <div class="val-actions val-print-hide" style="margin-top:16px;">
+          <button class="btn" onclick="resetValuation()">← 重新評估</button>
+          <button class="btn btn-primary" onclick="printValuation()">🖨️ 列印 / 儲存 PDF</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <div id="detail-modal" class="detail-modal" onclick="if(event.target===this)closeDetailModal()">
   <div class="detail-box">
     <div class="detail-head">
