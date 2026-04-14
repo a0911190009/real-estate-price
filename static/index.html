@@ -1389,9 +1389,14 @@ function renderValuationReport(d, subject) {
   // 頁尾
   var subjectDesc = escHtml(subject.address);
   if (subject.district) subjectDesc += '　' + escHtml(subject.district);
+  // 信心等級
+  var conf = d.confidence || 0;
+  var confLabel = conf >= 70 ? '高' : (conf >= 40 ? '中' : '低');
+  var confColor = conf >= 70 ? 'var(--ok)' : (conf >= 40 ? 'var(--warn)' : '#ef4444');
   document.getElementById('val-footer-info').innerHTML =
     '評估對象：' + subjectDesc + '　｜　產生時間：' + (d.generated_at || '') +
-    '　｜　參考筆數：' + (d.total_candidates || 0) + ' 筆中取 ' + (d.comparables || []).length + ' 筆';
+    '　｜　參考筆數：' + (d.total_candidates || 0) + ' 筆中取 ' + (d.comparables || []).length + ' 筆' +
+    '　｜　資料信心：<span style="color:' + confColor + ';font-weight:600;">' + confLabel + '（' + conf + '/100）</span>';
 
   // 切換到報告頁
   document.getElementById('val-step-loading').style.display = 'none';

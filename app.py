@@ -696,92 +696,152 @@ def api_valuation():
         except Exception:
             pass  # 查不到就退回路名比對，不阻斷流程
 
-    # ── Step 1：從資料庫找相似案例 ────────────────────────────────────
+    # ── Step 1：Hard Filter — 候選池篩選 ────────────────────────────
+    import re as _re
+    import math as _math
+
     all_data = _load_price_data()
     from datetime import date
     today = date.today()
-    two_years_ago = f"{today.year - 2}-{today.month:02d}-{today.day:02d}"
+    three_years_ago = f"{today.year - 3}-{today.month:02d}-{today.day:02d}"
 
     candidates = []
     for r in all_data:
-        # 只取近 2 年
-        if (r.get('date') or '') < two_years_ago:
+        # 只取近 3 年（擴大時間窗口，台東交易量少）
+        if (r.get('date') or '') < three_years_ago:
             continue
         # 地區過濾
         if district and r.get('district') != district:
             continue
-        # 交易標的過濾（有填才過濾）
+        # 交易標的過濾
         if tx_type and tx_type not in r.get('transaction_type', ''):
             continue
+        # ★ Hard Filter 1：預設排除預售屋（時間點、定價邏輯不同）
+        if '預售屋' in r.get('transaction_type', ''):
+            continue
+        # ★ Hard Filter 2：建物型態必須一致（有指定才強制）
+        if bld_type and r.get('building_type') and bld_type not in r['building_type']:
+            continue
+        # ★ Hard Filter 3：坪數限 ±60%（避免 10 坪跟 100 坪互比）
+        if bld_ping > 0 and r.get('building_ping', 0) > 0:
+            ratio = r['building_ping'] / bld_ping
+            if ratio < 0.4 or ratio > 2.5:
+                continue
         candidates.append(r)
 
-    # ── Step 2：相似度評分，取最相近 15 筆 ───────────────────────────
-    import re as _re
+    # ── Step 2：相似度評分 ───────────────────────────────────────────
 
     def _extract_road(addr):
-        """從地址擷取路名（含段），例如「台東市中山路123號」→「中山路」"""
+        """從地址擷取路名，例如「台東市中山路123號」→「中山路」"""
         m = _re.search(r'([^\s市縣鄉鎮區村里]+?(?:路|街|大道|道路)(?:[一二三四五六七八九十]段)?)', addr or '')
         return m.group(1) if m else ''
 
-    subject_road = _extract_road(address)  # 待估物件的路名
+    def _addr_prefix(addr):
+        """取地址路名+門牌號碼前半，用來判斷同棟/鄰棟"""
+        m = _re.search(r'(\d+)號', addr or '')
+        road = _extract_road(addr)
+        return f"{road}{m.group(1)}" if m and road else ''
+
+    subject_road   = _extract_road(address)
+    subject_prefix = _addr_prefix(address)
+
+    # 計算待估物件的相對樓層（無資料則 0）
+    subject_floor_ratio = (floor_val / total_floor) if (floor_val > 0 and total_floor > 0) else 0
 
     def similarity_score(r):
         score = 0.0
-        # ── 地理位置：優先用直線距離，沒座標才用路名比對 ────────────
+
+        # ── 地理位置（最高優先，40 分）────────────────────────────────
         has_coords = lat_val and lng_val and r.get('lat') and r.get('lng')
         if has_coords:
-            # 有座標：用 Haversine 直線距離評分
             dist_m = _haversine_m(lat_val, lng_val, r['lat'], r['lng'])
             if dist_m <= 300:
-                score += 40   # 300 公尺內：最高分
+                score += 40
             elif dist_m <= 600:
-                score += 30   # 600 公尺內
+                score += 30
             elif dist_m <= 1000:
-                score += 18   # 1 公里內
+                score += 18
             elif dist_m <= 2000:
-                score += 8    # 2 公里內
-            # 超過 2 公里：無距離加分
+                score += 8
         else:
-            # 無座標：退回路名比對
             comp_road = _extract_road(r.get('address', ''))
             if subject_road and comp_road:
                 if comp_road == subject_road:
-                    score += 35   # 同一條路：強力加分
+                    score += 35
                 elif comp_road[:2] == subject_road[:2]:
-                    score += 10   # 路名前兩字相同（同系路段）：小幅加分
-        # ── 建物型態相符 ─────────────────────────────────────────────
-        if bld_type and r.get('building_type'):
-            score += 30 if bld_type in r['building_type'] else 0
-        # ── 坪數接近（建物）──────────────────────────────────────────
+                    score += 10
+
+        # ── 同棟/鄰棟加分（20 分）────────────────────────────────────
+        if subject_prefix:
+            comp_prefix = _addr_prefix(r.get('address', ''))
+            if comp_prefix and comp_prefix == subject_prefix:
+                score += 20   # 同棟或同門牌：消除位置雜訊
+
+        # ── 建物型態（已硬篩選，這裡視為確認加分 20 分）────────────────
+        if bld_type and r.get('building_type') and bld_type in r['building_type']:
+            score += 20
+
+        # ── 坪數接近（建物，20 分）────────────────────────────────────
         if bld_ping > 0 and r.get('building_ping', 0) > 0:
             diff_ratio = abs(r['building_ping'] - bld_ping) / bld_ping
             score += max(0, 20 - diff_ratio * 40)
-        # ── 土地坪數接近 ─────────────────────────────────────────────
+
+        # ── 土地坪數接近（15 分）─────────────────────────────────────
         if land_ping > 0 and r.get('land_ping', 0) > 0:
             diff_ratio = abs(r['land_ping'] - land_ping) / land_ping
             score += max(0, 15 - diff_ratio * 30)
-        # ── 屋齡接近 ─────────────────────────────────────────────────
+
+        # ── 屋齡接近（10 分）─────────────────────────────────────────
         if age_val > 0 and r.get('age', 0) > 0:
             diff = abs(r['age'] - age_val)
             score += max(0, 10 - diff * 1)
-        # ── 樓層接近 ─────────────────────────────────────────────────
-        if floor_val > 0 and r.get('floor', 0) > 0:
-            score += 5 if r['floor'] == floor_val else 0
-        # ── 日期越新越好 ─────────────────────────────────────────────
+
+        # ── 相對樓層接近（8 分）──────────────────────────────────────
+        # 用 樓層/總樓層 比值差，比絕對層數更有意義
+        r_floor = r.get('floor', 0)
+        r_total = r.get('total_floor', 0)
+        if subject_floor_ratio > 0 and r_floor > 0 and r_total > 0:
+            comp_ratio = r_floor / r_total
+            diff = abs(comp_ratio - subject_floor_ratio)
+            score += max(0, 8 - diff * 16)   # 比值差 0.5 以上給 0 分
+
+        # ── 指數時間衰減（10 分，半衰期 6 個月）─────────────────────────
+        # 用指數衰減取代線性截止，越近越重要但不強制排除
         date_str = r.get('date', '')
         if date_str:
             try:
                 days_ago = (today - date.fromisoformat(date_str)).days
-                score += max(0, 10 - days_ago / 60)
+                score += 10 * _math.exp(-days_ago / 180)
             except Exception:
                 pass
+
         return score
 
-    candidates.sort(key=similarity_score, reverse=True)
-    comparables = candidates[:15]
+    scored = [(r, similarity_score(r)) for r in candidates]
+    scored.sort(key=lambda x: x[1], reverse=True)
+    top_scored = scored[:15]
+    comparables = [r for r, _ in top_scored]
 
     if not comparables:
-        return jsonify({'error': f'找不到符合條件的參考案例（{district or "全縣"}，近 2 年）'}), 404
+        # 放寬：移除型態硬篩，重試
+        fallback = [r for r in all_data
+                    if (r.get('date') or '') >= three_years_ago
+                    and (not district or r.get('district') == district)
+                    and '預售屋' not in r.get('transaction_type', '')]
+        fallback.sort(key=lambda r: r.get('date', ''), reverse=True)
+        comparables = fallback[:15]
+        if not comparables:
+            return jsonify({'error': f'找不到符合條件的參考案例（{district or "全縣"}，近 3 年）'}), 404
+
+    # ── 信心分數（0–100）────────────────────────────────────────────────
+    if top_scored:
+        avg_sim = sum(s for _, s in top_scored[:10]) / min(len(top_scored), 10)
+        # 分數上限約 100（各項滿分 40+20+20+20+15+10+8+10=143），正規化到 100
+        raw_confidence = int(avg_sim / 1.43)
+        data_density_bonus = min(20, len(top_scored))    # 案例越多信心越高
+        confidence_score = min(100, raw_confidence + data_density_bonus)
+    else:
+        confidence_score = 0
 
     # ── Step 3：計算統計數值 ──────────────────────────────────────────
     prices = [r['total_price'] for r in comparables if r.get('total_price', 0) > 0]
@@ -797,7 +857,7 @@ def api_valuation():
     if not api_key:
         return jsonify({'error': '未設定 ANTHROPIC_API_KEY'}), 500
 
-    # 整理參考案例給 AI
+    # 整理參考案例給 AI（加入距離資訊）
     comp_lines = []
     for i, r in enumerate(comparables[:10], 1):
         parts = [
@@ -817,6 +877,10 @@ def api_valuation():
             parts.append(f"屋齡：{r['age']}年")
         if r.get('floor', 0) > 0:
             parts.append(f"樓層：{r['floor']}/{r.get('total_floor', '?')}樓")
+        # 附上距離（有座標才計算）
+        if lat_val and lng_val and r.get('lat') and r.get('lng'):
+            dist_m = _haversine_m(lat_val, lng_val, r['lat'], r['lng'])
+            parts.append(f"距離：約{int(dist_m)}公尺")
         comp_lines.append('  ' + '，'.join(parts))
 
     # 待估物件條件
@@ -830,28 +894,43 @@ def api_valuation():
     if age_val > 0:    subject_parts.append(f"屋齡：{age_val}年")
     if note_val:       subject_parts.append(f"備注：{note_val}")
 
-    prompt = f"""你是一位台東縣的專業不動產估價顧問。
+    # 加入距離說明與信心等級供 AI 參考
+    has_distance = lat_val and lng_val
+    confidence_label = '高' if confidence_score >= 70 else ('中' if confidence_score >= 40 else '低')
+    location_note = (
+        f"（已提供 GPS 座標，比較案例已按直線距離篩選優先排序）"
+        if has_distance else
+        f"（未提供精確座標，按路名相似度篩選）"
+    )
+
+    prompt = f"""你是一位台東縣的專業不動產估價顧問，熟悉當地各區位價差。
 請根據以下「參考成交案例」，對「待估物件」給出合理的市場開價建議。
 
 【待估物件條件】
 {chr(10).join(subject_parts)}
 
-【近期參考成交案例（臺東縣，近2年實價登錄）】
+【近期參考成交案例（臺東縣，近3年實價登錄，已排除預售屋）{location_note}】
 {chr(10).join(comp_lines)}
 
 【統計摘要】
-- 參考案例數：{len(comparables)} 筆
+- 有效比較案例：{len(comparables)} 筆（資料信心：{confidence_label}，分數 {confidence_score}/100）
 - 總價中位數：{median_price} 萬
 - 總價平均：{avg_price} 萬
 - 建物單價平均：{avg_unit} 萬/坪
 
+【分析注意事項】
+1. 距離較遠的案例（>1公里）請在分析中適當降低其參考權重
+2. 較舊案例（>1年）市場可能已有變化，請酌情調整
+3. 台東交易量少，若案例不足請說明估價信心較低
+4. 請明確說明各案例與待估物件的差異（坪數、屋齡、位置），以及如何據此調整
+
 請以 JSON 格式回覆，格式如下：
 {{
   "suggested_min": 數字（萬，建議最低開價）,
-  "suggested_max": 數字（萬，建議最高開價），
-  "key_factors": ["影響價格的關鍵因素1", "因素2", "因素3"],
-  "analysis": "2~4段的市場分析說明（繁體中文，給一般民眾看，說明如何得出這個開價範圍）",
-  "strategy": "給業務員的議價建議（1~2句，說明開高或保守的理由）"
+  "suggested_max": 數字（萬，建議最高開價）,
+  "key_factors": ["影響價格的關鍵因素（需具體，勿籠統）", "因素2", "因素3"],
+  "analysis": "2~4段市場分析（繁體中文，說明選取哪些案例為主要參考依據、與待估物件的差異調整、最終如何得出開價範圍）",
+  "strategy": "給業務員的議價建議（1~2句）"
 }}
 
 只回覆 JSON，不要加任何其他文字。"""
@@ -895,6 +974,7 @@ def api_valuation():
         'strategy':       ai_result.get('strategy', ''),
         'comparables':    comparables[:10],
         'total_candidates': len(candidates),
+        'confidence':     confidence_score,   # 0–100，評估比較案例品質
         'generated_at':   datetime.now().strftime('%Y-%m-%d %H:%M'),
         'subject': {
             'address': address, 'district': district,
