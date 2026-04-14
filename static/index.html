@@ -1259,12 +1259,64 @@ function resetValuation() {
   document.getElementById('val-head-title').textContent = '🏷️ AI 市場估價';
 }
 
+// 從地址字串擷取鄉鎮市區，自動填入下拉選單
+function valAutoExtractDistrict(address) {
+  var sel = document.getElementById('val-district');
+  if (!sel) return;
+  // 比對所有選項，找出地址裡包含的鄉鎮名
+  for (var i = 0; i < sel.options.length; i++) {
+    var opt = sel.options[i].value;
+    if (opt && address.indexOf(opt) !== -1) {
+      sel.value = opt;
+      return;
+    }
+  }
+}
+
+// 用地址透過 Google Places API 取得 lat/lng（不需要段別）
+async function geocodeAddress() {
+  var address = document.getElementById('val-address').value.trim();
+  if (!address) { alert('請先輸入地址'); return; }
+
+  var btn = document.getElementById('val-addr-btn');
+  btn.textContent = '定位中…';
+  btn.disabled = true;
+
+  try {
+    var res  = await fetch('/api/geocode-address', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: address })
+    });
+    var data = await res.json();
+    if (data.lat) {
+      // 填入座標隱藏欄位
+      document.getElementById('val-lat').value = data.lat;
+      document.getElementById('val-lng').value = data.lng;
+      // 顯示已定位提示
+      var display = data.formatted || address;
+      document.getElementById('val-coord-display').textContent =
+        display + '（' + data.lat.toFixed(5) + ', ' + data.lng.toFixed(5) + '）';
+      document.getElementById('val-coord-row').style.display = '';
+      btn.textContent = '✓ 已定位';
+    } else {
+      alert('定位失敗：' + (data.error || '查無結果'));
+      btn.textContent = '📍 定位';
+    }
+  } catch (e) {
+    alert('定位失敗：' + e.message);
+    btn.textContent = '📍 定位';
+  }
+  btn.disabled = false;
+}
+
 function clearParcelCoords() {
-  // 清除已查到的座標
+  // 清除已查到的座標（地址定位 或 地號查座標 都共用此函數）
   document.getElementById('val-lat').value = '';
   document.getElementById('val-lng').value = '';
   document.getElementById('val-coord-row').style.display = 'none';
   document.getElementById('val-parcel-btn').textContent = '查座標';
+  document.getElementById('val-addr-btn').textContent = '📍 定位';
 }
 
 async function lookupParcelCoords() {
@@ -1730,8 +1782,15 @@ function escHtml(str) {
       <div id="val-step-form">
         <div class="val-form-grid col1" style="margin-bottom:12px;">
           <div class="val-field">
-            <label>地址 或 地號描述 *</label>
-            <input id="val-address" type="text" placeholder="例：台東市中華路 123 號 或 豐成段 0518 地號">
+            <label>地址 *
+              <span style="font-weight:400;font-size:0.78rem;color:var(--tx);opacity:.55;">（輸入後按「📍 定位」可自動取得座標）</span>
+            </label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input id="val-address" type="text" placeholder="例：台東市中華路 123 號" style="flex:1;min-width:0;"
+                     oninput="valAutoExtractDistrict(this.value)">
+              <button type="button" id="val-addr-btn" onclick="geocodeAddress()" class="btn"
+                      style="white-space:nowrap;padding:0 12px;flex-shrink:0;">📍 定位</button>
+            </div>
           </div>
         </div>
 

@@ -602,6 +602,59 @@ def _haversine_m(lat1, lng1, lat2, lng2):
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
+@app.route('/api/geocode-address', methods=['POST'])
+def api_geocode_address():
+    """
+    地址 → WGS84 座標（透過 Google Places Text Search API）。
+    輸入：{ "address": "台東市中山路123號" }
+    輸出：{ "lat": 22.xxx, "lng": 121.xxx }
+    不需要段別，直接從地址解析，比 Easymap 更方便。
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+
+    body    = request.get_json() or {}
+    address = (body.get('address') or '').strip()
+    if not address:
+        return jsonify({'error': '請填入地址'}), 400
+
+    api_key = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+    if not api_key:
+        return jsonify({'error': '未設定 GOOGLE_MAPS_API_KEY'}), 500
+
+    try:
+        import urllib.request as _ur
+        req_data = json.dumps({
+            'textQuery': address,
+            'languageCode': 'zh-TW',
+            'maxResultCount': 1,
+        }).encode('utf-8')
+        req = _ur.Request(
+            'https://places.googleapis.com/v1/places:searchText',
+            data=req_data,
+            headers={
+                'Content-Type': 'application/json',
+                'X-Goog-Api-Key': api_key,
+                'X-Goog-FieldMask': 'places.location,places.formattedAddress',
+            },
+            method='POST'
+        )
+        with _ur.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+        places = data.get('places', [])
+        if places:
+            loc = places[0].get('location', {})
+            lat = loc.get('latitude')
+            lng = loc.get('longitude')
+            if lat is not None and lng is not None:
+                return jsonify({'lat': float(lat), 'lng': float(lng),
+                                'formatted': places[0].get('formattedAddress', '')})
+        return jsonify({'error': f'查無結果：{address}'}), 404
+    except Exception as e:
+        return jsonify({'error': f'地址解析失敗：{str(e)}'}), 500
+
+
 @app.route('/api/geocode-parcel', methods=['POST'])
 def api_geocode_parcel():
     """
