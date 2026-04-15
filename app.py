@@ -591,6 +591,112 @@ def api_admin_import():
     )
 
 
+def _polygon_area_sqm(ring, center_lat):
+    """
+    Shoelace 公式計算多邊形面積（平方公尺）。
+    ring：[[lng, lat], ...] 座標環（WGS84）
+    center_lat：中心緯度（用來換算經度的公尺比例）
+    """
+    import math
+    lat_m = 111320.0                                    # 1° 緯度 ≈ 111320 公尺
+    lng_m = 111320.0 * math.cos(math.radians(center_lat))  # 1° 經度（依緯度換算）
+    n = len(ring)
+    area = 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        x1, y1 = ring[i][0] * lng_m, ring[i][1] * lat_m
+        x2, y2 = ring[j][0] * lng_m, ring[j][1] * lat_m
+        area += (x1 * y2 - x2 * y1)
+    return abs(area) / 2.0
+
+
+@app.route('/api/lookup-parcel', methods=['POST'])
+def api_lookup_parcel():
+    """
+    段別 + 地號 → 土地資料（twland.ronny.tw，免費無需登入）
+    輸入：{ "land_sect": "建國段", "land_no": "08350001" }
+    輸出：{
+      "lat": 22.xxx, "lng": 121.xxx,   ← 地塊中心座標
+      "district": "台東市",             ← 鄉鎮市區
+      "area_m2": 138.5,                ← 土地面積（平方公尺）
+      "land_ping": 41.9,               ← 土地面積（坪）
+    }
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+
+    body      = request.get_json() or {}
+    land_sect = (body.get('land_sect') or '').strip()
+    land_no   = (body.get('land_no') or '').strip()
+
+    if not land_sect or not land_no:
+        return jsonify({'error': '請填入段別和地號'}), 400
+
+    # 地號正規化：去除非數字 → 補零到 8 碼 → 格式化成 XXXX-XXXX
+    digits = ''.join(c for c in land_no if c.isdigit()).zfill(8)
+    land_no_fmt = f"{digits[:4]}-{digits[4:]}"   # e.g. 0835-0001
+
+    try:
+        import urllib.request as _ur, urllib.parse as _up
+        query = f"臺東縣,{land_sect},{land_no_fmt}"
+        url   = 'https://twland.ronny.tw/index/search?' + _up.urlencode({'lands[]': query})
+        req   = _ur.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with _ur.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+
+        features = data.get('features', [])
+        not_found = data.get('notfound', [])
+
+        if not features:
+            msg = f'查無地號：臺東縣 {land_sect} {land_no_fmt}'
+            if not_found:
+                msg += f'（notfound: {not_found}）'
+            return jsonify({'error': msg}), 404
+
+        feat = features[0]
+        props = feat.get('properties', {})
+        geom  = feat.get('geometry', {})
+
+        # 中心座標（twland 直接提供）
+        lat = float(props.get('ycenter', 0))
+        lng = float(props.get('xcenter', 0))
+
+        # 鄉鎮市區（去掉「縣市」部分，只保留鄉鎮名）
+        district = props.get('鄉鎮', '')
+
+        # 計算面積：取 MultiPolygon 最大環的 Shoelace 面積
+        area_m2 = 0.0
+        coords_type = geom.get('type', '')
+        rings = []
+        if coords_type == 'MultiPolygon':
+            for poly in geom.get('coordinates', []):
+                if poly:
+                    rings.append(poly[0])   # 外環
+        elif coords_type == 'Polygon':
+            c = geom.get('coordinates', [])
+            if c:
+                rings.append(c[0])
+        for ring in rings:
+            a = _polygon_area_sqm(ring, lat)
+            if a > area_m2:
+                area_m2 = a   # 取最大多邊形（面積最大的地塊）
+
+        SQM_PER_PING = 3.30579
+        land_ping = round(area_m2 / SQM_PER_PING, 1)
+
+        return jsonify({
+            'lat':       round(lat, 7),
+            'lng':       round(lng, 7),
+            'district':  district,
+            'area_m2':   round(area_m2, 1),
+            'land_ping': land_ping,
+        })
+
+    except Exception as e:
+        return jsonify({'error': f'地號查詢失敗：{str(e)}'}), 500
+
+
 def _haversine_m(lat1, lng1, lat2, lng2):
     """計算兩點 WGS84 座標的直線距離（公尺）"""
     import math

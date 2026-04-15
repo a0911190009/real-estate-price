@@ -1320,10 +1320,9 @@ function clearParcelCoords() {
 }
 
 async function lookupParcelCoords() {
-  // 用段別+地號透過 Easymap 查 WGS84 座標
+  // 用段別+地號查：座標 + 土地面積 + 鄉鎮（twland.ronny.tw，免費）
   var sect = document.getElementById('val-land-sect').value.trim();
   var no   = document.getElementById('val-land-no').value.trim();
-  var dist = document.getElementById('val-district').value.trim() || '台東市';
   if (!sect || !no) { alert('請先填入段別和地號'); return; }
 
   var btn = document.getElementById('val-parcel-btn');
@@ -1331,22 +1330,40 @@ async function lookupParcelCoords() {
   btn.disabled = true;
 
   try {
-    var res  = await fetch('/api/geocode-parcel', {
+    var res  = await fetch('/api/lookup-parcel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ district: dist, land_sect: sect, land_no: no })
+      body: JSON.stringify({ land_sect: sect, land_no: no })
     });
     var data = await res.json();
     if (data.lat) {
-      // 填入隱藏欄位，顯示已定位提示
+      // 填入座標
       document.getElementById('val-lat').value = data.lat;
       document.getElementById('val-lng').value = data.lng;
+
+      // 自動填入鄉鎮市區
+      if (data.district) {
+        var sel = document.getElementById('val-district');
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === data.district) { sel.value = data.district; break; }
+        }
+      }
+
+      // 自動填入土地坪數（如果使用者還沒填）
+      var landPingEl = document.getElementById('val-land-ping');
+      if (data.land_ping && (!landPingEl.value || parseFloat(landPingEl.value) === 0)) {
+        landPingEl.value = data.land_ping;
+      }
+
+      // 顯示已定位提示（附上面積）
+      var areaNote = data.land_ping ? '　土地 ' + data.land_ping + ' 坪' : '';
       document.getElementById('val-coord-display').textContent =
-        dist + ' ' + sect + ' ' + no + '（' + data.lat.toFixed(5) + ', ' + data.lng.toFixed(5) + '）';
+        (data.district || '') + ' ' + sect + ' ' + no +
+        '（' + data.lat.toFixed(5) + ', ' + data.lng.toFixed(5) + '）' + areaNote;
       document.getElementById('val-coord-row').style.display = '';
       btn.textContent = '✓ 已定位';
     } else {
-      alert('查無座標：' + (data.error || '未知錯誤'));
+      alert('查無資料：' + (data.error || '未知錯誤'));
       btn.textContent = '查座標';
     }
   } catch (e) {
