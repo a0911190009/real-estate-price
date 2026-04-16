@@ -58,6 +58,42 @@ GENERAL_FEEDBACK_FILE = os.path.join(_APP_DIR, "general_feedback.json")
 TOKEN_SERIALIZER = URLSafeTimedSerializer(app.secret_key)
 TOKEN_MAX_AGE = 300
 
+# ── FOUNDI 段別快取（台東縣，24 小時有效，不分使用者）──────────────────
+_foundi_sections: dict = {}   # { "利家段": {city_code, locality_code, section_code, ...} }
+_foundi_sects_ts: float = 0.0
+_foundi_sects_lock = threading.Lock()
+
+
+def _foundi_get_sections(jwt: str) -> dict:
+    """用 JWT 從 FOUNDI 取台東縣所有段別代碼，快取 24 小時。"""
+    global _foundi_sections, _foundi_sects_ts
+    with _foundi_sects_lock:
+        if _foundi_sections and (time.time() - _foundi_sects_ts) < 86400:
+            return _foundi_sections
+        try:
+            import urllib.request as _ur
+            req_data = json.dumps({"city_code": "V", "locality_code": []}).encode('utf-8')
+            req = _ur.Request(
+                'https://agent.foundi.info/dataapi/transcript/cadasterSections/',
+                data=req_data,
+                headers={
+                    'authorization': jwt,
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+                },
+                method='POST'
+            )
+            with _ur.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+            if isinstance(data, list) and data:
+                _foundi_sections = {s['section_name']: s for s in data}
+                _foundi_sects_ts = time.time()
+        except Exception as e:
+            import logging
+            logging.warning(f'FOUNDI sections 快取失敗：{e}')
+    return _foundi_sections
+
 # ── 資料快取（從 GCS 或本地讀取，每小時重新整理）────────────────────
 _data_cache = []
 _data_cache_ts = 0.0
@@ -191,6 +227,143 @@ def auth_logout():
 def api_config():
     """回傳前端需要的設定。"""
     return jsonify({"portal_url": PORTAL_URL or "/"})
+
+
+@app.route("/api/foundi-jwt", methods=["POST"])
+def api_foundi_jwt_set():
+    """儲存 FOUNDI JWT 到 session，並回傳過期時間。"""
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+    body = request.get_json() or {}
+    jwt_val = (body.get("jwt") or "").strip()
+    if not jwt_val:
+        return jsonify({"error": "JWT 不能為空"}), 400
+    # 解碼 JWT payload 取得過期時間（不驗簽名，只讀 payload）
+    try:
+        import base64 as _b64
+        payload_b64 = jwt_val.split(".")[1]
+        # 補齊 base64 padding
+        payload_b64 += "=" * ((4 - len(payload_b64) % 4) % 4)
+        payload = json.loads(_b64.b64decode(payload_b64).decode("utf-8"))
+        exp_ts = payload.get("exp", 0)
+    except Exception:
+        return jsonify({"error": "無法解析 JWT，請確認格式正確"}), 400
+    if exp_ts and exp_ts < time.time():
+        return jsonify({"error": "此 JWT 已過期，請從 FOUNDI 重新取得"}), 400
+    session["foundi_jwt"] = jwt_val
+    session.modified = True
+    exp_str = datetime.fromtimestamp(exp_ts).strftime("%H:%M") if exp_ts else "未知"
+    return jsonify({"ok": True, "exp_ts": exp_ts, "exp_str": exp_str})
+
+
+@app.route("/api/foundi-parcel", methods=["POST"])
+def api_foundi_parcel():
+    """
+    段別 + 地號 → FOUNDI 土地分區資料（自動帶入估價表單）
+    輸入：{ "land_sect": "利家段", "land_no": "54800006" }
+    輸出：{
+      "use_zone": "特定農業區（甲種建築用地）",
+      "building_coverage": 60,  # 建蔽率 %（整數）
+      "floor_area_ratio": 240,  # 容積率 %（整數）
+      "declared_price": 570,    # 公告地價 元/㎡
+      "current_value": 3900,    # 公告現值 元/㎡
+      "land_area": 96.8,        # 土地坪數
+      "land_area_m2": 320,
+      "lat": 22.792408, "lng": 121.079193,
+    }
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+
+    jwt_val = session.get("foundi_jwt", "").strip()
+    if not jwt_val:
+        return jsonify({"error": "FOUNDI_JWT_NOT_SET"}), 401
+
+    # 檢查 JWT 是否過期
+    try:
+        import base64 as _b64
+        payload_b64 = jwt_val.split(".")[1]
+        payload_b64 += "=" * ((4 - len(payload_b64) % 4) % 4)
+        payload = json.loads(_b64.b64decode(payload_b64).decode("utf-8"))
+        if payload.get("exp", 0) < time.time():
+            return jsonify({"error": "FOUNDI_JWT_EXPIRED"}), 401
+    except Exception:
+        return jsonify({"error": "FOUNDI_JWT_INVALID"}), 401
+
+    body      = request.get_json() or {}
+    land_sect = (body.get("land_sect") or "").strip()
+    land_no   = (body.get("land_no")   or "").strip()
+
+    if not land_sect or not land_no:
+        return jsonify({"error": "請填入段別和地號"}), 400
+
+    # 地號正規化：補零到 8 碼
+    digits   = "".join(c for c in land_no if c.isdigit()).zfill(8)
+    main_key = int(digits[:4])   # "0835" → 835
+    sub_key  = int(digits[4:])   # "0001" → 1
+
+    # 查段別代碼（帶入 JWT 以觸發快取刷新）
+    sections = _foundi_get_sections(jwt_val)
+    sec = sections.get(land_sect)
+    if not sec:
+        return jsonify({"error": f"找不到段別：{land_sect}"}), 404
+
+    # 呼叫 FOUNDI land/mapLocation
+    try:
+        import urllib.request as _ur, urllib.parse as _up
+        params = {
+            "city_code":     sec["city_code"],
+            "locality_code": sec["locality_code"],
+            "section_code":  sec["section_code"],
+            "main_key":      str(main_key),
+            "sub_key":       str(sub_key),
+        }
+        url = "https://api.foundi.info/land/mapLocation/?" + _up.urlencode(params)
+        req = _ur.Request(url, headers={
+            "authorization": jwt_val,
+            "accept": "application/json",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        })
+        with _ur.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except Exception as e:
+        return jsonify({"error": f"FOUNDI 查詢失敗：{e}"}), 500
+
+    lands = data.get("lands", [])
+    if not lands:
+        return jsonify({"error": f"查無此地號：{land_sect} {digits[:4]}-{digits[4:]}"}), 404
+
+    info = lands[0]["info"]
+
+    # 組合使用分區字串：大分區（使用別）
+    zone     = info.get("zone", [])
+    sub_zone = info.get("sub_zone", [])
+    zone_str = "、".join(zone)
+    if sub_zone:
+        zone_str += f"（{'、'.join(sub_zone)}）"
+
+    # 建蔽率/容積率（FOUNDI 回傳 0~1 比例，轉成百分比整數）
+    bcr = info.get("building_coverage_ratio", 0)  # 0.6 → 60
+    far = info.get("floor_area_ratio", 0)          # 2.4 → 240
+
+    # 座標中心點
+    repr_coords = info.get("repr_point", {}).get("coordinates", [None, None])
+
+    return jsonify({
+        "use_zone":               zone_str,
+        "building_coverage":      round(bcr * 100),
+        "floor_area_ratio":       round(far * 100),
+        "declared_price":         info.get("unit_value_with_square_meter", 0),         # 公告地價
+        "current_value":          info.get("current_unit_value_with_square_meter", 0), # 公告現值
+        "land_area":              info.get("land_area", 0),                 # 坪
+        "land_area_m2":           info.get("land_area_in_square_meter", 0), # ㎡
+        "building_coverage_area": info.get("building_coverage_area", 0),   # 建築面積坪
+        "total_floor_area":       info.get("total_floor_area", 0),          # 可用建坪
+        "lat":                    repr_coords[1],
+        "lng":                    repr_coords[0],
+    })
 
 
 @app.route("/api/me")

@@ -1379,12 +1379,143 @@ function openFoundiLand() {
   var no   = document.getElementById('val-land-no').value.trim();
   var url = 'https://agent.foundi.info/tool/land?city=%E8%87%BA%E6%9D%B1%E7%B8%A3&locality=%E5%8F%B0%E6%9D%B1%E5%B8%82';
   if (sect) url += '&section_name=' + encodeURIComponent(sect);
-  // 地號主號（前4碼）
   if (no) {
     var mainKey = no.replace(/[^0-9]/g, '').slice(0, 4).replace(/^0+/, '') || no;
     url += '&main_key=' + encodeURIComponent(mainKey);
   }
   window.open(url, '_blank');
+}
+
+// ── FOUNDI JWT 設定 ──────────────────────────────────────────────────────
+var _foundiJwtExpTs = 0;  // 記錄 JWT 過期時間戳（秒）
+
+function updateFoundiStatus() {
+  var row    = document.getElementById('foundi-status-row');
+  var badge  = document.getElementById('foundi-badge');
+  var autoBtn= document.getElementById('foundi-auto-btn');
+  if (!row) return;
+  var now = Math.floor(Date.now() / 1000);
+  if (_foundiJwtExpTs > now) {
+    var d = new Date(_foundiJwtExpTs * 1000);
+    var expStr = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    badge.textContent  = '已連線（' + expStr + ' 前有效）';
+    badge.style.color  = 'var(--ok)';
+    if (autoBtn) autoBtn.disabled = false;
+  } else {
+    badge.textContent = '未連線';
+    badge.style.color = 'var(--txs)';
+    if (autoBtn) autoBtn.disabled = true;
+  }
+}
+
+function openFoundiJwtModal() {
+  var modal = document.getElementById('foundi-jwt-modal');
+  if (modal) { modal.style.display = 'flex'; document.getElementById('foundi-jwt-input').focus(); }
+}
+function closeFoundiJwtModal() {
+  var modal = document.getElementById('foundi-jwt-modal');
+  if (modal) { modal.style.display = 'none'; document.getElementById('foundi-jwt-input').value = ''; }
+}
+
+async function saveFoundiJwt() {
+  var jwt = (document.getElementById('foundi-jwt-input').value || '').trim();
+  if (!jwt) return;
+  var btn = document.getElementById('foundi-jwt-save-btn');
+  btn.disabled = true; btn.textContent = '儲存中...';
+  try {
+    var r = await fetch('/api/foundi-jwt', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({jwt: jwt})
+    });
+    var d = await r.json();
+    if (d.ok) {
+      _foundiJwtExpTs = d.exp_ts;
+      updateFoundiStatus();
+      closeFoundiJwtModal();
+      // 自動展開土地分區區塊
+      var details = document.getElementById('land-zone-details');
+      if (details) details.open = true;
+    } else {
+      alert('❌ ' + d.error);
+    }
+  } catch(e) { alert('儲存失敗：' + e.message); }
+  btn.disabled = false; btn.textContent = '儲存';
+}
+
+// 自動帶入 FOUNDI 土地分區資料
+async function fetchFoundiParcel() {
+  var sect = document.getElementById('val-land-sect').value.trim();
+  var no   = document.getElementById('val-land-no').value.trim();
+  if (!sect || !no) { alert('請先填入段別和地號'); return; }
+
+  var btn = document.getElementById('foundi-auto-btn');
+  btn.disabled = true; btn.textContent = '查詢中...';
+
+  try {
+    var r = await fetch('/api/foundi-parcel', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({land_sect: sect, land_no: no})
+    });
+    var d = await r.json();
+
+    if (!r.ok) {
+      if (d.error === 'FOUNDI_JWT_NOT_SET' || d.error === 'FOUNDI_JWT_EXPIRED' || d.error === 'FOUNDI_JWT_INVALID') {
+        _foundiJwtExpTs = 0;
+        updateFoundiStatus();
+        openFoundiJwtModal();
+      } else {
+        alert('❌ ' + d.error);
+      }
+      return;
+    }
+
+    // 展開土地分區區塊並填入資料
+    var details = document.getElementById('land-zone-details');
+    if (details) details.open = true;
+
+    document.getElementById('val-use-zone').value    = d.use_zone        || '';
+    document.getElementById('val-coverage').value    = d.building_coverage > 0 ? d.building_coverage : '';
+    document.getElementById('val-far').value         = d.floor_area_ratio  > 0 ? d.floor_area_ratio  : '';
+    document.getElementById('val-declared-price').value = d.declared_price > 0 ? d.declared_price    : '';
+
+    // 若有座標且尚未設定，自動帶入
+    if (d.lat && d.lng) {
+      var latEl = document.getElementById('val-lat');
+      var lngEl = document.getElementById('val-lng');
+      if (latEl && !latEl.value) {
+        latEl.value = d.lat;
+        lngEl.value = d.lng;
+        var coordRow = document.getElementById('val-coord-row');
+        var coordDisp= document.getElementById('val-coord-display');
+        if (coordRow && coordDisp) {
+          coordDisp.textContent = d.lat.toFixed(6) + ', ' + d.lng.toFixed(6) + '（FOUNDI）';
+          coordRow.style.display = '';
+        }
+      }
+    }
+
+    // 更新土地坪數（若尚未填）
+    if (d.land_area > 0 && !document.getElementById('val-land-ping').value) {
+      document.getElementById('val-land-ping').value = d.land_area.toFixed(1);
+    }
+
+    // 顯示補充資訊
+    var infoEl = document.getElementById('foundi-parcel-info');
+    if (infoEl) {
+      var parts = [];
+      if (d.land_area_m2)           parts.push('地坪：' + d.land_area_m2 + '㎡（' + (d.land_area||0).toFixed(1) + '坪）');
+      if (d.current_value)          parts.push('公告現值：' + d.current_value.toLocaleString() + '元/㎡');
+      if (d.building_coverage_area) parts.push('建築面積：' + d.building_coverage_area + '坪');
+      if (d.total_floor_area)       parts.push('可用建坪：' + d.total_floor_area + '坪');
+      infoEl.textContent = parts.join('　');
+      infoEl.style.display = parts.length ? '' : 'none';
+    }
+
+  } catch(e) { alert('查詢失敗：' + e.message); }
+
+  btn.disabled = false; btn.textContent = '自動帶入';
 }
 
 function startValuation() {
@@ -1855,19 +1986,30 @@ function escHtml(str) {
         </div>
 
         <!-- 土地分區資料（選填，有填入可提升 AI 分析品質）-->
-        <details style="margin-bottom:12px;">
+        <details id="land-zone-details" style="margin-bottom:12px;">
           <summary style="cursor:pointer;color:var(--txs);font-size:0.85rem;padding:6px 4px;user-select:none;">
             ▶ 土地分區資料（選填）— 填入可讓 AI 分析更精準
           </summary>
           <div style="margin-top:8px;padding:10px 12px;background:var(--bg-s);border:1px solid var(--bd);border-radius:8px;">
-            <!-- 說明 + FOUNDI 按鈕 -->
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:0.82rem;color:var(--txs);">
-              <span>可至 FOUNDI 查詢後填入（在「土地謄本」頁面的「土地標示」欄）</span>
-              <button type="button" class="btn" onclick="openFoundiLand()"
-                      style="white-space:nowrap;padding:0 10px;height:28px;font-size:0.8rem;flex-shrink:0;">
-                在 FOUNDI 查
+            <!-- FOUNDI 連線狀態 + 操作按鈕 -->
+            <div id="foundi-status-row" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:0.82rem;">
+              <span style="color:var(--txs);">FOUNDI：</span>
+              <span id="foundi-badge" style="color:var(--txs);">未連線</span>
+              <button type="button" class="btn" onclick="openFoundiJwtModal()"
+                      style="white-space:nowrap;padding:0 10px;height:26px;font-size:0.78rem;flex-shrink:0;margin-left:2px;">
+                設定 JWT
+              </button>
+              <button id="foundi-auto-btn" type="button" class="btn" onclick="fetchFoundiParcel()" disabled
+                      style="white-space:nowrap;padding:0 10px;height:26px;font-size:0.78rem;flex-shrink:0;background:var(--ok);border-color:var(--ok);color:#fff;">
+                自動帶入
+              </button>
+              <button type="button" onclick="openFoundiLand()"
+                      style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--txs);text-decoration:underline;padding:0;flex-shrink:0;">
+                手動查 FOUNDI
               </button>
             </div>
+            <!-- 補充資訊（自動帶入後顯示） -->
+            <div id="foundi-parcel-info" style="display:none;font-size:0.78rem;color:var(--txs);margin-bottom:8px;padding:4px 8px;background:var(--bg-t);border-radius:6px;"></div>
             <div class="val-form-grid">
               <div class="val-field">
                 <label>使用分區</label>
@@ -2027,6 +2169,28 @@ function escHtml(str) {
       <button class="detail-close" onclick="closeDetailModal()">✕</button>
     </div>
     <div class="detail-body" id="dm-body"></div>
+  </div>
+</div>
+
+<!-- FOUNDI JWT 設定 Modal -->
+<div id="foundi-jwt-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:var(--bg-s);border:1px solid var(--bd);border-radius:12px;padding:20px 24px;width:min(480px,92vw);box-shadow:var(--sh);">
+    <div style="font-weight:700;font-size:1rem;margin-bottom:6px;">設定 FOUNDI JWT</div>
+    <div style="font-size:0.82rem;color:var(--txs);margin-bottom:12px;line-height:1.6;">
+      1. 開啟瀏覽器 → 登入 <a href="https://agent.foundi.info/tool/land" target="_blank" style="color:var(--ac);">agent.foundi.info</a><br>
+      2. 按 <kbd style="background:var(--bg-t);padding:1px 5px;border-radius:4px;font-size:0.8rem;">F12</kbd> 開 DevTools → Console 頁籤<br>
+      3. 輸入 <code style="background:var(--bg-t);padding:1px 5px;border-radius:4px;">window.foundi.apiToken</code> 並 Enter<br>
+      4. 複製回傳的字串（不含引號）貼到下方
+    </div>
+    <textarea id="foundi-jwt-input" rows="4"
+      placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;color:var(--tx);font-size:0.8rem;font-family:monospace;resize:vertical;outline:none;"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button type="button" onclick="closeFoundiJwtModal()"
+              style="background:none;border:1px solid var(--bd);border-radius:8px;padding:6px 16px;cursor:pointer;color:var(--tx);font-size:0.88rem;">取消</button>
+      <button id="foundi-jwt-save-btn" type="button" onclick="saveFoundiJwt()"
+              style="background:var(--ac);border:1px solid var(--ac);border-radius:8px;padding:6px 20px;cursor:pointer;color:#fff;font-size:0.88rem;font-weight:600;">儲存</button>
+    </div>
   </div>
 </div>
 </body>
