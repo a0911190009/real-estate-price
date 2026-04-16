@@ -369,9 +369,9 @@ def api_foundi_parcel():
 @app.route("/api/foundi-building", methods=["POST"])
 def api_foundi_building():
     """
-    完整地址 → FOUNDI 建物登記資料（自動帶入估價表單）
+    地址一鍵帶入：esDoorinfo 取建物資料 + cadaster_id → land/mapLocation 取土地分區
     輸入：{ "address": "台東縣台東市中山路123號" }
-    輸出：{ "building_ping": 36.17, "age": 33, "total_floors": 2, "completion_date": "1993-02-06" }
+    輸出：建物欄位 + 地號欄位 + 土地分區欄位（全部）
     """
     email, err = _require_user()
     if err:
@@ -397,13 +397,13 @@ def api_foundi_building():
     except Exception:
         pass
 
-    try:
-        import urllib.request as _ur
-        import urllib.parse as _up
+    import urllib.request as _ur
+    import urllib.parse as _up
 
-        # 不帶 format=foundiprotocol，取一般 JSON 回應
-        params = {"address": address}
-        url = "https://agent.foundi.info/dataapi/address/esDoorinfo/?" + _up.urlencode(params)
+    # ── Step 1：esDoorinfo → 建物基本資料 ──────────────────────────────
+    try:
+        url = ("https://agent.foundi.info/dataapi/address/esDoorinfo/?"
+               + _up.urlencode({"address": address}))
         req = _ur.Request(url, headers={
             "authorization": jwt_val,
             "accept": "application/json, text/plain, */*",
@@ -424,67 +424,137 @@ def api_foundi_building():
     except Exception:
         return jsonify({"error": f"無法解析回應（前200字）：{raw[:200]}"}), 500
 
-    # 將回應正規化成一個 dict（FOUNDI 有時回傳 list，有時回傳 dict）
+    # 正規化成 dict
     if isinstance(data, list):
         item = data[0] if data else {}
     elif isinstance(data, dict):
-        # 可能包裝在子 key 下
         inner = data.get("results") or data.get("data") or data.get("building")
-        if isinstance(inner, list):
-            item = inner[0] if inner else {}
-        elif isinstance(inner, dict):
-            item = inner
-        else:
-            item = data
+        item = (inner[0] if isinstance(inner, list) and inner
+                else inner if isinstance(inner, dict)
+                else data)
     else:
         item = {}
 
-    # esDoorinfo 回傳 { id, info: {...} }，實際資料在 info 裡
+    # 實際資料在 info 子物件
     if "info" in item and isinstance(item["info"], dict):
         item = item["info"]
 
-    # ── 建物坪數（優先找坪，找不到再用 m² 換算）──
+    # ── 建物坪數（m² → 坪）──
     area_ping = None
-    for k in ("building_area_ping", "area_ping", "total_area_ping", "ping"):
+    for k in ("building_area_ping", "area_ping", "ping"):
         if item.get(k):
-            area_ping = round(float(item[k]), 2)
-            break
+            area_ping = round(float(item[k]), 2); break
     if area_ping is None:
-        for k in ("building_area", "area", "total_area", "building_area_m2", "area_m2"):
+        for k in ("building_area", "area", "total_area"):
             if item.get(k):
-                area_ping = round(float(item[k]) / 3.30579, 2)
-                break
+                area_ping = round(float(item[k]) / 3.30579, 2); break
 
     # ── 建築完成日期 → 屋齡 ──
-    age = None
     completion_date = None
-    for k in ("completion_date", "complete_date", "build_date", "completion",
-              "建築完成日期", "建築完成", "完工日期"):
-        if item.get(k):
-            completion_date = str(item[k])
-            break
-    if completion_date:
-        # 只保留 YYYY-MM-DD，去掉時間與時區資訊
-        completion_date = completion_date[:10]
+    age = None
+    if item.get("completion_date"):
+        completion_date = str(item["completion_date"])[:10]
         try:
-            year = int(completion_date[:4])
-            age = datetime.now().year - year
+            age = datetime.now().year - int(completion_date[:4])
         except Exception:
             pass
 
-    # ── 總樓層 ──
-    total_floors = None
-    for k in ("total_floors", "total_floor", "floors", "floor_count", "total_level",
-              "總樓層", "樓層數"):
-        if item.get(k):
-            total_floors = int(item[k])
-            break
+    # ── 樓層（floor 是 int 或 null；floors 是 list of {"area":x,"floor":y}）──
+    raw_floor  = item.get("floor")
+    floors_raw = item.get("floors", [])
 
+    floor = int(raw_floor) if isinstance(raw_floor, (int, float)) else None
+
+    if isinstance(floors_raw, list) and floors_raw:
+        floor_nums = [int(f["floor"]) for f in floors_raw
+                      if isinstance(f, dict) and f.get("floor") is not None]
+        total_floors = max(floor_nums) if floor_nums else None
+        if floor is None and floor_nums:
+            floor = min(floor_nums)  # floor 未提供時，取最低所在樓層
+    else:
+        total_floors = None
+
+    # ── cadaster_id → 地號 + 段別（供串接 land/mapLocation）──
+    # 格式：V_04_0009_5480-0006（城市_鄉鎮_段碼_主號-次號）
+    cadaster_id = item.get("cadaster_id") or ""   # 可能是 null，統一成空字串
+    cadaster_base = item.get("cadaster_base") or ""  # 備用（建號）
+    land_sect_name = None
+    land_no        = None
+    zone_result    = {}
+
+    if cadaster_id:
+        try:
+            parts = cadaster_id.split("_")          # ['V','04','0009','5480-0006']
+            city_code     = parts[0]
+            locality_code = parts[1]
+            section_code  = parts[2]
+            main_sub      = parts[3].split("-")     # ['5480','0006']
+            main_key      = main_sub[0]
+            sub_key       = main_sub[1] if len(main_sub) > 1 else "0000"
+
+            # 8碼地號 = 主號左補零到4碼 + 次號左補零到4碼
+            land_no = main_key.zfill(4) + sub_key.zfill(4)
+
+            # 查段別名稱（反向查快取）
+            sections = _foundi_get_sections(jwt_val)
+            section_by_code = {v.get("section_code", ""): k for k, v in sections.items()}
+            land_sect_name = section_by_code.get(section_code, "")
+
+            # ── Step 2：land/mapLocation → 土地分區 ──
+            params = {
+                "city_code":     city_code,
+                "locality_code": locality_code,
+                "section_code":  section_code,
+                "main_key":      main_key,
+                "sub_key":       sub_key,
+            }
+            land_url = "https://api.foundi.info/land/mapLocation/?" + _up.urlencode(params)
+            land_req = _ur.Request(land_url, headers={
+                "authorization": jwt_val,
+                "accept": "application/json",
+                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            })
+            with _ur.urlopen(land_req, timeout=10) as land_resp:
+                land_data = json.loads(land_resp.read().decode("utf-8"))
+
+            lands = land_data.get("lands", [])
+            if lands:
+                info = lands[0]["info"]
+                zone     = info.get("zone", [])
+                sub_zone = info.get("sub_zone", [])
+                zone_str = "、".join(zone)
+                if sub_zone:
+                    zone_str += f"（{'、'.join(sub_zone)}）"
+                bcr = info.get("building_coverage_ratio", 0)
+                far = info.get("floor_area_ratio", 0)
+                repr_coords = info.get("repr_point", {}).get("coordinates", [None, None])
+                zone_result = {
+                    "use_zone":          zone_str,
+                    "building_coverage": round(bcr * 100),
+                    "floor_area_ratio":  round(far * 100),
+                    "declared_price":    info.get("unit_value_with_square_meter", 0),
+                    "current_value":     info.get("current_unit_value_with_square_meter", 0),
+                    "land_area":         info.get("land_area", 0),
+                    "lat":               repr_coords[1],
+                    "lng":               repr_coords[0],
+                }
+        except Exception as e:
+            import logging
+            logging.warning(f"地號/分區串接失敗：{e}")
+
+    # ── 組合回傳 ──
     result = {
+        # 建物欄位
         "building_ping":   area_ping,
-        "age":             age,
+        "floor":           floor,
         "total_floors":    total_floors,
+        "age":             age,
         "completion_date": completion_date,
+        # 地號欄位
+        "cadaster_id":     cadaster_id or None,
+        "land_sect":       land_sect_name or None,
+        "land_no":         land_no or None,
+        **zone_result,
     }
     return jsonify({k: v for k, v in result.items() if v is not None})
 

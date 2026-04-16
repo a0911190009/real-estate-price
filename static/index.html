@@ -1558,37 +1558,72 @@ async function fetchFoundiBuilding() {
 
     var filled = [];
 
-    // 建物坪數
+    // ── 建物欄位 ──
     if (d.building_ping != null) {
       document.getElementById('val-bld-ping').value = d.building_ping;
-      filled.push('坪數 ' + d.building_ping + '坪');
+      filled.push('建物 ' + d.building_ping + '坪');
     }
-    // 屋齡
-    if (d.age != null) {
-      document.getElementById('val-age').value = d.age;
-      filled.push('屋齡 ' + d.age + '年');
+    if (d.floor != null) {
+      document.getElementById('val-floor').value = d.floor;
     }
-    // 總樓層
     if (d.total_floors != null) {
       document.getElementById('val-total-floor').value = d.total_floors;
       filled.push('共' + d.total_floors + '層');
     }
-    // 建築完成日期（僅顯示，不填入欄位）
+    if (d.age != null) {
+      document.getElementById('val-age').value = d.age;
+      filled.push('屋齡 ' + d.age + '年');
+    }
     if (d.completion_date) {
       filled.push('完工 ' + d.completion_date);
+    }
+
+    // ── 地號欄位 ──
+    if (d.land_sect) {
+      document.getElementById('val-land-sect').value = d.land_sect;
+      filled.push('段別 ' + d.land_sect);
+    }
+    if (d.land_no) {
+      document.getElementById('val-land-no').value = d.land_no;
+      filled.push('地號 ' + d.land_no);
+    }
+
+    // ── 土地分區欄位 ──
+    if (d.use_zone) {
+      document.getElementById('val-use-zone').value = d.use_zone;
+      filled.push('分區 ' + d.use_zone);
+    }
+    if (d.building_coverage != null) {
+      document.getElementById('val-coverage').value = d.building_coverage;
+    }
+    if (d.floor_area_ratio != null) {
+      document.getElementById('val-far').value = d.floor_area_ratio;
+    }
+    if (d.declared_price != null) {
+      document.getElementById('val-declared-price').value = d.declared_price;
+    }
+    if (d.land_area != null) {
+      document.getElementById('val-land-ping').value = d.land_area;
+    }
+    // 座標
+    if (d.lat != null) document.getElementById('val-lat').value = d.lat;
+    if (d.lng != null) document.getElementById('val-lng').value = d.lng;
+
+    // 展開土地分區區塊（讓使用者看到已帶入的資料）
+    if (d.use_zone) {
+      var details = document.getElementById('land-zone-details');
+      if (details) details.open = true;
     }
 
     if (filled.length) {
       info.textContent = '✓ 已帶入：' + filled.join('、');
     } else {
-      // 若沒有解析到任何欄位，顯示 _raw 供偵錯
-      var rawKeys = d._raw ? Object.keys(d._raw).join(', ') : '（空）';
-      info.textContent = '⚠️ 查到資料但欄位未對應，請回報欄位名稱：' + rawKeys;
+      info.textContent = '⚠️ 查到資料但未能解析欄位，請確認地址正確';
     }
   } catch(e) {
     info.textContent = '⚠️ 網路錯誤：' + e.message;
   } finally {
-    btn.disabled = false; btn.textContent = '建物自動帶入';
+    btn.disabled = false; btn.textContent = '一鍵帶入';
   }
 }
 
@@ -2110,7 +2145,7 @@ function escHtml(str) {
           <span style="color:var(--txs);">建物資料：</span>
           <button id="foundi-bld-btn" type="button" class="btn" onclick="fetchFoundiBuilding()" disabled
                   style="white-space:nowrap;padding:0 10px;height:26px;font-size:0.78rem;flex-shrink:0;background:var(--ok);border-color:var(--ok);color:#fff;">
-            建物自動帶入
+            一鍵帶入
           </button>
           <span id="foundi-bld-info" style="color:var(--txs);font-size:0.78rem;"></span>
         </div>
