@@ -1401,10 +1401,14 @@ function updateFoundiStatus() {
     badge.textContent  = '已連線（' + expStr + ' 前有效）';
     badge.style.color  = 'var(--ok)';
     if (autoBtn) autoBtn.disabled = false;
+    var bldBtn = document.getElementById('foundi-bld-btn');
+    if (bldBtn) bldBtn.disabled = false;
   } else {
     badge.textContent = '未連線';
     badge.style.color = 'var(--txs)';
     if (autoBtn) autoBtn.disabled = true;
+    var bldBtn = document.getElementById('foundi-bld-btn');
+    if (bldBtn) bldBtn.disabled = true;
   }
 }
 
@@ -1516,6 +1520,76 @@ async function fetchFoundiParcel() {
   } catch(e) { alert('查詢失敗：' + e.message); }
 
   btn.disabled = false; btn.textContent = '自動帶入';
+}
+
+// 建物資料自動帶入（從 FOUNDI esDoorinfo 取得坪數、屋齡、樓層）
+async function fetchFoundiBuilding() {
+  var addr = (document.getElementById('val-address').value || '').trim();
+  if (!addr) { alert('請先填入地址（例：台東市中山路123號）'); return; }
+
+  // 補齊縣市前綴（讓 FOUNDI 能識別）
+  if (!addr.startsWith('台東縣') && !addr.startsWith('臺東縣')) {
+    var dist = document.getElementById('val-district').value;
+    addr = '台東縣' + (dist && !addr.startsWith(dist) ? dist : '') + addr;
+  }
+
+  var btn = document.getElementById('foundi-bld-btn');
+  var info = document.getElementById('foundi-bld-info');
+  btn.disabled = true; btn.textContent = '查詢中...';
+  info.textContent = '';
+
+  try {
+    var r = await fetch('/api/foundi-building', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ address: addr })
+    });
+    var d = await r.json();
+
+    if (!r.ok) {
+      var msg = d.error || '查詢失敗';
+      if (msg === 'FOUNDI_JWT_NOT_SET') {
+        alert('請先設定 FOUNDI JWT');
+      } else {
+        info.textContent = '⚠️ ' + msg;
+      }
+      return;
+    }
+
+    var filled = [];
+
+    // 建物坪數
+    if (d.building_ping != null) {
+      document.getElementById('val-bld-ping').value = d.building_ping;
+      filled.push('坪數 ' + d.building_ping + '坪');
+    }
+    // 屋齡
+    if (d.age != null) {
+      document.getElementById('val-age').value = d.age;
+      filled.push('屋齡 ' + d.age + '年');
+    }
+    // 總樓層
+    if (d.total_floors != null) {
+      document.getElementById('val-total-floor').value = d.total_floors;
+      filled.push('共' + d.total_floors + '層');
+    }
+    // 建築完成日期（僅顯示，不填入欄位）
+    if (d.completion_date) {
+      filled.push('完工 ' + d.completion_date);
+    }
+
+    if (filled.length) {
+      info.textContent = '✓ 已帶入：' + filled.join('、');
+    } else {
+      // 若沒有解析到任何欄位，顯示 _raw 供偵錯
+      var rawKeys = d._raw ? Object.keys(d._raw).join(', ') : '（空）';
+      info.textContent = '⚠️ 查到資料但欄位未對應，請回報欄位名稱：' + rawKeys;
+    }
+  } catch(e) {
+    info.textContent = '⚠️ 網路錯誤：' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = '建物自動帶入';
+  }
 }
 
 function startValuation() {
@@ -2030,6 +2104,16 @@ function escHtml(str) {
             </div>
           </div>
         </details>
+
+        <!-- 建物資料 FOUNDI 自動帶入 -->
+        <div id="foundi-building-row" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:0.82rem;">
+          <span style="color:var(--txs);">建物資料：</span>
+          <button id="foundi-bld-btn" type="button" class="btn" onclick="fetchFoundiBuilding()" disabled
+                  style="white-space:nowrap;padding:0 10px;height:26px;font-size:0.78rem;flex-shrink:0;background:var(--ok);border-color:var(--ok);color:#fff;">
+            建物自動帶入
+          </button>
+          <span id="foundi-bld-info" style="color:var(--txs);font-size:0.78rem;"></span>
+        </div>
 
         <div class="val-form-grid" style="margin-bottom:12px;">
           <div class="val-field">

@@ -366,6 +366,129 @@ def api_foundi_parcel():
     })
 
 
+@app.route("/api/foundi-building", methods=["POST"])
+def api_foundi_building():
+    """
+    完整地址 → FOUNDI 建物登記資料（自動帶入估價表單）
+    輸入：{ "address": "台東縣台東市中山路123號" }
+    輸出：{ "building_ping": 36.17, "age": 33, "total_floors": 2, "completion_date": "1993-02-06" }
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+
+    body = request.get_json(silent=True) or {}
+    address = (body.get("address") or "").strip()
+    if not address:
+        return jsonify({"error": "缺少地址參數"}), 400
+
+    jwt_val = session.get("foundi_jwt", "").strip()
+    if not jwt_val:
+        return jsonify({"error": "FOUNDI_JWT_NOT_SET"}), 401
+
+    # 檢查 JWT 是否過期
+    try:
+        import base64 as _b64
+        payload_b64 = jwt_val.split(".")[1]
+        payload_b64 += "=" * ((4 - len(payload_b64) % 4) % 4)
+        payload = json.loads(_b64.b64decode(payload_b64).decode("utf-8"))
+        if payload.get("exp", 0) < time.time():
+            return jsonify({"error": "FOUNDI JWT 已過期，請重新設定"}), 401
+    except Exception:
+        pass
+
+    try:
+        import urllib.request as _ur
+        import urllib.parse as _up
+
+        # 不帶 format=foundiprotocol，取一般 JSON 回應
+        params = {"address": address}
+        url = "https://agent.foundi.info/dataapi/address/esDoorinfo/?" + _up.urlencode(params)
+        req = _ur.Request(url, headers={
+            "authorization": jwt_val,
+            "accept": "application/json, text/plain, */*",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "referer": "https://agent.foundi.info/",
+        })
+        with _ur.urlopen(req, timeout=10) as resp:
+            http_status = resp.status
+            raw = resp.read().decode("utf-8")
+    except Exception as e:
+        return jsonify({"error": f"FOUNDI 查詢失敗：{e}"}), 500
+
+    if http_status == 204 or not raw.strip():
+        return jsonify({"error": "此地址查無建物登記資料"}), 404
+
+    try:
+        data = json.loads(raw)
+    except Exception:
+        return jsonify({"error": f"無法解析回應（前200字）：{raw[:200]}"}), 500
+
+    # 將回應正規化成一個 dict（FOUNDI 有時回傳 list，有時回傳 dict）
+    if isinstance(data, list):
+        item = data[0] if data else {}
+    elif isinstance(data, dict):
+        # 可能包裝在子 key 下
+        inner = data.get("results") or data.get("data") or data.get("building")
+        if isinstance(inner, list):
+            item = inner[0] if inner else {}
+        elif isinstance(inner, dict):
+            item = inner
+        else:
+            item = data
+    else:
+        item = {}
+
+    # esDoorinfo 回傳 { id, info: {...} }，實際資料在 info 裡
+    if "info" in item and isinstance(item["info"], dict):
+        item = item["info"]
+
+    # ── 建物坪數（優先找坪，找不到再用 m² 換算）──
+    area_ping = None
+    for k in ("building_area_ping", "area_ping", "total_area_ping", "ping"):
+        if item.get(k):
+            area_ping = round(float(item[k]), 2)
+            break
+    if area_ping is None:
+        for k in ("building_area", "area", "total_area", "building_area_m2", "area_m2"):
+            if item.get(k):
+                area_ping = round(float(item[k]) / 3.30579, 2)
+                break
+
+    # ── 建築完成日期 → 屋齡 ──
+    age = None
+    completion_date = None
+    for k in ("completion_date", "complete_date", "build_date", "completion",
+              "建築完成日期", "建築完成", "完工日期"):
+        if item.get(k):
+            completion_date = str(item[k])
+            break
+    if completion_date:
+        # 只保留 YYYY-MM-DD，去掉時間與時區資訊
+        completion_date = completion_date[:10]
+        try:
+            year = int(completion_date[:4])
+            age = datetime.now().year - year
+        except Exception:
+            pass
+
+    # ── 總樓層 ──
+    total_floors = None
+    for k in ("total_floors", "total_floor", "floors", "floor_count", "total_level",
+              "總樓層", "樓層數"):
+        if item.get(k):
+            total_floors = int(item[k])
+            break
+
+    result = {
+        "building_ping":   area_ping,
+        "age":             age,
+        "total_floors":    total_floors,
+        "completion_date": completion_date,
+    }
+    return jsonify({k: v for k, v in result.items() if v is not None})
+
+
 @app.route("/api/me")
 def api_me():
     email, err = _require_user()
