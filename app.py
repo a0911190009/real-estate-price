@@ -838,6 +838,11 @@ def api_valuation():
     lng_val    = float(body.get('lng') or 0)
     land_sect_val = (body.get('land_sect') or '').strip()
     land_no_val   = (body.get('land_no') or '').strip()
+    # 土地分區資料（選填，使用者從 FOUNDI 等來源填入）
+    use_zone_val  = (body.get('use_zone') or '').strip()
+    coverage_val  = float(body.get('building_coverage') or 0)   # 建蔽率 %
+    far_val       = float(body.get('floor_area_ratio') or 0)    # 容積率 %
+    declared_price_val = float(body.get('declared_price') or 0) # 公告地價 元/㎡
 
     if not address:
         return jsonify({'error': '請輸入地址或地號'}), 400
@@ -1052,6 +1057,11 @@ def api_valuation():
     if floor_val > 0:  subject_parts.append(f"樓層：{floor_val}" + (f"/{total_floor}樓" if total_floor > 0 else "樓"))
     if age_val > 0:    subject_parts.append(f"屋齡：{age_val}年")
     if note_val:       subject_parts.append(f"備注：{note_val}")
+    # 土地分區資料（有填才附上）
+    if use_zone_val:          subject_parts.append(f"使用分區：{use_zone_val}")
+    if coverage_val > 0:      subject_parts.append(f"建蔽率：{coverage_val}%")
+    if far_val > 0:           subject_parts.append(f"容積率：{far_val}%")
+    if declared_price_val > 0:subject_parts.append(f"公告地價：{declared_price_val:.0f}元/㎡")
 
     # 加入距離說明與信心等級供 AI 參考
     has_distance = lat_val and lng_val
@@ -1061,6 +1071,11 @@ def api_valuation():
         if has_distance else
         f"（未提供精確座標，按路名相似度篩選）"
     )
+
+    # 若有分區資料加入特別提示
+    zone_note = ""
+    if use_zone_val or coverage_val > 0 or far_val > 0:
+        zone_note = "\n5. 已提供土地分區資料，請在分析中說明分區對價值的影響（例如商業區通常比住宅區溢價）"
 
     prompt = f"""你是一位台東縣的專業不動產估價顧問，熟悉當地各區位價差。
 請根據以下「參考成交案例」，對「待估物件」給出合理的市場開價建議。
@@ -1081,7 +1096,7 @@ def api_valuation():
 1. 距離較遠的案例（>1公里）請在分析中適當降低其參考權重
 2. 較舊案例（>1年）市場可能已有變化，請酌情調整
 3. 台東交易量少，若案例不足請說明估價信心較低
-4. 請明確說明各案例與待估物件的差異（坪數、屋齡、位置），以及如何據此調整
+4. 請明確說明各案例與待估物件的差異（坪數、屋齡、位置），以及如何據此調整{zone_note}
 
 請以 JSON 格式回覆，格式如下：
 {{
@@ -1142,6 +1157,10 @@ def api_valuation():
             'floor': floor_val, 'total_floor': total_floor,
             'age': age_val, 'note': note_val,
             'lat': lat_val or None, 'lng': lng_val or None,
+            'use_zone': use_zone_val or None,
+            'building_coverage': coverage_val or None,
+            'floor_area_ratio': far_val or None,
+            'declared_price': declared_price_val or None,
         }
     })
 

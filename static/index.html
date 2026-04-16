@@ -1373,6 +1373,20 @@ async function lookupParcelCoords() {
   btn.disabled = false;
 }
 
+// 開啟 FOUNDI 土地查詢頁面（預填段別+地號）
+function openFoundiLand() {
+  var sect = document.getElementById('val-land-sect').value.trim();
+  var no   = document.getElementById('val-land-no').value.trim();
+  var url = 'https://agent.foundi.info/tool/land?city=%E8%87%BA%E6%9D%B1%E7%B8%A3&locality=%E5%8F%B0%E6%9D%B1%E5%B8%82';
+  if (sect) url += '&section_name=' + encodeURIComponent(sect);
+  // 地號主號（前4碼）
+  if (no) {
+    var mainKey = no.replace(/[^0-9]/g, '').slice(0, 4).replace(/^0+/, '') || no;
+    url += '&main_key=' + encodeURIComponent(mainKey);
+  }
+  window.open(url, '_blank');
+}
+
 function startValuation() {
   var address = document.getElementById('val-address').value.trim();
   if (!address) { alert('請輸入地址或地號描述'); return; }
@@ -1398,6 +1412,11 @@ function startValuation() {
     lng:              parseFloat(document.getElementById('val-lng').value) || 0,
     land_sect:        document.getElementById('val-land-sect').value.trim(),
     land_no:          document.getElementById('val-land-no').value.trim(),
+    // 土地分區資料（選填，提升 AI 分析品質）
+    use_zone:         document.getElementById('val-use-zone').value.trim(),
+    building_coverage:parseFloat(document.getElementById('val-coverage').value) || 0,
+    floor_area_ratio: parseFloat(document.getElementById('val-far').value) || 0,
+    declared_price:   parseFloat(document.getElementById('val-declared-price').value) || 0,
   };
 
   fetch('/api/valuation', {
@@ -1834,6 +1853,41 @@ function escHtml(str) {
           <input type="hidden" id="val-lat">
           <input type="hidden" id="val-lng">
         </div>
+
+        <!-- 土地分區資料（選填，有填入可提升 AI 分析品質）-->
+        <details style="margin-bottom:12px;">
+          <summary style="cursor:pointer;color:var(--txs);font-size:0.85rem;padding:6px 4px;user-select:none;">
+            ▶ 土地分區資料（選填）— 填入可讓 AI 分析更精準
+          </summary>
+          <div style="margin-top:8px;padding:10px 12px;background:var(--bg-s);border:1px solid var(--bd);border-radius:8px;">
+            <!-- 說明 + FOUNDI 按鈕 -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:0.82rem;color:var(--txs);">
+              <span>可至 FOUNDI 查詢後填入（在「土地謄本」頁面的「土地標示」欄）</span>
+              <button type="button" class="btn" onclick="openFoundiLand()"
+                      style="white-space:nowrap;padding:0 10px;height:28px;font-size:0.8rem;flex-shrink:0;">
+                在 FOUNDI 查
+              </button>
+            </div>
+            <div class="val-form-grid">
+              <div class="val-field">
+                <label>使用分區</label>
+                <input id="val-use-zone" type="text" placeholder="例：住宅區、商業區、工業區">
+              </div>
+              <div class="val-field">
+                <label>建蔽率（%）</label>
+                <input id="val-coverage" type="number" min="0" max="100" step="1" placeholder="例：60">
+              </div>
+              <div class="val-field">
+                <label>容積率（%）</label>
+                <input id="val-far" type="number" min="0" step="10" placeholder="例：200">
+              </div>
+              <div class="val-field">
+                <label>公告地價（元/㎡）</label>
+                <input id="val-declared-price" type="number" min="0" step="1" placeholder="例：12500">
+              </div>
+            </div>
+          </div>
+        </details>
 
         <div class="val-form-grid" style="margin-bottom:12px;">
           <div class="val-field">
