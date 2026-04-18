@@ -1319,6 +1319,80 @@ function clearParcelCoords() {
   document.getElementById('val-addr-btn').textContent = '📍 定位';
 }
 
+// 地號欄位貼上解析（支援多種 FOUNDI 格式）
+async function handleLandNoPaste(e) {
+  var text = (e.clipboardData || window.clipboardData).getData('text').trim();
+  var hint = document.getElementById('val-land-paste-hint');
+  var sectEl = document.getElementById('val-land-sect');
+  var noEl   = document.getElementById('val-land-no');
+
+  // 格式1：cadaster_id — V_04_0009_5480-0006
+  var m1 = text.match(/^[A-Z]_\d+_\d+_(\d{1,4})-(\d{1,4})$/);
+  if (m1) {
+    e.preventDefault();
+    noEl.value = m1[1].padStart(4,'0') + m1[2].padStart(4,'0');
+    hint.style.display = 'block';
+    hint.textContent = '⏳ 解析中…';
+    // 呼叫後端取段別名稱+分區資料
+    try {
+      var r = await fetch('/api/foundi-cadaster', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({cadaster_id: text})
+      });
+      var d = await r.json();
+      if (!r.ok) {
+        hint.textContent = d.error === 'FOUNDI_JWT_NOT_SET'
+          ? '⚠️ 請先設定 FOUNDI JWT' : ('⚠️ ' + (d.error || '查詢失敗'));
+        return;
+      }
+      _fillZoneData(d);
+      hint.textContent = '✓ 已帶入段別' + (d.land_sect ? '（' + d.land_sect + '）' : '') + ' + 分區資料';
+    } catch(err) {
+      hint.textContent = '⚠️ 網路錯誤：' + err.message;
+    }
+    return;
+  }
+
+  // 格式2：「建國段5480-0006」或「建國段 5480-0006」
+  var m2 = text.match(/^(.+段)\s*(\d{1,4})-(\d{1,4})$/);
+  if (m2) {
+    e.preventDefault();
+    sectEl.value = m2[1];
+    noEl.value   = m2[2].padStart(4,'0') + m2[3].padStart(4,'0');
+    hint.style.display = 'block';
+    hint.textContent = '✓ 已解析：' + m2[1] + ' ' + noEl.value + '，可點「自動帶入」取得分區資料';
+    return;
+  }
+
+  // 格式3：只有「5480-0006」（補零）
+  var m3 = text.match(/^(\d{1,4})-(\d{1,4})$/);
+  if (m3) {
+    e.preventDefault();
+    noEl.value = m3[1].padStart(4,'0') + m3[2].padStart(4,'0');
+    if (hint) { hint.style.display = 'block'; hint.textContent = '✓ 地號格式已轉換'; }
+    return;
+  }
+  // 其他格式不攔截，讓瀏覽器正常貼上
+}
+
+// 輔助：把分區資料填入表單（foundi-cadaster 和 fetchFoundiBuilding 共用）
+function _fillZoneData(d) {
+  if (d.land_sect)          document.getElementById('val-land-sect').value = d.land_sect;
+  if (d.land_no)            document.getElementById('val-land-no').value   = d.land_no;
+  if (d.use_zone)           document.getElementById('val-use-zone').value  = d.use_zone;
+  if (d.building_coverage != null) document.getElementById('val-coverage').value = d.building_coverage;
+  if (d.floor_area_ratio   != null) document.getElementById('val-far').value      = d.floor_area_ratio;
+  if (d.declared_price     != null) document.getElementById('val-declared-price').value = d.declared_price;
+  if (d.land_area          != null) document.getElementById('val-land-ping').value  = d.land_area;
+  if (d.lat != null) document.getElementById('val-lat').value = d.lat;
+  if (d.lng != null) document.getElementById('val-lng').value = d.lng;
+  if (d.use_zone) {
+    var details = document.getElementById('land-zone-details');
+    if (details) details.open = true;
+  }
+}
+
 async function lookupParcelCoords() {
   // 用段別+地號查：座標 + 土地面積 + 鄉鎮（twland.ronny.tw，免費）
   var sect = document.getElementById('val-land-sect').value.trim();
@@ -1578,42 +1652,11 @@ async function fetchFoundiBuilding() {
       filled.push('完工 ' + d.completion_date);
     }
 
-    // ── 地號欄位 ──
-    if (d.land_sect) {
-      document.getElementById('val-land-sect').value = d.land_sect;
-      filled.push('段別 ' + d.land_sect);
-    }
-    if (d.land_no) {
-      document.getElementById('val-land-no').value = d.land_no;
-      filled.push('地號 ' + d.land_no);
-    }
-
-    // ── 土地分區欄位 ──
-    if (d.use_zone) {
-      document.getElementById('val-use-zone').value = d.use_zone;
-      filled.push('分區 ' + d.use_zone);
-    }
-    if (d.building_coverage != null) {
-      document.getElementById('val-coverage').value = d.building_coverage;
-    }
-    if (d.floor_area_ratio != null) {
-      document.getElementById('val-far').value = d.floor_area_ratio;
-    }
-    if (d.declared_price != null) {
-      document.getElementById('val-declared-price').value = d.declared_price;
-    }
-    if (d.land_area != null) {
-      document.getElementById('val-land-ping').value = d.land_area;
-    }
-    // 座標
-    if (d.lat != null) document.getElementById('val-lat').value = d.lat;
-    if (d.lng != null) document.getElementById('val-lng').value = d.lng;
-
-    // 展開土地分區區塊（讓使用者看到已帶入的資料）
-    if (d.use_zone) {
-      var details = document.getElementById('land-zone-details');
-      if (details) details.open = true;
-    }
+    // ── 地號 + 土地分區（共用 _fillZoneData）──
+    if (d.land_sect) filled.push('段別 ' + d.land_sect);
+    if (d.land_no)   filled.push('地號 ' + d.land_no);
+    if (d.use_zone)  filled.push('分區 ' + d.use_zone);
+    _fillZoneData(d);
 
     if (filled.length) {
       info.textContent = '✓ 已帶入：' + filled.join('、');
@@ -2077,11 +2120,17 @@ function escHtml(str) {
             <input id="val-land-sect" type="text" placeholder="例：建國段">
           </div>
           <div class="val-field">
-            <label>地號</label>
+            <label>地號
+              <span style="font-weight:400;font-size:0.75rem;color:var(--txs);margin-left:4px;">
+                可貼 FOUNDI 格式（建國段5480-0006）
+              </span>
+            </label>
             <div style="display:flex;gap:6px;align-items:center;">
-              <input id="val-land-no" type="text" placeholder="例：08350001" style="flex:1;min-width:0;">
+              <input id="val-land-no" type="text" placeholder="例：08350001" style="flex:1;min-width:0;"
+                     onpaste="handleLandNoPaste(event)">
               <button type="button" id="val-parcel-btn" onclick="lookupParcelCoords()" class="btn" style="white-space:nowrap;padding:0 12px;flex-shrink:0;">查座標</button>
             </div>
+            <div id="val-land-paste-hint" style="display:none;font-size:0.75rem;color:var(--ok);margin-top:3px;"></div>
           </div>
         </div>
         <div id="val-coord-row" style="display:none;margin-bottom:12px;">

@@ -44,6 +44,10 @@ real-estate-price/
 | `/api/config` | GET | 回傳 `portal_url` 給前端 |
 | `/api/me` | GET | 目前登入者 email/name |
 | `/api/search` | POST | 查詢成交紀錄（keyword/district/type/price/ping/sort） |
+| `/api/foundi-jwt` | POST | 儲存 FOUNDI JWT 到 session，回傳過期時間 |
+| `/api/foundi-parcel` | POST | 段別+地號 → 土地分區資料（使用分區/建蔽率/容積率/公告地價） |
+| `/api/foundi-building` | POST | 地址一鍵帶入：建物+地號+土地分區（串接 esDoorinfo + land/mapLocation） |
+| `/api/foundi-cadaster` | POST | cadaster_id 字串 → 段別+地號+土地分區 |
 
 ## 資料欄位（JSON 格式）
 | 欄位 | 說明 |
@@ -74,6 +78,51 @@ real-estate-price/
 - **Cloud Run**：`gcloud run deploy real-estate-price --source . --region asia-east1 --allow-unauthenticated`
 - **GitHub**：`a0911190009/real-estate-price`
 - 透過 `sync-to-cloud-and-github.sh` 自動部署（已包含在腳本的 7 個工具列表中）
+
+## FOUNDI 整合（AI 市場估價表單自動帶入）
+
+### JWT 取得方式
+FOUNDI（agent.foundi.info）使用自訂 JWT（無 Bearer 前綴），12 小時有效。
+取得方式：FOUNDI 頁面 → F12 → Console → 輸入 `window.foundi.apiToken`（部分瀏覽器 / 安全設定下無法用 AppleScript 自動取，需手動）。
+設定方式：估價表單 → 土地分區資料 → 「設定 JWT」按鈕 → 貼入 → 儲存。
+
+### 估價表單 FOUNDI 自動帶入流程
+```
+輸入地址（台東市中山路123號）
+    ↓ 點「一鍵帶入」
+    esDoorinfo?address=台東縣台東市中山路123號
+    → 回傳 { id, info: {
+        building_area (m²),
+        floors: [{area, floor}, ...],  ← list of dict，非整數
+        floor (int or null),
+        cadaster_id ("V_04_0009_5480-0006" or null),
+        completion_date ("1991-02-06T..." or null),
+        building_type, usages, ...
+      }}
+    ↓ 若 cadaster_id 有值
+    land/mapLocation?city_code=V&locality_code=04&section_code=0009&main_key=5480&sub_key=0006
+    → 回傳使用分區/建蔽率/容積率/公告地價/座標
+```
+
+### 地號貼上解析（val-land-no 的 onpaste）
+| 貼上格式 | 動作 |
+|----------|------|
+| `V_04_0009_5480-0006`（cadaster_id） | 呼叫 `/api/foundi-cadaster` → 填段別+地號+分區 |
+| `建國段5480-0006` | 自動拆解填入 val-land-sect + val-land-no |
+| `5480-0006` | 轉 8 碼填入 val-land-no |
+
+### FOUNDI API 端點整理
+| 端點 | 位置 | 認證 | 用途 |
+|------|------|------|------|
+| `transcript/cadasterSections/` | agent.foundi.info/dataapi | JWT | 查台東縣段別代碼快取 |
+| `land/mapLocation/` | **api.foundi.info** | JWT | 地號 → 土地分區 |
+| `address/esDoorinfo/` | agent.foundi.info/dataapi | JWT | 地址 → 建物登記資料 |
+| `road-location/` | agent.foundi.info/dataapi | **Session Cookie**（JWT 無效） | 地址 → 詳細地籍（無法從後端呼叫） |
+
+### 已知限制
+- `esDoorinfo` 的 `cadaster_id` 對部分地址為 null（FOUNDI 無對應地籍），此時土地分區無法自動帶入，需手動填段別+地號
+- `road-location` 需要 FOUNDI 登入 session cookie，後端無法使用
+- FOUNDI JWT 12 小時過期，需重新取得
 
 ## 重要注意事項
 - **`price_data_v.json` 不進 git / Docker**：已加進 `.gitignore` 和 `.dockerignore`，資料只放 GCS

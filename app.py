@@ -366,6 +366,99 @@ def api_foundi_parcel():
     })
 
 
+@app.route("/api/foundi-cadaster", methods=["POST"])
+def api_foundi_cadaster():
+    """
+    cadaster_id 字串 → 段別名稱 + 地號 + 土地分區
+    輸入：{ "cadaster_id": "V_04_0009_5480-0006" }
+    輸出：{ land_sect, land_no, use_zone, building_coverage, floor_area_ratio,
+            declared_price, current_value, land_area, lat, lng }
+    """
+    email, err = _require_user()
+    if err:
+        return jsonify(err[0]), err[1]
+
+    body = request.get_json(silent=True) or {}
+    cadaster_id = (body.get("cadaster_id") or "").strip()
+    if not cadaster_id:
+        return jsonify({"error": "缺少 cadaster_id"}), 400
+
+    jwt_val = session.get("foundi_jwt", "").strip()
+    if not jwt_val:
+        return jsonify({"error": "FOUNDI_JWT_NOT_SET"}), 401
+
+    # 解析 cadaster_id：V_04_0009_5480-0006
+    try:
+        parts    = cadaster_id.split("_")        # ['V','04','0009','5480-0006']
+        city_code     = parts[0]
+        locality_code = parts[1]
+        section_code  = parts[2]
+        main_sub = parts[3].split("-")            # ['5480','0006']
+        main_key = main_sub[0]
+        sub_key  = main_sub[1] if len(main_sub) > 1 else "0000"
+        land_no  = main_key.zfill(4) + sub_key.zfill(4)
+    except (IndexError, ValueError):
+        return jsonify({"error": f"cadaster_id 格式不正確：{cadaster_id}"}), 400
+
+    # 查段別名稱（反向查 sections 快取）
+    sections = _foundi_get_sections(jwt_val)
+    section_by_code = {v.get("section_code", ""): k for k, v in sections.items()}
+    land_sect = section_by_code.get(section_code, "")
+
+    # 呼叫 land/mapLocation 取土地分區
+    try:
+        import urllib.request as _ur
+        import urllib.parse as _up
+        params = {
+            "city_code":     city_code,
+            "locality_code": locality_code,
+            "section_code":  section_code,
+            "main_key":      main_key,
+            "sub_key":       sub_key,
+        }
+        url = "https://api.foundi.info/land/mapLocation/?" + _up.urlencode(params)
+        req = _ur.Request(url, headers={
+            "authorization": jwt_val,
+            "accept": "application/json",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        })
+        with _ur.urlopen(req, timeout=10) as resp:
+            land_data = json.loads(resp.read().decode("utf-8"))
+    except Exception as e:
+        # 即使分區查詢失敗，至少回傳段別+地號
+        return jsonify({"land_sect": land_sect, "land_no": land_no,
+                        "warning": f"分區查詢失敗：{e}"})
+
+    lands = land_data.get("lands", [])
+    if not lands:
+        return jsonify({"land_sect": land_sect, "land_no": land_no,
+                        "warning": "查無土地分區資料"})
+
+    info = lands[0]["info"]
+    zone     = info.get("zone", [])
+    sub_zone = info.get("sub_zone", [])
+    zone_str = "、".join(zone)
+    if sub_zone:
+        zone_str += f"（{'、'.join(sub_zone)}）"
+
+    bcr = info.get("building_coverage_ratio", 0)
+    far = info.get("floor_area_ratio", 0)
+    repr_coords = info.get("repr_point", {}).get("coordinates", [None, None])
+
+    return jsonify({
+        "land_sect":         land_sect,
+        "land_no":           land_no,
+        "use_zone":          zone_str,
+        "building_coverage": round(bcr * 100),
+        "floor_area_ratio":  round(far * 100),
+        "declared_price":    info.get("unit_value_with_square_meter", 0),
+        "current_value":     info.get("current_unit_value_with_square_meter", 0),
+        "land_area":         info.get("land_area", 0),
+        "lat":               repr_coords[1],
+        "lng":               repr_coords[0],
+    })
+
+
 @app.route("/api/foundi-building", methods=["POST"])
 def api_foundi_building():
     """
