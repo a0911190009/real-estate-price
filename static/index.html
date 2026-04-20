@@ -494,8 +494,15 @@
     .filter-actions { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
     .filter-actions .btn { padding: 6px 12px; font-size: 0.8rem; }
     .filter-row-full { grid-column: 1 / -1; }
-    /* 建物型態 checkbox 群組 */
-    .bt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; margin-top: 4px; }
+    /* 篩選分組分隔線 */
+    .filter-divider { grid-column: 1/-1; border-top: 1px solid var(--border); margin: 4px 0 0; }
+    .filter-group-label { grid-column: 1/-1; font-size: 0.68rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: -2px; }
+    /* 交易期間 from-to */
+    .date-range-row { display: flex; align-items: center; gap: 6px; }
+    .date-range-row select { flex: 1; }
+    .date-range-row span { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }
+    /* 建物型態 checkbox 群組（3欄） */
+    .bt-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px 6px; margin-top: 4px; }
     .bt-grid label { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text); cursor: pointer; white-space: nowrap; }
     .bt-grid input[type=checkbox] { width: 13px; height: 13px; accent-color: var(--primary); flex-shrink: 0; }
     /* 多選下拉 */
@@ -772,9 +779,10 @@
     <!-- 進階篩選（預設收合） -->
     <div id="filter-bar" class="filter-bar collapsed">
       <div class="filter-toggle" onclick="toggleFilter()">
-        <span class="arrow">▼</span> 進階篩選（鄉鎮、類型、總價、坪數、建物型態、使用分區、方圓範圍）
+        <span class="arrow">▼</span> 進階篩選
       </div>
       <div class="filter-fields">
+        <!-- ── 基本條件 ── -->
         <div>
           <label>鄉鎮市區</label>
           <select id="filter-district">
@@ -787,23 +795,18 @@
             <option value="">全部</option>
           </select>
         </div>
-        <div>
-          <label>總價最低（萬元）</label>
-          <input id="filter-min-price" type="number" min="0" placeholder="不限制">
+        <!-- 交易期間 -->
+        <div class="filter-row-full">
+          <label>交易期間（民國年）</label>
+          <div class="date-range-row">
+            <select id="filter-year-from"><option value="">不限</option></select>
+            <span>年 至</span>
+            <select id="filter-year-to"><option value="">不限</option></select>
+            <span>年</span>
+          </div>
         </div>
-        <div>
-          <label>總價最高（萬元）</label>
-          <input id="filter-max-price" type="number" min="0" placeholder="不限制">
-        </div>
-        <div>
-          <label>坪數最低</label>
-          <input id="filter-min-ping" type="number" min="0" step="0.1" placeholder="不限制">
-        </div>
-        <div>
-          <label>坪數最高</label>
-          <input id="filter-max-ping" type="number" min="0" step="0.1" placeholder="不限制">
-        </div>
-        <div>
+        <!-- 排序 -->
+        <div class="filter-row-full">
           <label>排序</label>
           <select id="filter-sort">
             <option value="date_desc">交易日期 新→舊</option>
@@ -814,9 +817,37 @@
             <option value="unit_asc">單價 低→高</option>
           </select>
         </div>
-        <!-- 建物型態 -->
+        <!-- ── 數值範圍 ── -->
+        <div class="filter-divider"></div>
+        <div class="filter-group-label">數值範圍</div>
+        <div>
+          <label>總價最低（萬元）</label>
+          <input id="filter-min-price" type="number" min="0" placeholder="不限制">
+        </div>
+        <div>
+          <label>總價最高（萬元）</label>
+          <input id="filter-max-price" type="number" min="0" placeholder="不限制">
+        </div>
+        <div>
+          <label>建物坪數最低</label>
+          <input id="filter-min-ping" type="number" min="0" step="0.1" placeholder="不限制">
+        </div>
+        <div>
+          <label>建物坪數最高</label>
+          <input id="filter-max-ping" type="number" min="0" step="0.1" placeholder="不限制">
+        </div>
+        <div>
+          <label>屋齡最低（年）</label>
+          <input id="filter-min-age" type="number" min="0" placeholder="不限制">
+        </div>
+        <div>
+          <label>屋齡最高（年）</label>
+          <input id="filter-max-age" type="number" min="0" placeholder="不限制">
+        </div>
+        <!-- ── 建物型態 ── -->
+        <div class="filter-divider"></div>
+        <div class="filter-group-label">建物型態</div>
         <div class="filter-row-full">
-          <label>建物型態</label>
           <div class="bt-grid">
             <label><input type="checkbox" class="bt-cb" value="公寓"> 公寓</label>
             <label><input type="checkbox" class="bt-cb" value="店面"> 店面(店鋪)</label>
@@ -833,9 +864,10 @@
           </div>
         </div>
 
-        <!-- 使用分區 -->
+        <!-- ── 使用分區 ── -->
+        <div class="filter-divider"></div>
+        <div class="filter-group-label">使用分區</div>
         <div class="filter-row-full">
-          <label>使用分區</label>
           <div class="zone-toggles">
             <label><input type="checkbox" id="toggle-urban" onchange="onZoneToggle()"> 都市土地</label>
             <label><input type="checkbox" id="toggle-non-urban" onchange="onZoneToggle()"> 非都市土地</label>
@@ -897,9 +929,10 @@
           </div>
         </div>
 
-        <!-- 方圓範圍 -->
+        <!-- ── 方圓範圍 ── -->
+        <div class="filter-divider"></div>
+        <div class="filter-group-label">方圓範圍</div>
         <div class="filter-row-full">
-          <label>方圓範圍</label>
           <div class="radius-options">
             <label><input type="radio" name="radius" value="" checked onchange="onRadiusChange()"> 不限</label>
             <label><input type="radio" name="radius" value="1" onchange="onRadiusChange()"> 1 km</label>
@@ -1062,6 +1095,17 @@ var _results = [];        // 目前查詢結果
     document.getElementById('radius-hint').classList.remove('show');
   });
 
+  // 初始化交易期間年份下拉（民國 100–115）
+  (function() {
+    var fromSel = document.getElementById('filter-year-from');
+    var toSel   = document.getElementById('filter-year-to');
+    for (var y = 100; y <= 115; y++) {
+      fromSel.appendChild(new Option(y + ' 年', y));
+      toSel.appendChild(new Option(y + ' 年', y));
+    }
+    toSel.value = '115'; // 預設到最新年
+  })();
+
   // 進入頁面時自動查詢一筆，載入臺東資料與篩選選項
   doSearch();
 })();
@@ -1190,6 +1234,10 @@ function doSearch() {
   var minPing = document.getElementById('filter-min-ping') ? document.getElementById('filter-min-ping').value.trim() : '';
   var maxPing = document.getElementById('filter-max-ping') ? document.getElementById('filter-max-ping').value.trim() : '';
   var sort = document.getElementById('filter-sort') ? document.getElementById('filter-sort').value : 'date_desc';
+  var yearFrom = document.getElementById('filter-year-from') ? document.getElementById('filter-year-from').value : '';
+  var yearTo   = document.getElementById('filter-year-to')   ? document.getElementById('filter-year-to').value   : '';
+  var minAge = document.getElementById('filter-min-age') ? document.getElementById('filter-min-age').value.trim() : '';
+  var maxAge = document.getElementById('filter-max-age') ? document.getElementById('filter-max-age').value.trim() : '';
 
   // 建物型態
   var buildingTypes = Array.from(document.querySelectorAll('.bt-cb:checked')).map(function(c) { return c.value; });
@@ -1209,6 +1257,10 @@ function doSearch() {
   if (maxPrice !== '') body.max_price = parseFloat(maxPrice);
   if (minPing !== '') body.min_ping = parseFloat(minPing);
   if (maxPing !== '') body.max_ping = parseFloat(maxPing);
+  if (minAge !== '') body.age_min = parseInt(minAge);
+  if (maxAge !== '') body.age_max = parseInt(maxAge);
+  if (yearFrom) body.date_from = (parseInt(yearFrom) + 1911) + '-01-01';
+  if (yearTo)   body.date_to   = (parseInt(yearTo)   + 1911) + '-12-31';
   if (buildingTypes.length) body.building_types = buildingTypes;
   if (filterUrban) { body.filter_urban = true; if (urbanZones.length) body.urban_zones = urbanZones; }
   if (filterNonUrban) { body.filter_non_urban = true; if (nonUrbanZones.length) body.non_urban_zones = nonUrbanZones; if (nonUrbanUses.length) body.non_urban_uses = nonUrbanUses; }
@@ -1275,6 +1327,10 @@ function clearFilter() {
   document.getElementById('filter-max-price').value = '';
   document.getElementById('filter-min-ping').value = '';
   document.getElementById('filter-max-ping').value = '';
+  document.getElementById('filter-min-age').value = '';
+  document.getElementById('filter-max-age').value = '';
+  document.getElementById('filter-year-from').value = '';
+  document.getElementById('filter-year-to').value = '115';
   document.getElementById('filter-sort').value = 'date_desc';
   // 清除建物型態
   document.querySelectorAll('.bt-cb').forEach(function(c) { c.checked = false; });

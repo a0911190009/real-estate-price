@@ -778,6 +778,12 @@ def api_search():
     filter_non_urban = bool(body.get("filter_non_urban"))
     non_urban_zones = body.get("non_urban_zones") or []  # ["特定農業區", ...]
     non_urban_uses  = body.get("non_urban_uses")  or []  # ["農牧用地", ...]
+    # 交易期間（YYYY-MM-DD 格式）
+    date_from = (body.get("date_from") or "").strip()   # e.g. "2023-01-01"
+    date_to   = (body.get("date_to")   or "").strip()   # e.g. "2024-12-31"
+    # 屋齡範圍
+    age_min = body.get("age_min")   # 年
+    age_max = body.get("age_max")
     # 方圓範圍
     center_lat = body.get("center_lat")
     center_lng = body.get("center_lng")
@@ -810,11 +816,25 @@ def api_search():
         if max_price is not None and total > float(max_price):
             continue
 
+        # 交易期間
+        rec_date = r.get("date") or ""
+        if date_from and rec_date < date_from:
+            continue
+        if date_to   and rec_date > date_to:
+            continue
+
         # 建物面積範圍（坪）
         ping = r.get("building_ping", 0)
         if min_ping is not None and ping < float(min_ping):
             continue
         if max_ping is not None and ping > float(max_ping):
+            continue
+
+        # 屋齡範圍
+        age = r.get("age", 0) or 0
+        if age_min is not None and age < int(age_min):
+            continue
+        if age_max is not None and age > int(age_max):
             continue
 
         # 建物型態多選
