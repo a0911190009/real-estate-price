@@ -12,6 +12,7 @@ import time
 import zipfile
 import tempfile
 import threading
+from string import Template
 from datetime import timedelta, datetime
 from flask import Flask, request, session, redirect, jsonify, send_from_directory, Response, stream_with_context
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -47,6 +48,11 @@ def auto_login_dev():
         session['user_name'] = '開發測試'
 
 PORTAL_URL = (os.environ.get("PORTAL_URL") or "").strip()
+
+# ─── 載入估價 prompt 模板 ───
+_PROMPT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompts", "valuation.txt")
+with open(_PROMPT_FILE, encoding="utf-8") as _f:
+    _VALUATION_PROMPT_TPL = Template(_f.read())
 ADMIN_EMAILS = [e.strip() for e in (os.environ.get("ADMIN_EMAILS") or "").split(",") if e.strip()]
 GCS_BUCKET = (os.environ.get("GCS_BUCKET") or "").strip()
 PRICE_DATA_GCS_KEY = "price/price_data_v.json"   # GCS 上的路徑
@@ -454,6 +460,7 @@ def api_foundi_cadaster():
         "declared_price":    info.get("unit_value_with_square_meter", 0),
         "current_value":     info.get("current_unit_value_with_square_meter", 0),
         "land_area":         info.get("land_area", 0),
+        "land_area_m2":      info.get("land_area_in_square_meter", 0),  # ㎡
         "lat":               repr_coords[1],
         "lng":               repr_coords[0],
     })
@@ -628,6 +635,7 @@ def api_foundi_building():
                     "declared_price":    info.get("unit_value_with_square_meter", 0),
                     "current_value":     info.get("current_unit_value_with_square_meter", 0),
                     "land_area":         info.get("land_area", 0),
+                    "land_area_m2":      info.get("land_area_in_square_meter", 0),  # ㎡
                     "lat":               repr_coords[1],
                     "lng":               repr_coords[0],
                 }
@@ -1536,37 +1544,18 @@ def api_valuation():
     if use_zone_val or coverage_val > 0 or far_val > 0:
         zone_note = "\n5. 已提供土地分區資料，請在分析中說明分區對價值的影響（例如商業區通常比住宅區溢價）"
 
-    prompt = f"""你是一位台東縣的專業不動產估價顧問，熟悉當地各區位價差。
-請根據以下「參考成交案例」，對「待估物件」給出合理的市場開價建議。
-
-【待估物件條件】
-{chr(10).join(subject_parts)}
-
-【近期參考成交案例（臺東縣，近3年實價登錄，已排除預售屋）{location_note}】
-{chr(10).join(comp_lines)}
-
-【統計摘要】
-- 有效比較案例：{len(comparables)} 筆（資料信心：{confidence_label}，分數 {confidence_score}/100）
-- 總價中位數：{median_price} 萬
-- 總價平均：{avg_price} 萬
-- 建物單價平均：{avg_unit} 萬/坪
-
-【分析注意事項】
-1. 距離較遠的案例（>1公里）請在分析中適當降低其參考權重
-2. 較舊案例（>1年）市場可能已有變化，請酌情調整
-3. 台東交易量少，若案例不足請說明估價信心較低
-4. 請明確說明各案例與待估物件的差異（坪數、屋齡、位置），以及如何據此調整{zone_note}
-
-請以 JSON 格式回覆，格式如下：
-{{
-  "suggested_min": 數字（萬，建議最低開價）,
-  "suggested_max": 數字（萬，建議最高開價）,
-  "key_factors": ["影響價格的關鍵因素（需具體，勿籠統）", "因素2", "因素3"],
-  "analysis": "2~4段市場分析（繁體中文，說明選取哪些案例為主要參考依據、與待估物件的差異調整、最終如何得出開價範圍）",
-  "strategy": "給業務員的議價建議（1~2句）"
-}}
-
-只回覆 JSON，不要加任何其他文字。"""
+    prompt = _VALUATION_PROMPT_TPL.substitute(
+        subject_conditions="\n".join(subject_parts),
+        location_note=location_note,
+        comparables_list="\n".join(comp_lines),
+        comp_count=len(comparables),
+        confidence_label=confidence_label,
+        confidence_score=confidence_score,
+        median_price=median_price,
+        avg_price=avg_price,
+        avg_unit=avg_unit,
+        zone_note=zone_note,
+    )
 
     try:
         import urllib.request
@@ -1605,6 +1594,7 @@ def api_valuation():
         'key_factors':    ai_result.get('key_factors', []),
         'analysis':       ai_result.get('analysis', ''),
         'strategy':       ai_result.get('strategy', ''),
+        'data_warnings':  ai_result.get('data_warnings', []),
         'comparables':    comparables[:10],
         'total_candidates': len(candidates),
         'confidence':     confidence_score,   # 0–100，評估比較案例品質

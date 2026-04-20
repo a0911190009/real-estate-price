@@ -1384,7 +1384,11 @@ function _fillZoneData(d) {
   if (d.building_coverage != null) document.getElementById('val-coverage').value = d.building_coverage;
   if (d.floor_area_ratio   != null) document.getElementById('val-far').value      = d.floor_area_ratio;
   if (d.declared_price     != null) document.getElementById('val-declared-price').value = d.declared_price;
-  if (d.land_area          != null) document.getElementById('val-land-ping').value  = d.land_area;
+  if (d.land_area_m2 > 0) {
+    document.getElementById('val-land-ping').value = Math.round(d.land_area_m2 / 3.30579 * 10) / 10;
+  } else if (d.land_area > 0) {
+    document.getElementById('val-land-ping').value = d.land_area;
+  }
   if (d.lat != null) document.getElementById('val-lat').value = d.lat;
   if (d.lng != null) document.getElementById('val-lng').value = d.lng;
   if (d.use_zone) {
@@ -1575,15 +1579,19 @@ async function fetchFoundiParcel() {
     }
 
     // 更新土地坪數（若尚未填）
-    if (d.land_area > 0 && !document.getElementById('val-land-ping').value) {
-      document.getElementById('val-land-ping').value = d.land_area.toFixed(1);
+    if (!document.getElementById('val-land-ping').value) {
+      if (d.land_area_m2 > 0) {
+        document.getElementById('val-land-ping').value = Math.round(d.land_area_m2 / 3.30579 * 10) / 10;
+      } else if (d.land_area > 0) {
+        document.getElementById('val-land-ping').value = d.land_area.toFixed(1);
+      }
     }
 
     // 顯示補充資訊
     var infoEl = document.getElementById('foundi-parcel-info');
     if (infoEl) {
       var parts = [];
-      if (d.land_area_m2)           parts.push('地坪：' + d.land_area_m2 + '㎡（' + (d.land_area||0).toFixed(1) + '坪）');
+      if (d.land_area_m2) { var _ping = Math.round(d.land_area_m2/3.30579*10)/10; parts.push('地坪：' + d.land_area_m2 + '㎡（' + _ping + '坪）'); }
       if (d.current_value)          parts.push('公告現值：' + d.current_value.toLocaleString() + '元/㎡');
       if (d.building_coverage_area) parts.push('建築面積：' + d.building_coverage_area + '坪');
       if (d.total_floor_area)       parts.push('可用建坪：' + d.total_floor_area + '坪');
@@ -1742,6 +1750,14 @@ function renderValuationReport(d, subject) {
   // 業務議價建議
   document.getElementById('val-strategy').textContent = d.strategy || '';
   document.getElementById('val-strategy-section').style.display = d.strategy ? '' : 'none';
+
+  // 資料警示
+  var warnings = d.data_warnings || [];
+  var warnList = document.getElementById('val-warnings-list');
+  warnList.innerHTML = warnings.map(function(w) {
+    return '<li>' + escHtml(w) + '</li>';
+  }).join('');
+  document.getElementById('val-warnings-section').style.display = warnings.length ? '' : 'none';
 
   // 參考案例表格
   var tbody = document.getElementById('val-comp-tbody');
@@ -2291,6 +2307,12 @@ function escHtml(str) {
         <div class="val-section val-print-hide" id="val-strategy-section">
           <div class="val-section-title">💼 業務議價建議（客戶不可見）</div>
           <div class="val-strategy" id="val-strategy"></div>
+        </div>
+
+        <!-- 資料警示（有才顯示） -->
+        <div class="val-section" id="val-warnings-section" style="display:none;">
+          <div class="val-section-title">⚠️ 注意事項</div>
+          <ul id="val-warnings-list" style="margin:0;padding-left:1.2em;line-height:1.8;"></ul>
         </div>
 
         <!-- 參考案例 -->
