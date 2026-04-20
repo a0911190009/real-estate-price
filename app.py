@@ -1544,6 +1544,63 @@ def api_valuation():
     else:
         confidence_score = 0
 
+    # ── Step 2.5：地點統計 — 計算本地 vs 鄉鎮均價，提供 AI 地點加成依據 ──
+    location_stats_text = ""
+    if lat_val and lng_val:
+        nearby_units = []
+        for r in all_data:
+            if (r.get('date') or '') < three_years_ago:
+                continue
+            if '預售屋' in r.get('transaction_type', ''):
+                continue
+            if tx_type and tx_type not in r.get('transaction_type', ''):
+                continue
+            if not (r.get('lat') and r.get('lng')):
+                continue
+            if r.get('unit_price', 0) <= 0:
+                continue
+            dist_m = _haversine_m(lat_val, lng_val, r['lat'], r['lng'])
+            if dist_m <= 1000:
+                nearby_units.append(r['unit_price'])
+
+        district_units = [
+            r['unit_price'] for r in all_data
+            if (r.get('date') or '') >= three_years_ago
+            and (not district or r.get('district') == district)
+            and '預售屋' not in r.get('transaction_type', '')
+            and (not tx_type or tx_type in r.get('transaction_type', ''))
+            and r.get('unit_price', 0) > 0
+        ]
+
+        if nearby_units and district_units:
+            local_avg = round(sum(nearby_units) / len(nearby_units), 1)
+            dist_avg  = round(sum(district_units) / len(district_units), 1)
+            ratio = local_avg / dist_avg if dist_avg > 0 else 1.0
+            if ratio >= 1.3:
+                tier = "明顯高於區域均價（精華路段／蛋黃區）"
+            elif ratio >= 1.1:
+                tier = "高於區域均價（較佳地段）"
+            elif ratio >= 0.9:
+                tier = "接近區域均價（一般地段）"
+            elif ratio >= 0.75:
+                tier = "低於區域均價（較偏遠地段）"
+            else:
+                tier = "明顯低於區域均價（偏遠／非精華區）"
+            location_stats_text = (
+                f"\n- 待估地點方圓1公里同類均價：{local_avg}萬/坪"
+                f"（{len(nearby_units)}筆，近3年）"
+                f"\n- {district or '全縣'}同類均價：{dist_avg}萬/坪"
+                f"（{len(district_units)}筆）"
+                f"\n- 地點相對位階：{tier}（本地/區域比 = {ratio:.2f}）"
+            )
+        elif district_units:
+            dist_avg = round(sum(district_units) / len(district_units), 1)
+            location_stats_text = (
+                f"\n- {district or '全縣'}同類均價：{dist_avg}萬/坪"
+                f"（{len(district_units)}筆）"
+                f"\n- 待估地點方圓1公里成交案例不足，無法計算本地均價"
+            )
+
     # ── Step 3：計算統計數值 ──────────────────────────────────────────
     prices = [r['total_price'] for r in comparables if r.get('total_price', 0) > 0]
     prices.sort()
@@ -1625,6 +1682,7 @@ def api_valuation():
         avg_price=avg_price,
         avg_unit=avg_unit,
         zone_note=zone_note,
+        location_stats=location_stats_text,
     )
 
     try:
