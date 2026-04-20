@@ -494,6 +494,32 @@
     .filter-actions { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
     .filter-actions .btn { padding: 6px 12px; font-size: 0.8rem; }
     .filter-row-full { grid-column: 1 / -1; }
+    /* 建物型態 checkbox 群組 */
+    .bt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; margin-top: 4px; }
+    .bt-grid label { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text); cursor: pointer; white-space: nowrap; }
+    .bt-grid input[type=checkbox] { width: 13px; height: 13px; accent-color: var(--primary); flex-shrink: 0; }
+    /* 多選下拉 */
+    .multi-sel { position: relative; }
+    .multi-sel-btn { width: 100%; text-align: left; padding: 5px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+    .multi-sel-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .multi-sel-panel { display: none; position: absolute; left: 0; right: 0; top: 100%; z-index: 2000; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.18); max-height: 220px; overflow-y: auto; padding: 4px 0; }
+    .multi-sel-panel.open { display: block; }
+    .multi-sel-panel label { display: flex; align-items: center; gap: 8px; padding: 5px 12px; cursor: pointer; font-size: 0.8rem; color: var(--text); }
+    .multi-sel-panel label:hover { background: var(--surface2); }
+    .multi-sel-panel .ms-divider { border-top: 1px solid var(--border); margin: 3px 0; }
+    /* 使用分區區塊 */
+    .zone-toggles { display: flex; gap: 12px; margin-bottom: 6px; }
+    .zone-toggles label { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; cursor: pointer; }
+    .zone-sub { display: none; }
+    .zone-sub.show { display: block; }
+    .zone-sub label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; margin-top: 6px; display: block; }
+    /* 方圓範圍 */
+    .radius-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .radius-options label { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; cursor: pointer; }
+    .radius-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: none; }
+    .radius-hint.show { display: block; }
+    .radius-center-info { font-size: 0.75rem; color: var(--primary); margin-top: 4px; display: none; }
+    .radius-center-info.show { display: flex; align-items: center; gap: 6px; }
 
     /* 響應式：小螢幕 */
     @media (max-width: 700px) {
@@ -746,7 +772,7 @@
     <!-- 進階篩選（預設收合） -->
     <div id="filter-bar" class="filter-bar collapsed">
       <div class="filter-toggle" onclick="toggleFilter()">
-        <span class="arrow">▼</span> 進階篩選（鄉鎮、類型、總價、坪數、排序）
+        <span class="arrow">▼</span> 進階篩選（鄉鎮、類型、總價、坪數、建物型態、使用分區、方圓範圍）
       </div>
       <div class="filter-fields">
         <div>
@@ -788,6 +814,105 @@
             <option value="unit_asc">單價 低→高</option>
           </select>
         </div>
+        <!-- 建物型態 -->
+        <div class="filter-row-full">
+          <label>建物型態</label>
+          <div class="bt-grid">
+            <label><input type="checkbox" class="bt-cb" value="公寓"> 公寓</label>
+            <label><input type="checkbox" class="bt-cb" value="店面"> 店面(店鋪)</label>
+            <label><input type="checkbox" class="bt-cb" value="透天厝"> 透天厝</label>
+            <label><input type="checkbox" class="bt-cb" value="辦公商業大樓"> 辦公商業大樓</label>
+            <label><input type="checkbox" class="bt-cb" value="華廈"> 華廈</label>
+            <label><input type="checkbox" class="bt-cb" value="住宅大樓"> 住宅大樓</label>
+            <label><input type="checkbox" class="bt-cb" value="套房"> 套房</label>
+            <label><input type="checkbox" class="bt-cb" value="工廠"> 工廠</label>
+            <label><input type="checkbox" class="bt-cb" value="廠辦"> 廠辦</label>
+            <label><input type="checkbox" class="bt-cb" value="農舍"> 農舍</label>
+            <label><input type="checkbox" class="bt-cb" value="倉庫"> 倉庫</label>
+            <label><input type="checkbox" class="bt-cb" value="土地"> 土地（純）</label>
+          </div>
+        </div>
+
+        <!-- 使用分區 -->
+        <div class="filter-row-full">
+          <label>使用分區</label>
+          <div class="zone-toggles">
+            <label><input type="checkbox" id="toggle-urban" onchange="onZoneToggle()"> 都市土地</label>
+            <label><input type="checkbox" id="toggle-non-urban" onchange="onZoneToggle()"> 非都市土地</label>
+          </div>
+          <!-- 都市 -->
+          <div id="zone-urban-sub" class="zone-sub">
+            <div class="multi-sel" id="ms-urban">
+              <button type="button" class="multi-sel-btn" onclick="toggleMultiSel('ms-urban')"><span id="ms-urban-label">請選擇</span>▾</button>
+              <div class="multi-sel-panel" id="ms-urban-panel">
+                <label><input type="checkbox" class="ms-cb" data-group="urban" value="__all__"> 全選</label>
+                <div class="ms-divider"></div>
+                <label><input type="checkbox" class="ms-cb" data-group="urban" value="住"> 住宅區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="urban" value="商"> 商業區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="urban" value="工"> 工業區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="urban" value="農"> 農業區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="urban" value="其他"> 其他</label>
+              </div>
+            </div>
+          </div>
+          <!-- 非都市 -->
+          <div id="zone-non-urban-sub" class="zone-sub">
+            <div class="zone-sub-label" style="font-size:0.75rem;color:var(--text-muted);margin:6px 0 2px;">使用分區</div>
+            <div class="multi-sel" id="ms-nuz">
+              <button type="button" class="multi-sel-btn" onclick="toggleMultiSel('ms-nuz')"><span id="ms-nuz-label">請選擇</span>▾</button>
+              <div class="multi-sel-panel" id="ms-nuz-panel">
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="__all__"> 全選</label>
+                <div class="ms-divider"></div>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="特定農業區"> 特定農業區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="一般農業區"> 一般農業區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="鄉村區"> 鄉村區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="山坡地保育區"> 山坡地保育區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="森林區"> 森林區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="風景區"> 風景區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="工業區"> 工業區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="特定專用區"> 特定專用區</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuz" value="河川區"> 河川區</label>
+              </div>
+            </div>
+            <div class="zone-sub-label" style="font-size:0.75rem;color:var(--text-muted);margin:6px 0 2px;">使用編定</div>
+            <div class="multi-sel" id="ms-nuu">
+              <button type="button" class="multi-sel-btn" onclick="toggleMultiSel('ms-nuu')"><span id="ms-nuu-label">請選擇</span>▾</button>
+              <div class="multi-sel-panel" id="ms-nuu-panel">
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="__all__"> 全選</label>
+                <div class="ms-divider"></div>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="甲種建築用地"> 甲種建築用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="乙種建築用地"> 乙種建築用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="丙種建築用地"> 丙種建築用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="丁種建築用地"> 丁種建築用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="農牧用地"> 農牧用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="林業用地"> 林業用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="養殖用地"> 養殖用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="水利用地"> 水利用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="交通用地"> 交通用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="特定目的事業用地"> 特定目的事業用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="遊憩用地"> 遊憩用地</label>
+                <label><input type="checkbox" class="ms-cb" data-group="nuu" value="殯葬用地"> 殯葬用地</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 方圓範圍 -->
+        <div class="filter-row-full">
+          <label>方圓範圍</label>
+          <div class="radius-options">
+            <label><input type="radio" name="radius" value="" checked onchange="onRadiusChange()"> 不限</label>
+            <label><input type="radio" name="radius" value="1" onchange="onRadiusChange()"> 1 km</label>
+            <label><input type="radio" name="radius" value="2.5" onchange="onRadiusChange()"> 2.5 km</label>
+            <label><input type="radio" name="radius" value="5" onchange="onRadiusChange()"> 5 km</label>
+          </div>
+          <div id="radius-hint" class="radius-hint">點地圖任一位置設定搜尋中心點</div>
+          <div id="radius-center-info" class="radius-center-info">
+            <span id="radius-center-text"></span>
+            <button type="button" onclick="clearRadiusCenter()" style="font-size:0.72rem;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:none;cursor:pointer;color:var(--text-muted);">清除</button>
+          </div>
+        </div>
+
         <div class="filter-row-full filter-actions">
           <button type="button" class="btn btn-primary" onclick="doSearch()">查詢</button>
           <button type="button" class="btn btn-ghost" onclick="clearFilter()">清除篩選</button>
@@ -924,9 +1049,136 @@ var _results = [];        // 目前查詢結果
     if (e.key === 'Enter') doSearch();
   });
 
+  // 地圖點擊設定方圓範圍中心點
+  _map.on('click', function(e) {
+    var km = (document.querySelector('input[name="radius"]:checked') || {value:''}).value;
+    if (!km) return; // 未選半徑則忽略點擊
+    _radiusCenter = { lat: e.latlng.lat, lng: e.latlng.lng };
+    _updateRadiusCircle(km);
+    var infoEl = document.getElementById('radius-center-info');
+    document.getElementById('radius-center-text').textContent =
+      '中心：' + e.latlng.lat.toFixed(5) + ', ' + e.latlng.lng.toFixed(5);
+    infoEl.classList.add('show');
+    document.getElementById('radius-hint').classList.remove('show');
+  });
+
   // 進入頁面時自動查詢一筆，載入臺東資料與篩選選項
   doSearch();
 })();
+
+// ── 多選下拉 helper ───────────────────────────────────────────────────
+var _msOpen = null; // 目前開著的多選下拉 id
+
+function toggleMultiSel(id) {
+  var panel = document.getElementById(id + '-panel');
+  if (!panel) return;
+  var isOpen = panel.classList.contains('open');
+  // 關閉其他
+  if (_msOpen && _msOpen !== id) {
+    var other = document.getElementById(_msOpen + '-panel');
+    if (other) other.classList.remove('open');
+  }
+  panel.classList.toggle('open', !isOpen);
+  _msOpen = isOpen ? null : id;
+}
+
+// 點外部關閉所有多選下拉
+document.addEventListener('click', function(e) {
+  if (_msOpen && !e.target.closest('.multi-sel')) {
+    var p = document.getElementById(_msOpen + '-panel');
+    if (p) p.classList.remove('open');
+    _msOpen = null;
+  }
+});
+
+// 多選下拉勾選（含全選邏輯）
+document.addEventListener('change', function(e) {
+  var cb = e.target;
+  if (!cb.classList.contains('ms-cb')) return;
+  var group = cb.dataset.group;
+  var all = document.querySelectorAll('.ms-cb[data-group="' + group + '"]');
+  var allCb = document.querySelector('.ms-cb[data-group="' + group + '"][value="__all__"]');
+  if (cb.value === '__all__') {
+    all.forEach(function(c) { c.checked = cb.checked; });
+  } else {
+    var items = Array.from(all).filter(function(c) { return c.value !== '__all__'; });
+    if (allCb) allCb.checked = items.every(function(c) { return c.checked; });
+  }
+  updateMultiSelLabel(group);
+});
+
+function updateMultiSelLabel(group) {
+  var groupMap = { urban: 'ms-urban', nuz: 'ms-nuz', nuu: 'ms-nuu' };
+  var msId = groupMap[group];
+  if (!msId) return;
+  var items = Array.from(document.querySelectorAll('.ms-cb[data-group="' + group + '"]'))
+    .filter(function(c) { return c.value !== '__all__' && c.checked; });
+  var labelEl = document.getElementById(msId + '-label');
+  if (!labelEl) return;
+  if (items.length === 0) labelEl.textContent = '請選擇';
+  else if (items.length <= 2) labelEl.textContent = items.map(function(c) { return c.parentElement.textContent.trim(); }).join('、');
+  else labelEl.textContent = '已選 ' + items.length + ' 項';
+}
+
+function getMultiSelValues(group) {
+  return Array.from(document.querySelectorAll('.ms-cb[data-group="' + group + '"]:checked'))
+    .filter(function(c) { return c.value !== '__all__'; })
+    .map(function(c) { return c.value; });
+}
+
+// ── 使用分區 toggle ───────────────────────────────────────────────────
+function onZoneToggle() {
+  var urban = document.getElementById('toggle-urban').checked;
+  var nonUrban = document.getElementById('toggle-non-urban').checked;
+  document.getElementById('zone-urban-sub').classList.toggle('show', urban);
+  document.getElementById('zone-non-urban-sub').classList.toggle('show', nonUrban);
+}
+
+// ── 方圓範圍 ─────────────────────────────────────────────────────────
+var _radiusCenter = null;   // {lat, lng}
+var _radiusCircle = null;   // Leaflet circle
+var _radiusMarker = null;   // Leaflet marker
+
+function onRadiusChange() {
+  var r = document.querySelector('input[name="radius"]:checked');
+  var km = r ? r.value : '';
+  var hint = document.getElementById('radius-hint');
+  var centerInfo = document.getElementById('radius-center-info');
+  if (km) {
+    hint.classList.add('show');
+    if (_radiusCenter) _updateRadiusCircle(km);
+  } else {
+    hint.classList.remove('show');
+    clearRadiusCenter();
+  }
+  if (!_radiusCenter) centerInfo.classList.remove('show');
+}
+
+function _updateRadiusCircle(km) {
+  if (!_map || !_radiusCenter) return;
+  var radiusM = parseFloat(km) * 1000;
+  if (_radiusCircle) _map.removeLayer(_radiusCircle);
+  _radiusCircle = L.circle([_radiusCenter.lat, _radiusCenter.lng], {
+    radius: radiusM,
+    color: 'var(--primary)',
+    fillColor: 'var(--primary)',
+    fillOpacity: 0.08,
+    weight: 2,
+  }).addTo(_map);
+  if (_radiusMarker) _map.removeLayer(_radiusMarker);
+  _radiusMarker = L.circleMarker([_radiusCenter.lat, _radiusCenter.lng], {
+    radius: 6, color: 'var(--primary)', fillColor: 'var(--primary)', fillOpacity: 1, weight: 2,
+  }).addTo(_map);
+}
+
+function clearRadiusCenter() {
+  _radiusCenter = null;
+  if (_radiusCircle) { _map.removeLayer(_radiusCircle); _radiusCircle = null; }
+  if (_radiusMarker) { _map.removeLayer(_radiusMarker); _radiusMarker = null; }
+  document.getElementById('radius-center-info').classList.remove('show');
+  document.getElementById('radius-hint').classList.toggle('show',
+    !!(document.querySelector('input[name="radius"]:checked') || {value:''}).value);
+}
 
 // ── 執行搜尋 ──────────────────────────────────────────────────────────
 function doSearch() {
@@ -939,6 +1191,17 @@ function doSearch() {
   var maxPing = document.getElementById('filter-max-ping') ? document.getElementById('filter-max-ping').value.trim() : '';
   var sort = document.getElementById('filter-sort') ? document.getElementById('filter-sort').value : 'date_desc';
 
+  // 建物型態
+  var buildingTypes = Array.from(document.querySelectorAll('.bt-cb:checked')).map(function(c) { return c.value; });
+  // 使用分區
+  var filterUrban = document.getElementById('toggle-urban').checked;
+  var filterNonUrban = document.getElementById('toggle-non-urban').checked;
+  var urbanZones = filterUrban ? getMultiSelValues('urban') : [];
+  var nonUrbanZones = filterNonUrban ? getMultiSelValues('nuz') : [];
+  var nonUrbanUses = filterNonUrban ? getMultiSelValues('nuu') : [];
+  // 方圓範圍
+  var radiusKm = (document.querySelector('input[name="radius"]:checked') || {value:''}).value;
+
   var body = { query: query, sort: sort, limit: 200 };
   if (district) body.district = district;
   if (transactionType) body.transaction_type = transactionType;
@@ -946,6 +1209,10 @@ function doSearch() {
   if (maxPrice !== '') body.max_price = parseFloat(maxPrice);
   if (minPing !== '') body.min_ping = parseFloat(minPing);
   if (maxPing !== '') body.max_ping = parseFloat(maxPing);
+  if (buildingTypes.length) body.building_types = buildingTypes;
+  if (filterUrban) { body.filter_urban = true; if (urbanZones.length) body.urban_zones = urbanZones; }
+  if (filterNonUrban) { body.filter_non_urban = true; if (nonUrbanZones.length) body.non_urban_zones = nonUrbanZones; if (nonUrbanUses.length) body.non_urban_uses = nonUrbanUses; }
+  if (_radiusCenter && radiusKm) { body.center_lat = _radiusCenter.lat; body.center_lng = _radiusCenter.lng; body.radius_km = parseFloat(radiusKm); }
 
   setLoadingState(true);
 
@@ -1009,6 +1276,21 @@ function clearFilter() {
   document.getElementById('filter-min-ping').value = '';
   document.getElementById('filter-max-ping').value = '';
   document.getElementById('filter-sort').value = 'date_desc';
+  // 清除建物型態
+  document.querySelectorAll('.bt-cb').forEach(function(c) { c.checked = false; });
+  // 清除使用分區
+  document.getElementById('toggle-urban').checked = false;
+  document.getElementById('toggle-non-urban').checked = false;
+  document.querySelectorAll('.ms-cb').forEach(function(c) { c.checked = false; });
+  ['ms-urban-label','ms-nuz-label','ms-nuu-label'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.textContent = '請選擇';
+  });
+  onZoneToggle();
+  // 清除方圓範圍
+  var noLimit = document.querySelector('input[name="radius"][value=""]');
+  if (noLimit) noLimit.checked = true;
+  clearRadiusCenter();
+  document.getElementById('radius-hint').classList.remove('show');
   doSearch();
 }
 

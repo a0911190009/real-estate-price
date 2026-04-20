@@ -8,7 +8,10 @@
 real-estate-price/
 ├── app.py                  # Flask 後端（所有 API）
 ├── static/index.html       # 前端 UI（Leaflet 地圖 + 篩選面板）
+├── prompts/
+│   └── valuation.txt       # AI 估價 prompt 模板（string.Template，$placeholder 格式）
 ├── update_price_data.py    # 本機更新腳本：解析 ZIP/CSV → 合併 → 上傳 GCS
+├── geocode_price_data.py   # 本機補座標腳本：地號 → Easymap → lat/lng → 上傳 GCS
 ├── parse_csv.py            # 舊版本機解析腳本（全台，備用）
 ├── Dockerfile
 ├── requirements.txt

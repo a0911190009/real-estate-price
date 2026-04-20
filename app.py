@@ -770,6 +770,18 @@ def api_search():
     max_ping = body.get("max_ping")
     sort_by = (body.get("sort") or "date_desc").strip()
     limit = min(int(body.get("limit") or 100), 500)
+    # 建物型態（多選，"土地" 為特殊值 → 篩 transaction_type='土地'）
+    building_types = body.get("building_types") or []
+    # 使用分區（都市 / 非都市）
+    filter_urban = bool(body.get("filter_urban"))
+    urban_zones = body.get("urban_zones") or []          # ["住","商","工","農","其他"]
+    filter_non_urban = bool(body.get("filter_non_urban"))
+    non_urban_zones = body.get("non_urban_zones") or []  # ["特定農業區", ...]
+    non_urban_uses  = body.get("non_urban_uses")  or []  # ["農牧用地", ...]
+    # 方圓範圍
+    center_lat = body.get("center_lat")
+    center_lng = body.get("center_lng")
+    radius_km  = body.get("radius_km")
 
     # 讀取資料
     all_data = _load_price_data()
@@ -804,6 +816,64 @@ def api_search():
             continue
         if max_ping is not None and ping > float(max_ping):
             continue
+
+        # 建物型態多選
+        if building_types:
+            _BT_FULL = {
+                "公寓": "公寓(5樓含以下無電梯)",
+                "透天厝": "透天厝",
+                "華廈": "華廈(10層含以下有電梯)",
+                "住宅大樓": "住宅大樓(11層含以上有電梯)",
+                "套房": "套房(1房1廳1衛)",
+                "店面": "店面(店鋪)",
+                "農舍": "農舍",
+                "辦公商業大樓": "辦公商業大樓",
+                "廠辦": "廠辦",
+                "工廠": "工廠",
+                "倉庫": "倉庫",
+            }
+            has_land  = "土地" in building_types
+            bt_values = [_BT_FULL[b] for b in building_types if b in _BT_FULL]
+            r_bt = r.get("building_type", "").strip()
+            r_tx = r.get("transaction_type", "").strip()
+            if not ((has_land and r_tx == "土地") or (bt_values and r_bt in bt_values)):
+                continue
+
+        # 使用分區：都市土地
+        if filter_urban:
+            r_uz = (r.get("urban_zone") or "").strip()
+            if not r_uz:
+                continue  # 非都市土地，排除
+            if urban_zones:
+                matched = False
+                for z in urban_zones:
+                    if z == "其他":
+                        if not any(c in r_uz for c in ("住", "商", "工", "農")):
+                            matched = True; break
+                    elif z in r_uz:
+                        matched = True; break
+                if not matched:
+                    continue
+
+        # 使用分區：非都市土地
+        if filter_non_urban:
+            r_nuz = (r.get("non_urban_zone") or "").strip()
+            r_nuu = (r.get("non_urban_use")  or "").strip()
+            if not r_nuz and not r_nuu:
+                continue  # 都市土地，排除
+            if non_urban_zones and r_nuz not in non_urban_zones:
+                continue
+            if non_urban_uses and r_nuu not in non_urban_uses:
+                continue
+
+        # 方圓範圍（需有座標）
+        if center_lat is not None and center_lng is not None and radius_km:
+            r_lat = r.get("lat")
+            r_lng = r.get("lng")
+            if not r_lat or not r_lng:
+                continue
+            if _haversine_m(float(center_lat), float(center_lng), r_lat, r_lng) > float(radius_km) * 1000:
+                continue
 
         results.append(r)
 
