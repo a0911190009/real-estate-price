@@ -207,10 +207,65 @@ def gcs_upload(bucket_name, key, data):
         print(f'⚠ GCS 上傳失敗：{e}')
 
 
+# ── 地址解析工具 ──────────────────────────────────────────────────────
+
+def _extract_land_from_addr(address):
+    """
+    從地址文字抽取段名和地號。
+    「南清段226地號」→ ('南清段', '226')
+    「豐榮段1032-3地號」→ ('豐榮段', '1032-3')
+    若格式不符回傳 (None, None)。
+    """
+    m = re.match(r'^(.+?段)\s*(\d+(?:-\d+)?)\s*地號', address or '')
+    if m:
+        return m.group(1), m.group(2)
+    return None, None
+
+
+def _fmt_land_no(raw_no):
+    """
+    將地址文字中的地號轉成 Easymap 使用的 8 碼格式。
+    '226'   → '02260000'  (主號 226，附號 0)
+    '226-3' → '02260003'  (主號 226，附號 3)
+    """
+    if '-' in str(raw_no):
+        parts = raw_no.split('-')
+        main = int(parts[0])
+        sub  = int(parts[1]) if len(parts) > 1 else 0
+    else:
+        main = int(raw_no)
+        sub  = 0
+    return f'{main:04d}{sub:04d}'
+
+
+def _nominatim_geocode(address):
+    """
+    用 Nominatim（OpenStreetMap，免費無需 API key）查門牌地址座標。
+    回傳 {'lat': float, 'lng': float} 或 None。
+    """
+    url = 'https://nominatim.openstreetmap.org/search'
+    params = {
+        'q': address,
+        'format': 'json',
+        'limit': 1,
+        'countrycodes': 'tw',
+    }
+    headers = {'User-Agent': 'real-estate-price-geocoder/1.0'}
+    try:
+        resp = requests.get(url, params=params, headers=headers, timeout=10)
+        results = resp.json()
+        if results:
+            return {'lat': float(results[0]['lat']), 'lng': float(results[0]['lon'])}
+    except Exception as e:
+        print(f'    ⚠ Nominatim 查詢失敗：{e}')
+    return None
+
+
 # ── 主程式 ────────────────────────────────────────────────────────────
 
 def main():
-    dry_run = '--dry-run' in sys.argv
+    dry_run  = '--dry-run' in sys.argv
+    addr_mode = '--addr' in sys.argv   # 門牌地址模式（Nominatim）
 
     # 讀取資料
     if GCS_BUCKET:
@@ -223,43 +278,70 @@ def main():
         print(f'錯誤：找不到 {LOCAL_PATH}，請先執行 update_price_data.py')
         sys.exit(1)
 
-    # 篩選需要補座標的紀錄：lat 為 null 且有地號資料
-    need = [r for r in records
-            if r.get('lat') is None
-            and r.get('land_sect', '').strip()
-            and r.get('land_no', '').strip()]
+    if addr_mode:
+        _run_addr_mode(records, dry_run)
+    else:
+        _run_land_mode(records, dry_run)
+
+
+def _run_land_mode(records, dry_run):
+    """
+    Phase 1：地號模式（Easymap）。
+    同時處理：
+      (a) land_sect + land_no 已有欄位的紀錄
+      (b) address 欄位內嵌地號文字（如「南清段226地號」）的紀錄
+    """
+    need = []
+    for r in records:
+        if r.get('lat') is not None:
+            continue
+        if r.get('land_sect', '').strip() and r.get('land_no', '').strip():
+            # 欄位已有地號資料，直接加入
+            need.append(r)
+        else:
+            # 嘗試從 address 文字抽取地號
+            sect, raw_no = _extract_land_from_addr(r.get('address', ''))
+            if sect and raw_no:
+                r['_addr_sect']    = sect
+                r['_addr_land_no'] = _fmt_land_no(raw_no)
+                need.append(r)
 
     print(f'總筆數：{len(records)}')
-    print(f'已有座標：{len(records) - len(need)} 筆（略過）')
-    print(f'待補座標：{len(need)} 筆')
+    print(f'已有座標：{sum(1 for r in records if r.get("lat") is not None)} 筆（略過）')
+    print(f'待補座標（地號）：{len(need)} 筆')
+    addr_embedded = sum(1 for r in need if r.get('_addr_sect'))
+    if addr_embedded:
+        print(f'  其中從 address 欄位抽取地號：{addr_embedded} 筆')
 
     if dry_run:
         print('--dry-run：不執行查詢')
-        # 統計不重複的查詢鍵
-        keys = {(r['district'], r['land_sect'], r['land_no']) for r in need}
-        print(f'不重複查詢組合：{len(keys)} 個（實際呼叫 Easymap 次數）')
+        keys = set()
+        for r in need:
+            sect    = r.get('land_sect') or r.get('_addr_sect', '')
+            land_no = r.get('land_no')   or r.get('_addr_land_no', '')
+            keys.add((r.get('district', ''), sect, land_no))
+        print(f'不重複查詢組合：{len(keys)} 個')
         print(f'預估耗時：約 {len(keys) * DELAY_SEC / 60:.1f} 分鐘')
         return
 
     if not need:
         print('無需補座標，結束。')
+        _save(records)
         return
 
-    # 建立 Easymap 爬蟲
     crawler = EasymapCrawler()
     print('\n初始化 Easymap session...')
     crawler.init()
 
-    # 以 (鄉鎮, 段名, 地號) 為 key 快取結果，相同組合只查一次
     coord_cache = {}
     updated = 0
-    failed = 0
+    failed  = 0
 
     print(f'開始補座標（每筆間隔 {DELAY_SEC}s）...\n')
     for i, r in enumerate(need):
         district = r.get('district', '')
-        sect = r['land_sect']
-        land_no = r['land_no']
+        sect     = r.get('land_sect') or r.get('_addr_sect', '')
+        land_no  = r.get('land_no')   or r.get('_addr_land_no', '')
         cache_key = (district, sect, land_no)
 
         if cache_key not in coord_cache:
@@ -267,18 +349,25 @@ def main():
             coords = crawler.get_coordinates('臺東縣', district, sect, land_no)
             coord_cache[cache_key] = coords
             status = f'lat={coords["lat"]:.5f}, lng={coords["lng"]:.5f}' if coords else '查無座標'
-            print(f'  [{i+1}/{len(need)}] {district} {sect} {land_no} → {status}')
+            suffix = '（從 address 抽取）' if r.get('_addr_sect') else ''
+            print(f'  [{i+1}/{len(need)}] {district} {sect} {land_no} → {status}{suffix}')
         else:
             coords = coord_cache[cache_key]
 
         if coords:
             r['lat'] = coords['lat']
             r['lng'] = coords['lng']
+            # 若是從 address 抽取到的，順便補回欄位
+            if r.get('_addr_sect'):
+                r['land_sect'] = r.pop('_addr_sect')
+                r['land_no']   = r.pop('_addr_land_no')
             updated += 1
         else:
+            # 清除暫存欄位
+            r.pop('_addr_sect', None)
+            r.pop('_addr_land_no', None)
             failed += 1
 
-        # 每 50 筆重新初始化 session，避免 token 過期
         if (i + 1) % 50 == 0:
             print(f'\n  重新初始化 Easymap session（第 {i+1} 筆）...')
             try:
@@ -287,12 +376,61 @@ def main():
                 print(f'  ⚠ 重新初始化失敗：{e}，繼續使用舊 session')
 
     print(f'\n已補座標：{updated} 筆，查無結果：{failed} 筆')
+    _save(records)
 
-    # 儲存
+
+def _run_addr_mode(records, dry_run):
+    """
+    Phase 2：門牌地址模式（Nominatim，OpenStreetMap，免費）。
+    用法：python3 geocode_price_data.py --addr
+    處理仍無座標且地址含門牌號碼（含「號」）的紀錄。
+    注意：Nominatim 每秒 1 次限制，與 DELAY_SEC 相同。
+    """
+    need = [r for r in records
+            if r.get('lat') is None
+            and re.search(r'\d+號', r.get('address', ''))]
+
+    print(f'總筆數：{len(records)}')
+    print(f'已有座標：{sum(1 for r in records if r.get("lat") is not None)} 筆（略過）')
+    print(f'待補座標（門牌地址）：{len(need)} 筆')
+
+    if dry_run:
+        print('--dry-run：不執行查詢')
+        print(f'預估耗時：約 {len(need) * DELAY_SEC / 60:.1f} 分鐘')
+        return
+
+    if not need:
+        print('無需補門牌座標，結束。')
+        return
+
+    updated = 0
+    failed  = 0
+    print(f'\n開始補門牌座標（Nominatim，每筆間隔 {DELAY_SEC}s）...\n')
+    for i, r in enumerate(need):
+        addr = r.get('address', '')
+        # 確保地址含縣市前綴，提高 Nominatim 準確率
+        if '臺東' not in addr and '台東' not in addr:
+            addr = f'臺東縣{r.get("district", "")}{addr}'
+        time.sleep(DELAY_SEC)
+        coords = _nominatim_geocode(addr)
+        status = f'lat={coords["lat"]:.5f}, lng={coords["lng"]:.5f}' if coords else '查無座標'
+        print(f'  [{i+1}/{len(need)}] {addr} → {status}')
+        if coords:
+            r['lat'] = coords['lat']
+            r['lng'] = coords['lng']
+            updated += 1
+        else:
+            failed += 1
+
+    print(f'\n已補座標：{updated} 筆，查無結果：{failed} 筆')
+    _save(records)
+
+
+def _save(records):
+    """儲存本地並上傳 GCS。"""
     with open(LOCAL_PATH, 'w', encoding='utf-8') as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
     print(f'已儲存本地：{LOCAL_PATH}')
-
     if GCS_BUCKET:
         gcs_upload(GCS_BUCKET, PRICE_DATA_GCS_KEY, records)
         print('✅ 完成。Cloud Run 最多 1 小時內會載入新資料。')
