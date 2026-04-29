@@ -202,6 +202,25 @@ def _require_user():
     return email, None
 
 
+# ── LOG 工具函式 ──
+def log_event(event_type, user_id="", detail=None):
+    """記錄業務事件，輸出至 Cloud Logging（Cloud Run stdout 自動收集）。"""
+    print(json.dumps({
+        "time": datetime.now(timezone.utc).isoformat(),
+        "event": event_type,   # 事件名稱，例如 "price_search"
+        "user": user_id,
+        "detail": detail or {}
+    }, ensure_ascii=False), flush=True)
+
+
+@app.route("/api/client-log", methods=["POST"])
+def api_client_log():
+    """接收前端 JS 錯誤，記錄至 Cloud Logging。"""
+    data = request.get_json(silent=True) or {}
+    log_event("client_error", detail=data)
+    return jsonify({"ok": True})
+
+
 @app.route("/auth/portal-login", methods=["GET", "POST"])
 def auth_portal_login():
     """Portal 跳轉過來時，驗證 token 建立 session。"""
@@ -764,6 +783,7 @@ def api_search():
     query = (body.get("query") or "").strip()
     district = (body.get("district") or "").strip()
     transaction_type = (body.get("transaction_type") or "").strip()
+    log_event("price_search", user_id=email, detail={"query": query, "district": district})
     min_price = body.get("min_price")   # 萬元
     max_price = body.get("max_price")
     min_ping = body.get("min_ping")     # 坪

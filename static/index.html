@@ -732,6 +732,15 @@
       .val-price-hero { background: #f5f5f5 !important; }
     }
   </style>
+<script>
+/* 前端錯誤自動回報至 Cloud Logging */
+window.onerror = function(msg, src, line, col, err) {
+    fetch('/api/client-log', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'js_error', msg: msg, src: src, line: line, viewport: window.innerWidth + 'x' + window.innerHeight})}).catch(function(){});
+};
+window.addEventListener('unhandledrejection', function(e) {
+    fetch('/api/client-log', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'promise_error', msg: String(e.reason), viewport: window.innerWidth + 'x' + window.innerHeight})}).catch(function(){});
+});
+</script>
 </head>
 <body data-theme="navy-dark">
 <script>
