@@ -1753,6 +1753,10 @@ def api_valuation():
         return jsonify({'error': f'AI 分析失敗：{e}'}), 500
 
     # ── Step 5：組合回傳 ──────────────────────────────────────────────
+    # 記錄 AI 估價完成
+    log_event("price_valuation", user_id=email, detail={
+        "address": address[:50], "district": district, "building_type": bld_type
+    })
     return jsonify({
         'suggested_min':  ai_result.get('suggested_min', 0),
         'suggested_max':  ai_result.get('suggested_max', 0),
