@@ -28,6 +28,11 @@ except Exception:
     pass
 
 app = Flask(__name__)
+
+# 跨工具回饋系統
+from feedback_endpoint import bp as _feedback_bp
+app.register_blueprint(_feedback_bp)
+
 _secret = os.environ.get("FLASK_SECRET_KEY", "")
 if not _secret:
     import logging
